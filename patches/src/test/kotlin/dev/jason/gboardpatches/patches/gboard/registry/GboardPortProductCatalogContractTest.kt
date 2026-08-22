@@ -273,6 +273,24 @@ class GboardPortProductCatalogContractTest {
             listOf("ZHUYIN_TRADITIONAL_SIMPLIFIED_TOGGLE_RUNTIME_PATCH_POPUP_ACTION"),
             popup.getAsJsonArray("runtime_calls").map { it.asString },
         )
+
+        val shotgunGesture = byFeatureId.getValue("shotgun_keyboard")
+            .getAsJsonArray("contributions")
+            .map { it.asJsonObject }
+            .single { it["anchor_family_id"].asString == "gesture_dispatch" }
+        assertEquals(
+            listOf("SHOTGUN_KEYBOARD_RUNTIME_MAYBE_PLAY_SHOTGUN_SOUND"),
+            shotgunGesture.getAsJsonArray("runtime_calls").map { it.asString },
+        )
+        assertEquals(
+            setOf(
+                "gesture_dispatch",
+                "gesture_dispatcher_type",
+                "gesture_stock_delegate_field",
+                "gesture_stock_dispatch",
+            ),
+            shotgunGesture.getAsJsonArray("required_bindings").map { it.asString }.toSet(),
+        )
     }
 
     @Test

@@ -46,6 +46,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -2259,6 +2260,9 @@ public final class GboardPatchesSettingsActivity extends Activity
         if (row instanceof GboardPatchesSettingsContract.DetailRow detailRow) {
             return createDetailRow(detailRow);
         }
+        if (row instanceof GboardPatchesSettingsContract.SliderRow sliderRow) {
+            return createSliderRow(sliderRow);
+        }
         if (row instanceof GboardPatchesSettingsContract.DangerRow dangerRow) {
             return createDangerRow(dangerRow);
         }
@@ -2409,6 +2413,66 @@ public final class GboardPatchesSettingsActivity extends Activity
         titleView.setTextColor(rowModel.isEnabled() ? palette.textPrimary : palette.textDisabled);
         summaryView.setTextColor(rowModel.isEnabled() ? palette.textSecondary : palette.textDisabled);
         row.setAlpha(rowModel.isEnabled() ? 1f : 0.92f);
+        return row;
+    }
+
+    private View createSliderRow(GboardPatchesSettingsContract.SliderRow rowModel) {
+        LinearLayout row = buildDetailRowContainer();
+        LinearLayout textColumn = buildRowTextColumn(true);
+        TextView titleView = buildRowTitle(rowModel.getTitle());
+        String currentLabel = rowModel.getCurrentValue() + rowModel.getUnitSuffix();
+        TextView summaryView = buildRowSummary(
+                rowModel.getSummary() != null && !rowModel.getSummary().isEmpty()
+                        ? rowModel.getSummary() + " (" + currentLabel + ")"
+                        : currentLabel, false);
+        textColumn.addView(titleView);
+        textColumn.addView(summaryView);
+        row.addView(textColumn);
+
+        SeekBar seekBar = new SeekBar(this);
+        LinearLayout.LayoutParams seekParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        seekParams.topMargin = dp(8);
+        seekParams.bottomMargin = dp(4);
+        seekBar.setLayoutParams(seekParams);
+        int maxProgress = (rowModel.getMaxValue() - rowModel.getMinValue()) / rowModel.getStep();
+        int initialProgress = (rowModel.getCurrentValue() - rowModel.getMinValue()) / rowModel.getStep();
+        seekBar.setMax(maxProgress);
+        seekBar.setProgress(initialProgress);
+        seekBar.setEnabled(rowModel.isEnabled());
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    int val = rowModel.getMinValue() + progress * rowModel.getStep();
+                    String updatedLabel = val + rowModel.getUnitSuffix();
+                    summaryView.setText(rowModel.getSummary() != null && !rowModel.getSummary().isEmpty()
+                            ? rowModel.getSummary() + " (" + updatedLabel + ")"
+                            : updatedLabel);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar bar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar bar) {
+                int val = rowModel.getMinValue() + bar.getProgress() * rowModel.getStep();
+                try {
+                    backgroundStateExecutor.execute(() -> {
+                        try {
+                            rowModel.getSliderAction().accept(val);
+                        } catch (Throwable throwable) {
+                            Log.w(TAG, "Failed to update slider row value", throwable);
+                        }
+                    });
+                } catch (RejectedExecutionException ignored) {
+                }
+            }
+        });
+        row.addView(seekBar);
         return row;
     }
 

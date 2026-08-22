@@ -2114,4 +2114,124 @@
         <translation locale="en">The feature settings could not be loaded.</translation>
         <translation locale="zh-Hant">目前無法載入這項功能的設定。</translation>
     </string>
+    <string name="gboard_patches_shotgun_keyboard_title">
+        <translation locale="en">Shotgun Keyboard</translation>
+        <translation locale="zh-Hant">散彈槍音效鍵盤</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_summary">
+        <translation locale="en">Play shotgun blast on keypress, and pump on Space / Enter</translation>
+        <translation locale="zh-Hant">打字時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_enabled_title">
+        <translation locale="en">Enable Shotgun sound effects</translation>
+        <translation locale="zh-Hant">啟用散彈槍音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_enabled_summary">
+        <translation locale="en">Play audio feedback on every keypress</translation>
+        <translation locale="zh-Hant">每次按鍵時播放音效反饋</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_section_settings">
+        <translation locale="en">Settings</translation>
+        <translation locale="zh-Hant">設定</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_volume_title">
+        <translation locale="en">Volume</translation>
+        <translation locale="zh-Hant">音量</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_volume_summary">
+        <translation locale="en">Adjust sound effect playback volume</translation>
+        <translation locale="zh-Hant">調整音效播放音量</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_section_pump_keys">
+        <translation locale="en">Pump Sound Keys</translation>
+        <translation locale="zh-Hant">上膛音效按鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_section_pump_keys_summary">
+        <translation locale="en">Choose which special keys trigger the shotgun pump sound</translation>
+        <translation locale="zh-Hant">選擇哪些特殊按鍵觸發散彈槍上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_space_title">
+        <translation locale="en">Spacebar</translation>
+        <translation locale="zh-Hant">空白鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_space_summary">
+        <translation locale="en">Play pump sound on Spacebar</translation>
+        <translation locale="zh-Hant">按下空白鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_enter_title">
+        <translation locale="en">Enter / Action key</translation>
+        <translation locale="zh-Hant">換行 / 送出鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_enter_summary">
+        <translation locale="en">Play pump sound on Enter and action keys</translation>
+        <translation locale="zh-Hant">按下換行與送出鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_backspace_title">
+        <translation locale="en">Backspace</translation>
+        <translation locale="zh-Hant">倒退鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_backspace_summary">
+        <translation locale="en">Play pump sound on Backspace / Delete</translation>
+        <translation locale="zh-Hant">按下倒退鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_shift_title">
+        <translation locale="en">Shift / Caps Lock</translation>
+        <translation locale="zh-Hant">Shift / 大寫鎖定鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_shift_summary">
+        <translation locale="en">Play pump sound on Shift key</translation>
+        <translation locale="zh-Hant">按下 Shift 鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_tab_title">
+        <translation locale="en">Tab key</translation>
+        <translation locale="zh-Hant">Tab 鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_tab_summary">
+        <translation locale="en">Play pump sound on Tab key</translation>
+        <translation locale="zh-Hant">按下 Tab 鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_symbols_title">
+        <translation locale="en">Symbols key (?123)</translation>
+        <translation locale="zh-Hant">符號鍵 (?123)</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_symbols_summary">
+        <translation locale="en">Play pump sound on ?123 symbol switch</translation>
+        <translation locale="zh-Hant">切換 ?123 符號鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_globe_title">
+        <translation locale="en">Language / Globe key</translation>
+        <translation locale="zh-Hant">語言 / 地球鍵</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_pump_globe_summary">
+        <translation locale="en">Play pump sound on language switch key</translation>
+        <translation locale="zh-Hant">切換語言鍵時播放上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_test_sound_title">
+        <translation locale="en">Sound Test</translation>
+        <translation locale="zh-Hant">測試音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_test_blast_title">
+        <translation locale="en">Test Blast Sound</translation>
+        <translation locale="zh-Hant">測試開火音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_test_blast_summary">
+        <translation locale="en">Play a sample shotgun blast sound</translation>
+        <translation locale="zh-Hant">播放散彈槍開火音效範例</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_test_pump_title">
+        <translation locale="en">Test Pump Sound</translation>
+        <translation locale="zh-Hant">測試上膛音效</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_test_pump_summary">
+        <translation locale="en">Play a sample shotgun pump sound</translation>
+        <translation locale="zh-Hant">播放散彈槍上膛音效範例</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_error_title">
+        <translation locale="en">Shotgun Keyboard unavailable</translation>
+        <translation locale="zh-Hant">無法載入散彈槍音效設定</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_error_summary">
+        <translation locale="en">The feature settings could not be loaded.</translation>
+        <translation locale="zh-Hant">目前無法載入這項功能的設定。</translation>
+    </string>
 </settings-text>

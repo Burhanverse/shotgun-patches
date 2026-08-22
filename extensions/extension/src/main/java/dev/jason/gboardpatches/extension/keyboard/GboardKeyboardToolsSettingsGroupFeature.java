@@ -12,6 +12,7 @@ import dev.jason.gboardpatches.extension.ocr.GboardOcrSettingsFeature;
 import dev.jason.gboardpatches.extension.settings.GboardFeatureGroup;
 import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsContract;
 import dev.jason.gboardpatches.extension.settings.GboardSettingsText;
+import dev.jason.gboardpatches.extension.shotgunkeyboard.GboardShotgunKeyboardSettingsFeature;
 import dev.jason.gboardpatches.extension.toprowswipe.GboardTopRowSwipeSettingsFeature;
 
 public final class GboardKeyboardToolsSettingsGroupFeature
@@ -32,6 +33,7 @@ public final class GboardKeyboardToolsSettingsGroupFeature
                 GboardSettingsText.get(context,
                         R.string.gboard_patches_group_keyboard_empty_summary),
                 Arrays.asList(
+                        new GboardShotgunKeyboardSettingsFeature(context),
                         new GboardTopRowSwipeSettingsFeature(context),
                         new GboardManualIncognitoSettingsFeature(context),
                         new GboardLongPressQuickActionsSettingsFeature(context),

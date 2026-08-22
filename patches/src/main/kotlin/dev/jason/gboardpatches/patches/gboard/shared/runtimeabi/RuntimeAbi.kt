@@ -79,6 +79,7 @@ internal enum class RuntimeCallId(internal val encodedAbi: String) {
     RAMBLER_RUNTIME_EXIT_DEFAULT_SELECTION_SUPPRESSION("Ldev/jason/gboardpatches/extension/rambler/GboardRambler1803OfficialSelectionRuntime;->exitDefaultSelectionSuppression()V"),
     RAMBLER_RUNTIME_EXIT_VOICE_SETTINGS_SCOPE("Ldev/jason/gboardpatches/extension/rambler/GboardRambler1803OfficialSelectionRuntime;->exitVoiceSettingsScope()V"),
     RAMBLER_RUNTIME_UPDATE_OFFICIAL_SELECTION("Ldev/jason/gboardpatches/extension/rambler/GboardRambler1803OfficialSelectionRuntime;->updateOfficialSelection(Z)V"),
+    SHOTGUN_KEYBOARD_RUNTIME_MAYBE_PLAY_SHOTGUN_SOUND("Ldev/jason/gboardpatches/extension/shotgunkeyboard/GboardShotgunKeyboardRuntime;->maybePlayShotgunSound(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z"),
     SETTINGS_HOMEPAGE_RUNTIME_APPLY_SETTINGS_HOMEPAGE_POLICY("Ldev/jason/gboardpatches/extension/settingshomepage/GboardSettingsHomepageRuntime;->applySettingsHomepagePolicy(Ljava/lang/Object;)V"),
     SPLIT_KEYBOARD_RUNTIME_APPLY_ACCESS_POINT_STATE("Ldev/jason/gboardpatches/extension/splitkeyboard/GboardSplitKeyboard1803Runtime;->applyAccessPointState(Ljava/lang/String;I)I"),
     SPLIT_KEYBOARD_RUNTIME_AFTER_MODE_ENVIRONMENT_CHANGED("Ldev/jason/gboardpatches/extension/splitkeyboard/GboardSplitKeyboard1803Runtime;->afterModeEnvironmentChanged(Ljava/lang/Object;)V"),

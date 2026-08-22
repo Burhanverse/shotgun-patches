@@ -228,6 +228,10 @@ public final class GboardPatchesSettingsContract {
         void accept(boolean value);
     }
 
+    public interface SliderAction {
+        void accept(int value);
+    }
+
     public enum PreviewLayout {
         SIDE_BY_SIDE,
         STACKED
@@ -674,6 +678,57 @@ public final class GboardPatchesSettingsContract {
 
         public Runnable getAction() {
             return action;
+        }
+    }
+
+    public static class SliderRow extends Row {
+        private final int currentValue;
+        private final int minValue;
+        private final int maxValue;
+        private final int step;
+        private final String unitSuffix;
+        private final SliderAction sliderAction;
+
+        public SliderRow(CharSequence title, String summary, boolean enabled,
+                int currentValue, int minValue, int maxValue, int step, String unitSuffix,
+                SliderAction sliderAction) {
+            this(title, summary, enabled, currentValue, minValue, maxValue, step, unitSuffix, sliderAction, null);
+        }
+
+        public SliderRow(CharSequence title, String summary, boolean enabled,
+                int currentValue, int minValue, int maxValue, int step, String unitSuffix,
+                SliderAction sliderAction, PreviewSpec previewSpec) {
+            super(title, summary, enabled, previewSpec);
+            this.currentValue = currentValue;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.step = step <= 0 ? 1 : step;
+            this.unitSuffix = unitSuffix == null ? "" : unitSuffix;
+            this.sliderAction = sliderAction;
+        }
+
+        public int getCurrentValue() {
+            return currentValue;
+        }
+
+        public int getMinValue() {
+            return minValue;
+        }
+
+        public int getMaxValue() {
+            return maxValue;
+        }
+
+        public int getStep() {
+            return step;
+        }
+
+        public String getUnitSuffix() {
+            return unitSuffix;
+        }
+
+        public SliderAction getSliderAction() {
+            return sliderAction;
         }
     }
 

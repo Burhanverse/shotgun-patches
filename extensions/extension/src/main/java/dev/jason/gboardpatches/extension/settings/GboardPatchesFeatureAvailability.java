@@ -61,6 +61,8 @@ public final class GboardPatchesFeatureAvailability {
             "dev.jason.gboardpatches.feature.accessibility_layout";
     public static final String FEATURE_SPACEBAR_LOGO =
             "dev.jason.gboardpatches.feature.spacebar_logo";
+    public static final String FEATURE_SHOTGUN_KEYBOARD =
+            "dev.jason.gboardpatches.feature.shotgun_keyboard";
 
     private static final String TAG = "GboardPatches";
 

@@ -58,6 +58,8 @@ import dev.jason.gboardpatches.patches.gboard.features.splitkeyboard.gboardSplit
 import dev.jason.gboardpatches.patches.gboard.features.spacebarlogo.gboardSpacebarLogoFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.symbolfooter.gboardSymbolFooterOrderBytecodePatch
 import dev.jason.gboardpatches.patches.gboard.features.symbolfooter.gboardSymbolFooterOrderFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.shotgunkeyboard.gboardShotgunKeyboardFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.shotgunkeyboard.gboardShotgunKeyboardGesturePatch
 import dev.jason.gboardpatches.patches.gboard.features.toprowswipe.gboardTopRowSwipeFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingToolsFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803AutoFixAcceptancePatch
@@ -332,6 +334,22 @@ val gboardCustomTopRowSwipePatch = gboardPublicResourcePatch(
     dependsOn(
         gboardPatchesSettingsPatch,
         gboardTopRowSwipeFeatureMarkerPatch,
+    )
+}
+
+@Suppress("unused")
+val gboardShotgunKeyboardPatch = gboardPublicResourcePatch(
+    featureId = "shotgun_keyboard",
+    name = "Shotgun Keyboard",
+    description = "擊鍵時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效\nPlay shotgun blast sound on keystrokes, and pump sound on Space / Enter.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardShotgunKeyboardFeatureMarkerPatch,
+        gboardShotgunKeyboardGesturePatch,
     )
 }
 
@@ -615,6 +633,7 @@ object GboardPublishedPatchCatalog {
         gboardZhuyinQuickTraditionalSimplifiedTogglePatch,
         gboardCustomSymbolsPatch,
         gboardCustomTopRowSwipePatch,
+        gboardShotgunKeyboardPatch,
         gboardDeveloperOptionsPatch,
         gboardSymbolsFooterOrderPatch,
         gboardClipboardEnhancementsPatch,

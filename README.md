@@ -91,6 +91,12 @@ Gboard Patches is a public Morphe source for a curated set of Gboard enhancement
 </details>
 
 <details>
+  <summary><code>Shotgun Keyboard</code></summary>
+
+  Plays realistic low-latency shotgun blast audio effects on typing keystrokes, and pump/cocking sounds on Spacebar, Enter, Backspace, or other customizable keys with volume slider controls.
+</details>
+
+<details>
   <summary><code>Emojis, stickers & GIFs Tab Order</code></summary>
 
 Customize the bottom tab order in Gboard's Emojis, stickers & GIFs panel with drag-and-drop reordering.
