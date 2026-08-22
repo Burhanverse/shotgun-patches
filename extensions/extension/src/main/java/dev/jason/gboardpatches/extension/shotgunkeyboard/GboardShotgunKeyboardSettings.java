@@ -64,12 +64,13 @@ public final class GboardShotgunKeyboardSettings {
         if (current != null) {
             return current;
         }
-        if (context == null) {
+        Context effectiveContext = context != null ? context : GboardShotgunKeyboardRuntime.resolveApplicationContext();
+        if (effectiveContext == null) {
             return new SettingsSnapshot(DEFAULT_ENABLED, DEFAULT_VOLUME, DEFAULT_PUMP_ON_SPACE,
                     DEFAULT_PUMP_ON_ENTER, DEFAULT_PUMP_ON_BACKSPACE, DEFAULT_PUMP_ON_SHIFT,
                     DEFAULT_PUMP_ON_TAB, DEFAULT_PUMP_ON_SYMBOLS, DEFAULT_PUMP_ON_GLOBE);
         }
-        SharedPreferences preferences = GboardPatchesSettings.preferences(context);
+        SharedPreferences preferences = GboardPatchesSettings.preferences(effectiveContext);
         SettingsSnapshot created = readSnapshot(preferences);
         cachedSnapshot = created;
         return created;

@@ -1,3 +1,13 @@
+## [3.0.0-dev.3](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.2...v3.0.0-dev.3) (2026-08-22)
+
+### 🐛 Bug Fixes
+
+* **Shotgun Keyboard:** fix audio resource loading by embedding payload in bytecode, fix playback context resolution, and polish settings UI layout.
+
+### 🐛 問題修復
+
+* **散彈槍音效鍵盤:** 修復音訊資源載入、播放上下文解析並優化設定介面佈局。
+
 ## [3.0.0-dev.2](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2026-08-22)
 
 ### ✨ New Features

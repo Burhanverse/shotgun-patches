@@ -148,14 +148,17 @@ public final class GboardShotgunKeyboardSettingsFeature
 
             List<GboardPatchesSettingsContract.Section> sections = new ArrayList<>();
 
-            // Section 1: Main Toggle & Volume Slider
+            // Section 1: Main Toggle, Volume Slider & Audio Test
             List<GboardPatchesSettingsContract.Row> mainRows = new ArrayList<>();
             mainRows.add(new GboardPatchesSettingsContract.ToggleRow(
                     enabledTitle,
                     enabledSummary,
                     true,
                     snapshot.enabled,
-                    value -> GboardShotgunKeyboardSettings.writeEnabled(context, value)));
+                    value -> {
+                        GboardShotgunKeyboardSettings.writeEnabled(context, value);
+                        GboardPatchesSettingsContract.refresh(host);
+                    }));
 
             if (snapshot.enabled) {
                 mainRows.add(new GboardPatchesSettingsContract.SliderRow(
@@ -167,11 +170,26 @@ public final class GboardShotgunKeyboardSettingsFeature
                         100,
                         5,
                         "%",
-                        val -> GboardShotgunKeyboardSettings.writeVolume(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writeVolume(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
+
+                mainRows.add(new GboardPatchesSettingsContract.CommandRow(
+                        testBlastTitle,
+                        testBlastSummary,
+                        true,
+                        () -> GboardShotgunAudioEngine.playBlast(context, snapshot.volumeMultiplier)));
+
+                mainRows.add(new GboardPatchesSettingsContract.CommandRow(
+                        testPumpTitle,
+                        testPumpSummary,
+                        true,
+                        () -> GboardShotgunAudioEngine.playPump(context, snapshot.volumeMultiplier)));
             }
             sections.add(new GboardPatchesSettingsContract.Section(settingsSectionTitle, mainRows));
 
-            // Section 2: Pump Sound Key Customizations (multiple keys support)
+            // Section 2: Pump Sound Key Customizations
             if (snapshot.enabled) {
                 List<GboardPatchesSettingsContract.Row> pumpRows = new ArrayList<>();
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
@@ -179,74 +197,79 @@ public final class GboardShotgunKeyboardSettingsFeature
                         pumpSpaceSummary,
                         true,
                         snapshot.pumpOnSpace,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnSpace(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnSpace(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpEnterTitle,
                         pumpEnterSummary,
                         true,
                         snapshot.pumpOnEnter,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnEnter(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnEnter(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpBackspaceTitle,
                         pumpBackspaceSummary,
                         true,
                         snapshot.pumpOnBackspace,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnBackspace(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnBackspace(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpShiftTitle,
                         pumpShiftSummary,
                         true,
                         snapshot.pumpOnShift,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnShift(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnShift(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpTabTitle,
                         pumpTabSummary,
                         true,
                         snapshot.pumpOnTab,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnTab(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnTab(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpSymbolsTitle,
                         pumpSymbolsSummary,
                         true,
                         snapshot.pumpOnSymbols,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnSymbols(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnSymbols(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 pumpRows.add(new GboardPatchesSettingsContract.ToggleRow(
                         pumpGlobeTitle,
                         pumpGlobeSummary,
                         true,
                         snapshot.pumpOnGlobe,
-                        val -> GboardShotgunKeyboardSettings.writePumpOnGlobe(context, val)));
+                        val -> {
+                            GboardShotgunKeyboardSettings.writePumpOnGlobe(context, val);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
 
                 sections.add(new GboardPatchesSettingsContract.Section(pumpKeysSectionTitle, pumpRows));
-
-                // Section 3: Audio Test
-                List<GboardPatchesSettingsContract.Row> testRows = new ArrayList<>();
-                testRows.add(new GboardPatchesSettingsContract.CommandRow(
-                        testBlastTitle,
-                        testBlastSummary,
-                        true,
-                        () -> GboardShotgunAudioEngine.playBlast(context, snapshot.volumeMultiplier)));
-
-                testRows.add(new GboardPatchesSettingsContract.CommandRow(
-                        testPumpTitle,
-                        testPumpSummary,
-                        true,
-                        () -> GboardShotgunAudioEngine.playPump(context, snapshot.volumeMultiplier)));
-
-                sections.add(new GboardPatchesSettingsContract.Section(testSoundSectionTitle, testRows));
             }
 
             return new GboardPatchesSettingsContract.Screen(
                     entryTitle,
                     headerBadge,
                     entryTitle,
-                    "",
+                    entrySummary,
                     Collections.emptyList(),
                     sections,
                     GboardPatchesSettingsContract.RefreshPolicy.none(),

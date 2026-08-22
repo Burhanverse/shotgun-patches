@@ -56,6 +56,10 @@ val quickJsPayloadSourceDir = layout.projectDirectory.dir("native-payload/arm64-
 val generatedQuickJsPayloadDir = layout.buildDirectory.dir(
     "generated/source/quickJsPayload/java"
 )
+val shotgunAudioSourceDir = layout.projectDirectory.dir("src/main/resources/shotgun")
+val generatedShotgunAudioDir = layout.buildDirectory.dir(
+    "generated/source/shotgunAudio/java"
+)
 val settingsTextAuthority = layout.projectDirectory.file(
     "src/main/settings-text/gboard_settings_text.xml"
 )
@@ -86,6 +90,7 @@ android {
 
     sourceSets.named("main") {
         java.directories.add(generatedQuickJsPayloadDir.get().asFile.absolutePath)
+        java.directories.add(generatedShotgunAudioDir.get().asFile.absolutePath)
         java.directories.add(generatedSettingsTextJavaDir.get().asFile.absolutePath)
         res.directories.add(generatedSettingsTextResDir.get().asFile.absolutePath)
     }
@@ -335,7 +340,101 @@ val generateSettingsText = tasks.register("generateSettingsText") {
     }
 }
 
+val generateShotgunAudioPayload = tasks.register("generateShotgunAudioPayload") {
+    val blastFile = shotgunAudioSourceDir.file("blast.mp3")
+    val pumpFile = shotgunAudioSourceDir.file("pump.mp3")
+    val outputFile = generatedShotgunAudioDir.map { directory ->
+        directory.file(
+            "dev/jason/gboardpatches/extension/shotgunkeyboard/GboardShotgunAudioPayload.java"
+        )
+    }
+
+    inputs.file(blastFile)
+    inputs.file(pumpFile)
+    outputs.file(outputFile)
+
+    doLast {
+        val blastBytes = blastFile.asFile.readBytes()
+        val pumpBytes = pumpFile.asFile.readBytes()
+
+        fun encodeChunks(bytes: ByteArray, chunkSize: Int = 8192): String {
+            val base64 = Base64.getEncoder().encodeToString(bytes)
+            val chunks = buildList {
+                var index = 0
+                while (index < base64.length) {
+                    add(base64.substring(index, minOf(index + chunkSize, base64.length)))
+                    index += chunkSize
+                }
+            }
+            return chunks.joinToString(",\n") { chunk ->
+                "            \"$chunk\""
+            }
+        }
+
+        val blastChunks = encodeChunks(blastBytes)
+        val pumpChunks = encodeChunks(pumpBytes)
+
+        val output = outputFile.get().asFile
+        output.parentFile.mkdirs()
+        output.writeText(
+            """
+            package dev.jason.gboardpatches.extension.shotgunkeyboard;
+
+            public final class GboardShotgunAudioPayload {
+                private static final String[] BLAST_CHUNKS = new String[] {
+$blastChunks
+                };
+
+                private static final String[] PUMP_CHUNKS = new String[] {
+$pumpChunks
+                };
+
+                private static volatile byte[] cachedBlastBytes;
+                private static volatile byte[] cachedPumpBytes;
+
+                private GboardShotgunAudioPayload() {
+                }
+
+                public static byte[] getBlastAudioBytes() {
+                    byte[] existing = cachedBlastBytes;
+                    if (existing != null) {
+                        return existing;
+                    }
+                    byte[] decoded = decodeBase64(BLAST_CHUNKS);
+                    cachedBlastBytes = decoded;
+                    return decoded;
+                }
+
+                public static byte[] getPumpAudioBytes() {
+                    byte[] existing = cachedPumpBytes;
+                    if (existing != null) {
+                        return existing;
+                    }
+                    byte[] decoded = decodeBase64(PUMP_CHUNKS);
+                    cachedPumpBytes = decoded;
+                    return decoded;
+                }
+
+                private static byte[] decodeBase64(String[] chunks) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String chunk : chunks) {
+                        sb.append(chunk);
+                    }
+                    String base64 = sb.toString();
+                    try {
+                        return android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+                    } catch (Throwable ignored) {
+                        return java.util.Base64.getDecoder().decode(base64);
+                    }
+                }
+            }
+            """.trimIndent()
+        )
+    }
+}
+
 tasks.named("preBuild") {
     dependsOn(generateQuickJsNativePayload)
     dependsOn(generateSettingsText)
+    dependsOn(generateShotgunAudioPayload)
 }

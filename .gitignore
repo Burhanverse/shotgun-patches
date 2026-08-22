@@ -118,7 +118,7 @@ gradle-app.setting
 
 # Ignore vscode config
 .vscode/
-
+release-notes.md
 # Dependency directories
 node_modules/
 

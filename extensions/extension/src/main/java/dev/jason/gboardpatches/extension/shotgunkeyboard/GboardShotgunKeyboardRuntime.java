@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -13,6 +14,7 @@ public final class GboardShotgunKeyboardRuntime {
 
     private static final Map<ClassLoader, ReflectionHandles> HANDLES_BY_CLASSLOADER =
             Collections.synchronizedMap(new WeakHashMap<>());
+    private static volatile Context applicationContext;
 
     private GboardShotgunKeyboardRuntime() {
     }
@@ -27,11 +29,18 @@ public final class GboardShotgunKeyboardRuntime {
             Field ctxField = null;
             try {
                 Class<?> dispatcherClass = Class.forName("pvf", false, classLoader);
-                for (Field field : dispatcherClass.getDeclaredFields()) {
-                    if (Context.class.isAssignableFrom(field.getType())) {
-                        field.setAccessible(true);
-                        ctxField = field;
-                        break;
+                try {
+                    ctxField = dispatcherClass.getDeclaredField("b");
+                    ctxField.setAccessible(true);
+                } catch (Throwable ignored) {
+                }
+                if (ctxField == null) {
+                    for (Field field : dispatcherClass.getDeclaredFields()) {
+                        if (Context.class.isAssignableFrom(field.getType())) {
+                            field.setAccessible(true);
+                            ctxField = field;
+                            break;
+                        }
                     }
                 }
             } catch (Throwable ignored) {
@@ -63,15 +72,16 @@ public final class GboardShotgunKeyboardRuntime {
         }
 
         public Context extractContext(Object dispatcher) {
-            if (dispatcher == null || contextField == null) {
-                return null;
+            if (dispatcher != null && contextField != null) {
+                try {
+                    Object val = contextField.get(dispatcher);
+                    if (val instanceof Context ctx) {
+                        return ctx;
+                    }
+                } catch (Throwable ignored) {
+                }
             }
-            try {
-                Object val = contextField.get(dispatcher);
-                return val instanceof Context ctx ? ctx : null;
-            } catch (Throwable ignored) {
-                return null;
-            }
+            return resolveApplicationContext();
         }
 
         public int extractKeyId(Object softKeyDef) {
@@ -102,11 +112,40 @@ public final class GboardShotgunKeyboardRuntime {
             }
             try {
                 Object val = entryPayloadField.get(actionData);
-                return val instanceof String str ? str : (val != null ? val.toString() : null);
+                return val instanceof CharSequence charSequence ? charSequence.toString() : (val != null ? val.toString() : null);
             } catch (Throwable ignored) {
                 return null;
             }
         }
+    }
+
+    public static Context resolveApplicationContext() {
+        Context cached = applicationContext;
+        if (cached != null) {
+            return cached;
+        }
+        Context reflected = reflectedContext("android.app.ActivityThread", "currentApplication");
+        if (reflected == null) {
+            reflected = reflectedContext("android.app.AppGlobals", "getInitialApplication");
+        }
+        if (reflected != null) {
+            applicationContext = reflected;
+        }
+        return reflected;
+    }
+
+    private static Context reflectedContext(String className, String methodName) {
+        try {
+            Method method = Class.forName(className).getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            Object application = method.invoke(null);
+            if (application instanceof Context ctx) {
+                Context app = ctx.getApplicationContext();
+                return app != null ? app : ctx;
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
     }
 
     private static ReflectionHandles handles(ClassLoader classLoader) {
@@ -144,7 +183,7 @@ public final class GboardShotgunKeyboardRuntime {
                     : (softKeyDef != null ? softKeyDef.getClass().getClassLoader() : null);
 
             ReflectionHandles handles = classLoader != null ? handles(classLoader) : null;
-            Context context = handles != null ? handles.extractContext(gestureDispatcher) : null;
+            Context context = handles != null ? handles.extractContext(gestureDispatcher) : resolveApplicationContext();
 
             GboardShotgunKeyboardSettings.SettingsSnapshot settings =
                     GboardShotgunKeyboardSettings.snapshot(context);
