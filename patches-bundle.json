@@ -1,7 +1,7 @@
 {
     "created_at":  "2026-08-22T22:45:32",
-    "description":  "### 🐛 Bug Fixes\n\n* **Shotgun Keyboard:** fix audio resource loading by embedding payload in bytecode, fix playback context resolution, and polish settings UI layout.\n\n### 🐛 問題修復\n\n* **散彈槍音效鍵盤:** 修復音訊資源載入、播放上下文解析並優化設定介面佈局。",
-    "download_url":  "https://github.com/Burhanverse/Gboard-patches/releases/download/v3.0.0-dev.3/patches-3.0.0-dev.3.mpp",
+    "description":  "### 🐛 Bug Fixes\n\n* **Settings UI:** fix slider row layout weight bug, restore slider title & live value display, and remove empty vertical gap.\n\n### 🐛 問題修復\n\n* **設定介面:** 修復滑桿排版 weight 異常、恢復滑桿標題與即時數值顯示並消除空白間距。",
+    "download_url":  "https://github.com/Burhanverse/Gboard-patches/releases/download/v3.0.0-dev.4/patches-3.0.0-dev.4.mpp",
     "signature_download_url":  "",
-    "version":  "3.0.0-dev.3"
+    "version":  "3.0.0-dev.4"
 }

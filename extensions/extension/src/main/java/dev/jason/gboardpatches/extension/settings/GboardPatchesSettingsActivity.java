@@ -2418,16 +2418,29 @@ public final class GboardPatchesSettingsActivity extends Activity
 
     private View createSliderRow(GboardPatchesSettingsContract.SliderRow rowModel) {
         LinearLayout row = buildDetailRowContainer();
-        LinearLayout textColumn = buildRowTextColumn(true);
+
+        LinearLayout headerRow = new LinearLayout(this);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        headerRow.setGravity(Gravity.CENTER_VERTICAL);
+        headerRow.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
         TextView titleView = buildRowTitle(rowModel.getTitle());
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        titleView.setLayoutParams(titleParams);
+        headerRow.addView(titleView);
+
         String currentLabel = rowModel.getCurrentValue() + rowModel.getUnitSuffix();
-        TextView summaryView = buildRowSummary(
-                rowModel.getSummary() != null && !rowModel.getSummary().isEmpty()
-                        ? rowModel.getSummary() + " (" + currentLabel + ")"
-                        : currentLabel, false);
-        textColumn.addView(titleView);
-        textColumn.addView(summaryView);
-        row.addView(textColumn);
+        TextView valueView = buildTrailingValue(currentLabel);
+        headerRow.addView(valueView);
+        row.addView(headerRow);
+
+        if (rowModel.getSummary() != null && !rowModel.getSummary().isEmpty()) {
+            TextView summaryView = buildRowSummary(rowModel.getSummary(), false);
+            row.addView(summaryView);
+        }
 
         SeekBar seekBar = new SeekBar(this);
         LinearLayout.LayoutParams seekParams = new LinearLayout.LayoutParams(
@@ -2446,10 +2459,7 @@ public final class GboardPatchesSettingsActivity extends Activity
             public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
                 if (fromUser) {
                     int val = rowModel.getMinValue() + progress * rowModel.getStep();
-                    String updatedLabel = val + rowModel.getUnitSuffix();
-                    summaryView.setText(rowModel.getSummary() != null && !rowModel.getSummary().isEmpty()
-                            ? rowModel.getSummary() + " (" + updatedLabel + ")"
-                            : updatedLabel);
+                    valueView.setText(val + rowModel.getUnitSuffix());
                 }
             }
 

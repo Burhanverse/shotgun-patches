@@ -1,3 +1,13 @@
+## [3.0.0-dev.4](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.3...v3.0.0-dev.4) (2026-08-22)
+
+### 🐛 Bug Fixes
+
+* **Settings UI:** fix slider row layout weight bug, restore slider title & live value display, and remove empty vertical gap.
+
+### 🐛 問題修復
+
+* **設定介面:** 修復滑桿排版 weight 異常、恢復滑桿標題與即時數值顯示並消除空白間距。
+
 ## [3.0.0-dev.3](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.2...v3.0.0-dev.3) (2026-08-22)
 
 ### 🐛 Bug Fixes
