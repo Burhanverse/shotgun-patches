@@ -1,3 +1,13 @@
+## [3.0.0-dev.2](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2026-08-22)
+
+### ✨ New Features
+
+* **Gboard:** add the `Shotgun Keyboard` patch.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Shotgun Keyboard` Patch。
+
 ## [3.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.11.0...v3.0.0-dev.1) (2026-08-22)
 
 ### ✨ New Features

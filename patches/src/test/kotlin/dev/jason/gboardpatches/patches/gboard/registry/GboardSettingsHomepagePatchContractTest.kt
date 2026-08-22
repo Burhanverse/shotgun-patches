@@ -37,13 +37,13 @@ class GboardSettingsHomepagePatchContractTest {
     }
 
     @Test
-    fun generatedInventoryStaysThirtyOneWithSettingsOnceAndTargetOnlyCompatibility() {
+    fun generatedInventoryStaysThirtyTwoWithSettingsOnceAndTargetOnlyCompatibility() {
         val patchesList = generatedPublishedPatches()
         val settings = patchesList.filter {
             it.get("name").asString == "Settings Homepage Override"
         }
 
-        assertEquals(31, patchesList.size)
+        assertEquals(32, patchesList.size)
         assertEquals(1, settings.size)
         assertEquals(true, settings.single().get("use").asBoolean)
         assertEquals(

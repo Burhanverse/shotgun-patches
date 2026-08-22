@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-dev.1",
+  "version": "3.0.0-dev.2",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -292,6 +292,18 @@
     {
       "name": "Settings Homepage Override",
       "description": "允許切換新版或舊版 Gboard 設定頁面\nAllow switching between the new and legacy Gboard settings pages.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Shotgun Keyboard",
+      "description": "擊鍵時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效\nPlay shotgun blast sound on keystrokes, and pump sound on Space / Enter.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {
