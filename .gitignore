@@ -131,3 +131,4 @@ local.properties
 
 # Local patch/build inspection artifacts
 .validation/
+.kotlin
