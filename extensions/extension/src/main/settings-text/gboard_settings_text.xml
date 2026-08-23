@@ -2190,6 +2190,14 @@
         <translation locale="en">Play audio feedback on every keypress</translation>
         <translation locale="zh-Hant">每次按鍵時播放音效反饋</translation>
     </string>
+    <string name="gboard_patches_shotgun_keyboard_mute_on_headphones_title">
+        <translation locale="en">Mute with headphones / external audio</translation>
+        <translation locale="zh-Hant">使用耳機/外接音訊裝置時靜音</translation>
+    </string>
+    <string name="gboard_patches_shotgun_keyboard_mute_on_headphones_summary">
+        <translation locale="en">Automatically mute sound effects when headphones, earbuds, or Bluetooth audio devices are connected</translation>
+        <translation locale="zh-Hant">當連接耳機、耳塞或藍牙音訊裝置時自動靜音</translation>
+    </string>
     <string name="gboard_patches_shotgun_keyboard_section_settings">
         <translation locale="en">Settings</translation>
         <translation locale="zh-Hant">設定</translation>

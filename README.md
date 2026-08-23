@@ -93,7 +93,7 @@ Shotgun Patches is a public Morphe source for a curated set of Gboard enhancemen
 <details>
   <summary><code>Shotgun Keyboard</code></summary>
 
-  Plays realistic low-latency shotgun blast audio effects on typing keystrokes, and pump/cocking sounds on Spacebar, Enter, Backspace, or other customizable keys with volume slider controls.
+  Plays realistic low-latency shotgun blast audio effects on typing keystrokes, and pump/cocking sounds on Spacebar, Enter, Backspace, or other customizable keys with volume slider controls and automatic headphone/external audio muting.
 </details>
 
 <details>

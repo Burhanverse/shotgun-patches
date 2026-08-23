@@ -2,6 +2,8 @@ package dev.jason.gboardpatches.extension.shotgunkeyboard;
 
 import android.content.Context;
 import android.media.AudioAttributes;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
 
@@ -23,6 +25,54 @@ public final class GboardShotgunAudioEngine {
     private static volatile Context cachedContext;
 
     private GboardShotgunAudioEngine() {
+    }
+
+    public static boolean isExternalAudioConnected(Context context) {
+        Context ctx = resolveContext(context);
+        if (ctx == null) {
+            return false;
+        }
+        try {
+            AudioManager audioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager == null) {
+                return false;
+            }
+            AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+            if (devices != null) {
+                for (AudioDeviceInfo device : devices) {
+                    if (device == null || !device.isSink()) {
+                        continue;
+                    }
+                    int type = device.getType();
+                    switch (type) {
+                        case AudioDeviceInfo.TYPE_WIRED_HEADSET:
+                        case AudioDeviceInfo.TYPE_WIRED_HEADPHONES:
+                        case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP:
+                        case AudioDeviceInfo.TYPE_BLUETOOTH_SCO:
+                        case AudioDeviceInfo.TYPE_USB_HEADSET:
+                        case AudioDeviceInfo.TYPE_USB_DEVICE:
+                        case AudioDeviceInfo.TYPE_USB_ACCESSORY:
+                        case AudioDeviceInfo.TYPE_LINE_ANALOG:
+                        case AudioDeviceInfo.TYPE_LINE_DIGITAL:
+                        case AudioDeviceInfo.TYPE_AUX_LINE:
+                        case AudioDeviceInfo.TYPE_HEARING_AID:
+                        case AudioDeviceInfo.TYPE_DOCK:
+                        case AudioDeviceInfo.TYPE_HDMI:
+                        case AudioDeviceInfo.TYPE_HDMI_ARC:
+                        case 26: // AudioDeviceInfo.TYPE_BLE_HEADSET
+                        case 27: // AudioDeviceInfo.TYPE_BLE_SPEAKER
+                        case 29: // AudioDeviceInfo.TYPE_HDMI_EARC
+                        case 30: // AudioDeviceInfo.TYPE_BLE_BROADCAST
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+            }
+        } catch (Throwable throwable) {
+            Log.w(TAG, "Error checking external audio devices", throwable);
+        }
+        return false;
     }
 
     public static Context resolveContext(Context context) {

@@ -27,6 +27,7 @@ public class GboardShotgunKeyboardSettingsTest {
         assertFalse(snapshot.enabled);
         assertEquals(100, snapshot.volume);
         assertEquals(1.0f, snapshot.volumeMultiplier, 0.01f);
+        assertFalse(snapshot.muteOnHeadphones);
         assertTrue(snapshot.pumpOnSpace);
         assertTrue(snapshot.pumpOnEnter);
         assertTrue(snapshot.pumpOnBackspace);
@@ -41,6 +42,7 @@ public class GboardShotgunKeyboardSettingsTest {
         Context context = RuntimeEnvironment.getApplication();
         GboardShotgunKeyboardSettings.writeEnabled(context, true);
         GboardShotgunKeyboardSettings.writeVolume(context, 75);
+        GboardShotgunKeyboardSettings.writeMuteOnHeadphones(context, true);
         GboardShotgunKeyboardSettings.writePumpOnSpace(context, false);
         GboardShotgunKeyboardSettings.writePumpOnShift(context, true);
 
@@ -50,6 +52,7 @@ public class GboardShotgunKeyboardSettingsTest {
         assertTrue(snapshot.enabled);
         assertEquals(75, snapshot.volume);
         assertEquals(0.75f, snapshot.volumeMultiplier, 0.01f);
+        assertTrue(snapshot.muteOnHeadphones);
         assertFalse(snapshot.pumpOnSpace);
         assertTrue(snapshot.pumpOnShift);
     }
@@ -58,7 +61,7 @@ public class GboardShotgunKeyboardSettingsTest {
     public void testPolicySoundTypeEvaluation() {
         GboardShotgunKeyboardSettings.SettingsSnapshot enabledSettings =
                 new GboardShotgunKeyboardSettings.SettingsSnapshot(
-                        true, 100, true, true, true, false, true, false, false);
+                        true, 100, false, true, true, true, false, true, false, false);
 
         // Spacebar -> PUMP
         assertEquals(
@@ -87,11 +90,26 @@ public class GboardShotgunKeyboardSettingsTest {
         // Disabled settings -> NONE
         GboardShotgunKeyboardSettings.SettingsSnapshot disabledSettings =
                 new GboardShotgunKeyboardSettings.SettingsSnapshot(
-                        false, 100, true, true, true, false, true, false, false);
+                        false, 100, false, true, true, true, false, true, false, false);
         assertEquals(
                 GboardShotgunKeyboardPolicy.SoundType.NONE,
                 GboardShotgunKeyboardPolicy.evaluateSoundType(
                         0, KeyEvent.KEYCODE_A, "a", "key_pos_1", disabledSettings));
+
+        // Mute on headphones enabled + external audio connected -> NONE
+        GboardShotgunKeyboardSettings.SettingsSnapshot muteOnHeadphonesSettings =
+                new GboardShotgunKeyboardSettings.SettingsSnapshot(
+                        true, 100, true, true, true, true, false, true, false, false);
+        assertEquals(
+                GboardShotgunKeyboardPolicy.SoundType.NONE,
+                GboardShotgunKeyboardPolicy.evaluateSoundType(
+                        0, KeyEvent.KEYCODE_A, "a", "key_pos_1", muteOnHeadphonesSettings, true));
+
+        // Mute on headphones enabled + external audio NOT connected -> BLAST
+        assertEquals(
+                GboardShotgunKeyboardPolicy.SoundType.BLAST,
+                GboardShotgunKeyboardPolicy.evaluateSoundType(
+                        0, KeyEvent.KEYCODE_A, "a", "key_pos_1", muteOnHeadphonesSettings, false));
     }
 
     @Test
@@ -103,5 +121,12 @@ public class GboardShotgunKeyboardSettingsTest {
         assertTrue(blast.length > 10000);
         assertNotNull(pump);
         assertTrue(pump.length > 10000);
+    }
+
+    @Test
+    public void testExternalAudioDetection() {
+        Context context = RuntimeEnvironment.getApplication();
+        // In default Robolectric environment without simulated connected headset
+        assertFalse(GboardShotgunAudioEngine.isExternalAudioConnected(context));
     }
 }

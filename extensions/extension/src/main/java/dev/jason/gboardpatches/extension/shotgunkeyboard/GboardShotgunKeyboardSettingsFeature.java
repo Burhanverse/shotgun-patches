@@ -26,6 +26,8 @@ public final class GboardShotgunKeyboardSettingsFeature
     private final String errorSummary;
     private final String enabledTitle;
     private final String enabledSummary;
+    private final String muteOnHeadphonesTitle;
+    private final String muteOnHeadphonesSummary;
     private final String settingsSectionTitle;
     private final String volumeTitle;
     private final String volumeSummary;
@@ -66,6 +68,10 @@ public final class GboardShotgunKeyboardSettingsFeature
                 R.string.gboard_patches_shotgun_keyboard_enabled_title);
         this.enabledSummary = GboardSettingsText.get(context,
                 R.string.gboard_patches_shotgun_keyboard_enabled_summary);
+        this.muteOnHeadphonesTitle = GboardSettingsText.get(context,
+                R.string.gboard_patches_shotgun_keyboard_mute_on_headphones_title);
+        this.muteOnHeadphonesSummary = GboardSettingsText.get(context,
+                R.string.gboard_patches_shotgun_keyboard_mute_on_headphones_summary);
         this.settingsSectionTitle = GboardSettingsText.get(context,
                 R.string.gboard_patches_shotgun_keyboard_section_settings);
         this.volumeTitle = GboardSettingsText.get(context,
@@ -161,6 +167,16 @@ public final class GboardShotgunKeyboardSettingsFeature
                     }));
 
             if (snapshot.enabled) {
+                mainRows.add(new GboardPatchesSettingsContract.ToggleRow(
+                        muteOnHeadphonesTitle,
+                        muteOnHeadphonesSummary,
+                        true,
+                        snapshot.muteOnHeadphones,
+                        value -> {
+                            GboardShotgunKeyboardSettings.writeMuteOnHeadphones(context, value);
+                            GboardPatchesSettingsContract.refresh(host);
+                        }));
+
                 mainRows.add(new GboardPatchesSettingsContract.SliderRow(
                         volumeTitle,
                         volumeSummary,

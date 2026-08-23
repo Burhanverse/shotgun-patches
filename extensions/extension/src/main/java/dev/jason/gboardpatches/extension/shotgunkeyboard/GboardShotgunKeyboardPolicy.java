@@ -19,8 +19,22 @@ public final class GboardShotgunKeyboardPolicy {
             String pressText,
             String keyName,
             GboardShotgunKeyboardSettings.SettingsSnapshot settings) {
+        return evaluateSoundType(keyId, keycode, pressText, keyName, settings, false);
+    }
+
+    public static SoundType evaluateSoundType(
+            int keyId,
+            int keycode,
+            String pressText,
+            String keyName,
+            GboardShotgunKeyboardSettings.SettingsSnapshot settings,
+            boolean isExternalAudioConnected) {
 
         if (settings == null || !settings.enabled) {
+            return SoundType.NONE;
+        }
+
+        if (isMutedByOutputDevice(settings.muteOnHeadphones, isExternalAudioConnected)) {
             return SoundType.NONE;
         }
 
@@ -54,6 +68,10 @@ public final class GboardShotgunKeyboardPolicy {
 
         // Default all other valid typing / character / symbol keys to BLAST
         return SoundType.BLAST;
+    }
+
+    public static boolean isMutedByOutputDevice(boolean muteOnHeadphones, boolean isExternalAudioConnected) {
+        return muteOnHeadphones && isExternalAudioConnected;
     }
 
     public static boolean isSpaceKey(int keyId, int keycode, String pressText, String keyName) {

@@ -192,6 +192,10 @@ public final class GboardShotgunKeyboardRuntime {
                 return false;
             }
 
+            if (settings.muteOnHeadphones && GboardShotgunAudioEngine.isExternalAudioConnected(context)) {
+                return false;
+            }
+
             int keyId = handles != null ? handles.extractKeyId(softKeyDef) : 0;
             int keycode = handles != null ? handles.extractKeycode(actionData) : 0;
             String pressText = handles != null ? handles.extractPayload(actionData) : null;

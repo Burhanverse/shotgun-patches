@@ -8,6 +8,7 @@ import dev.jason.gboardpatches.extension.settings.GboardPatchesSettings;
 public final class GboardShotgunKeyboardSettings {
     public static final String PREF_KEY_ENABLED = "shotgun_keyboard_enabled";
     public static final String PREF_KEY_VOLUME = "shotgun_keyboard_volume";
+    public static final String PREF_KEY_MUTE_ON_HEADPHONES = "shotgun_keyboard_mute_on_headphones";
     public static final String PREF_KEY_PUMP_ON_SPACE = "shotgun_keyboard_pump_on_space";
     public static final String PREF_KEY_PUMP_ON_ENTER = "shotgun_keyboard_pump_on_enter";
     public static final String PREF_KEY_PUMP_ON_BACKSPACE = "shotgun_keyboard_pump_on_backspace";
@@ -18,6 +19,7 @@ public final class GboardShotgunKeyboardSettings {
 
     public static final boolean DEFAULT_ENABLED = false;
     public static final int DEFAULT_VOLUME = 100;
+    public static final boolean DEFAULT_MUTE_ON_HEADPHONES = false;
     public static final boolean DEFAULT_PUMP_ON_SPACE = true;
     public static final boolean DEFAULT_PUMP_ON_ENTER = true;
     public static final boolean DEFAULT_PUMP_ON_BACKSPACE = true;
@@ -35,6 +37,7 @@ public final class GboardShotgunKeyboardSettings {
         public final boolean enabled;
         public final int volume;
         public final float volumeMultiplier;
+        public final boolean muteOnHeadphones;
         public final boolean pumpOnSpace;
         public final boolean pumpOnEnter;
         public final boolean pumpOnBackspace;
@@ -43,12 +46,13 @@ public final class GboardShotgunKeyboardSettings {
         public final boolean pumpOnSymbols;
         public final boolean pumpOnGlobe;
 
-        public SettingsSnapshot(boolean enabled, int volume, boolean pumpOnSpace,
-                boolean pumpOnEnter, boolean pumpOnBackspace, boolean pumpOnShift,
-                boolean pumpOnTab, boolean pumpOnSymbols, boolean pumpOnGlobe) {
+        public SettingsSnapshot(boolean enabled, int volume, boolean muteOnHeadphones,
+                boolean pumpOnSpace, boolean pumpOnEnter, boolean pumpOnBackspace,
+                boolean pumpOnShift, boolean pumpOnTab, boolean pumpOnSymbols, boolean pumpOnGlobe) {
             this.enabled = enabled;
             this.volume = Math.max(0, Math.min(100, volume));
             this.volumeMultiplier = this.volume / 100.0f;
+            this.muteOnHeadphones = muteOnHeadphones;
             this.pumpOnSpace = pumpOnSpace;
             this.pumpOnEnter = pumpOnEnter;
             this.pumpOnBackspace = pumpOnBackspace;
@@ -56,6 +60,13 @@ public final class GboardShotgunKeyboardSettings {
             this.pumpOnTab = pumpOnTab;
             this.pumpOnSymbols = pumpOnSymbols;
             this.pumpOnGlobe = pumpOnGlobe;
+        }
+
+        public SettingsSnapshot(boolean enabled, int volume, boolean pumpOnSpace,
+                boolean pumpOnEnter, boolean pumpOnBackspace, boolean pumpOnShift,
+                boolean pumpOnTab, boolean pumpOnSymbols, boolean pumpOnGlobe) {
+            this(enabled, volume, DEFAULT_MUTE_ON_HEADPHONES, pumpOnSpace, pumpOnEnter,
+                    pumpOnBackspace, pumpOnShift, pumpOnTab, pumpOnSymbols, pumpOnGlobe);
         }
     }
 
@@ -66,9 +77,9 @@ public final class GboardShotgunKeyboardSettings {
         }
         Context effectiveContext = context != null ? context : GboardShotgunKeyboardRuntime.resolveApplicationContext();
         if (effectiveContext == null) {
-            return new SettingsSnapshot(DEFAULT_ENABLED, DEFAULT_VOLUME, DEFAULT_PUMP_ON_SPACE,
-                    DEFAULT_PUMP_ON_ENTER, DEFAULT_PUMP_ON_BACKSPACE, DEFAULT_PUMP_ON_SHIFT,
-                    DEFAULT_PUMP_ON_TAB, DEFAULT_PUMP_ON_SYMBOLS, DEFAULT_PUMP_ON_GLOBE);
+            return new SettingsSnapshot(DEFAULT_ENABLED, DEFAULT_VOLUME, DEFAULT_MUTE_ON_HEADPHONES,
+                    DEFAULT_PUMP_ON_SPACE, DEFAULT_PUMP_ON_ENTER, DEFAULT_PUMP_ON_BACKSPACE,
+                    DEFAULT_PUMP_ON_SHIFT, DEFAULT_PUMP_ON_TAB, DEFAULT_PUMP_ON_SYMBOLS, DEFAULT_PUMP_ON_GLOBE);
         }
         SharedPreferences preferences = GboardPatchesSettings.preferences(effectiveContext);
         SettingsSnapshot created = readSnapshot(preferences);
@@ -78,13 +89,14 @@ public final class GboardShotgunKeyboardSettings {
 
     public static SettingsSnapshot readSnapshot(SharedPreferences preferences) {
         if (preferences == null) {
-            return new SettingsSnapshot(DEFAULT_ENABLED, DEFAULT_VOLUME, DEFAULT_PUMP_ON_SPACE,
-                    DEFAULT_PUMP_ON_ENTER, DEFAULT_PUMP_ON_BACKSPACE, DEFAULT_PUMP_ON_SHIFT,
-                    DEFAULT_PUMP_ON_TAB, DEFAULT_PUMP_ON_SYMBOLS, DEFAULT_PUMP_ON_GLOBE);
+            return new SettingsSnapshot(DEFAULT_ENABLED, DEFAULT_VOLUME, DEFAULT_MUTE_ON_HEADPHONES,
+                    DEFAULT_PUMP_ON_SPACE, DEFAULT_PUMP_ON_ENTER, DEFAULT_PUMP_ON_BACKSPACE,
+                    DEFAULT_PUMP_ON_SHIFT, DEFAULT_PUMP_ON_TAB, DEFAULT_PUMP_ON_SYMBOLS, DEFAULT_PUMP_ON_GLOBE);
         }
         return new SettingsSnapshot(
                 preferences.getBoolean(PREF_KEY_ENABLED, DEFAULT_ENABLED),
                 preferences.getInt(PREF_KEY_VOLUME, DEFAULT_VOLUME),
+                preferences.getBoolean(PREF_KEY_MUTE_ON_HEADPHONES, DEFAULT_MUTE_ON_HEADPHONES),
                 preferences.getBoolean(PREF_KEY_PUMP_ON_SPACE, DEFAULT_PUMP_ON_SPACE),
                 preferences.getBoolean(PREF_KEY_PUMP_ON_ENTER, DEFAULT_PUMP_ON_ENTER),
                 preferences.getBoolean(PREF_KEY_PUMP_ON_BACKSPACE, DEFAULT_PUMP_ON_BACKSPACE),
@@ -105,6 +117,10 @@ public final class GboardShotgunKeyboardSettings {
         if (!preferences.contains(PREF_KEY_VOLUME)) {
             if (editor == null) editor = preferences.edit();
             editor.putInt(PREF_KEY_VOLUME, DEFAULT_VOLUME);
+        }
+        if (!preferences.contains(PREF_KEY_MUTE_ON_HEADPHONES)) {
+            if (editor == null) editor = preferences.edit();
+            editor.putBoolean(PREF_KEY_MUTE_ON_HEADPHONES, DEFAULT_MUTE_ON_HEADPHONES);
         }
         if (!preferences.contains(PREF_KEY_PUMP_ON_SPACE)) {
             if (editor == null) editor = preferences.edit();
@@ -156,6 +172,16 @@ public final class GboardShotgunKeyboardSettings {
     public static void writeVolume(Context context, int value) {
         if (context == null) return;
         GboardPatchesSettings.preferences(context).edit().putInt(PREF_KEY_VOLUME, value).apply();
+        cachedSnapshot = null;
+    }
+
+    public static boolean readMuteOnHeadphones(SharedPreferences preferences) {
+        return preferences != null && preferences.getBoolean(PREF_KEY_MUTE_ON_HEADPHONES, DEFAULT_MUTE_ON_HEADPHONES);
+    }
+
+    public static void writeMuteOnHeadphones(Context context, boolean value) {
+        if (context == null) return;
+        GboardPatchesSettings.preferences(context).edit().putBoolean(PREF_KEY_MUTE_ON_HEADPHONES, value).apply();
         cachedSnapshot = null;
     }
 
