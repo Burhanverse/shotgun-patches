@@ -1,4 +1,4 @@
-rootProject.name = "gboard-patches"
+rootProject.name = "shotgun-patches"
 
 pluginManagement {
     repositories {

@@ -187,12 +187,12 @@ val generateGboardVersionBindings = tasks.register<GenerateTargetBindingsTask>(
 
 patches {
     about {
-        name = "Gboard Patches"
+        name = "Shotgun Patches"
         description = "Morphe patches for Gboard."
-        source = "https://github.com/jasonwu1994/gboard-patches"
+        source = "https://github.com/Burhanverse/shotgun-patches"
         author = "Jason Wu"
-        contact = "https://github.com/jasonwu1994/gboard-patches/issues"
-        website = "https://github.com/jasonwu1994/gboard-patches"
+        contact = "https://github.com/Burhanverse/shotgun-patches/issues"
+        website = "https://github.com/Burhanverse/shotgun-patches"
         license = "GPLv3"
     }
 }
