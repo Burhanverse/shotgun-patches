@@ -396,7 +396,7 @@ val gboardCustomTopRowSwipePatch = gboardPublicResourcePatch(
 val gboardShotgunKeyboardPatch = gboardPublicResourcePatch(
     featureId = "shotgun_keyboard",
     name = "Shotgun Keyboard",
-    description = "擊鍵時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效\nPlay shotgun blast sound on keystrokes, and pump sound on Space / Enter.",
+    description = "擊鍵時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效，支援耳機與外接裝置自動靜音\nPlay shotgun blast sound on keystrokes, pump sound on Space / Enter, and auto-mute with headphones/external audio.",
     default = true,
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
