@@ -1,4 +1,26 @@
-## [3.0.0-dev.4](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.3...v3.0.0-dev.4) (2026-08-22)
+## [3.1.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.0.0...v3.1.0-dev.1) (2026-08-23)
+
+### ✨ New Features
+
+* **Gboard:** add the `Quick Insert` patch, which enables the Quick Insert panel and toolbar access point.
+* **Gboard:** add the `Hyperspeed Typing Animation` patch, which shows an animation during sustained fast typing on all keyboards.
+* **Gboard:** add the `Close Proactive Suggestions` patch, which adds a dismiss button to the proactive suggestions bar.
+
+### 🐛 Bug Fixes
+
+* **Gboard:** harden QuickJS native library loading for Android 17.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Quick Insert` Patch，啟用 Quick Insert 面板與工具列入口。
+* **Gboard:** 新增 `Hyperspeed Typing Animation` Patch，在所有鍵盤持續快速輸入時顯示動畫。
+* **Gboard:** 新增 `Close Proactive Suggestions` Patch，在主動建議列顯示關閉按鈕。
+
+### 🐛 修復
+
+* **Gboard:** 強化 Android 17 的 QuickJS 原生程式庫載入相容性。
+
+## [3.0.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.0.0-dev.3...v3.0.0-dev.4) (2026-08-22)
 
 ### 🐛 Bug Fixes
 
@@ -8,7 +30,7 @@
 
 * **設定介面:** 修復滑桿排版 weight 異常、恢復滑桿標題與即時數值顯示並消除空白間距。
 
-## [3.0.0-dev.3](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.2...v3.0.0-dev.3) (2026-08-22)
+## [3.0.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.0.0-dev.2...v3.0.0-dev.3) (2026-08-22)
 
 ### 🐛 Bug Fixes
 
@@ -18,7 +40,7 @@
 
 * **散彈槍音效鍵盤:** 修復音訊資源載入、播放上下文解析並優化設定介面佈局。
 
-## [3.0.0-dev.2](https://github.com/Burhanverse/Gboard-patches/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2026-08-22)
+## [3.0.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2026-08-22)
 
 ### ✨ New Features
 
@@ -27,6 +49,16 @@
 ### ✨ 新功能
 
 * **Gboard:** 新增 `Shotgun Keyboard` Patch。
+
+## [3.0.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.11.0...v3.0.0) (2026-08-22)
+
+### ✨ New Features
+
+* **Gboard:** update the supported Gboard version to `18.0.3.954559732-release-arm64-v8a`.
+
+### ✨ 新功能
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.0.3.954559732-release-arm64-v8a`。
 
 ## [3.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.11.0...v3.0.0-dev.1) (2026-08-22)
 

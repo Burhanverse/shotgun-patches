@@ -63,6 +63,12 @@ public final class GboardPatchesFeatureAvailability {
             "dev.jason.gboardpatches.feature.spacebar_logo";
     public static final String FEATURE_SHOTGUN_KEYBOARD =
             "dev.jason.gboardpatches.feature.shotgun_keyboard";
+    public static final String FEATURE_CLOSE_PROACTIVE_SUGGESTIONS =
+            "dev.jason.gboardpatches.feature.close_proactive_suggestions";
+    public static final String FEATURE_FLOW_MODE_ANIMATION =
+            "dev.jason.gboardpatches.feature.flow_mode_animation";
+    public static final String FEATURE_QUICK_INSERT =
+            "dev.jason.gboardpatches.feature.quick_insert";
 
     private static final String TAG = "GboardPatches";
 
@@ -107,8 +113,12 @@ public final class GboardPatchesFeatureAvailability {
             }
             return false;
         } catch (Throwable throwable) {
-            Log.w(TAG, "Failed to resolve feature marker: " + describeFeatures(featureKeys),
-                    throwable);
+            try {
+                Log.w(TAG, "Failed to resolve feature marker: " + describeFeatures(featureKeys),
+                        throwable);
+            } catch (Throwable ignored) {
+                // Feature detection still fails closed when logging is unavailable.
+            }
             return false;
         }
     }
