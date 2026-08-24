@@ -116,13 +116,13 @@ class GboardPackageRenamePatchContractTest {
         const val APP_DISPLAY_NAME_OPTION_KEY = "app_display_name"
         const val APP_DISPLAY_NAME_OPTION_TITLE = "App 名稱 / App name"
         const val APP_DISPLAY_NAME_OPTION_DESCRIPTION = ""
-        const val APP_DISPLAY_NAME_DEFAULT = "GboardWu"
+        const val APP_DISPLAY_NAME_DEFAULT = "Shotgun"
         val APP_DISPLAY_NAME_PRESETS = linkedMapOf(
             "Gboard" to "Gboard",
             "Gboard Dev" to "Gboard Dev",
             "Gboard Patches" to "Gboard Patches",
             "Gboard Mod" to "Gboard Mod",
-            "GboardWu" to "GboardWu",
+            "Shotgun" to "Shotgun",
         )
         const val BINDINGS_PROFILE_PATH =
             "patches/src/main/resources/gboard/gboard-version-bindings.json"

@@ -318,13 +318,13 @@
           "description": "",
           "required": true,
           "type": "kotlin.String",
-          "default": "GboardWu",
+          "default": "Shotgun",
           "values": {
             "Gboard": "Gboard",
             "Gboard Dev": "Gboard Dev",
             "Gboard Patches": "Gboard Patches",
             "Gboard Mod": "Gboard Mod",
-            "GboardWu": "GboardWu"
+            "Shotgun": "Shotgun"
           }
         }
       ]
