@@ -194,7 +194,7 @@ public final class ScreenshotCaptureObserver extends ContentObserver {
         String name = displayName != null ? displayName.toLowerCase(Locale.ROOT) : "";
         String path = pathOrRelative != null ? pathOrRelative.toLowerCase(Locale.ROOT) : "";
 
-        if (name.contains("pending") || name.endsWith(".tmp") || name.endsWith(".crdownload")) {
+        if (name.contains("pending") || name.endsWith(".tmp") || name.endsWith(".crdownload") || name.contains("webclip")) {
             return false;
         }
 

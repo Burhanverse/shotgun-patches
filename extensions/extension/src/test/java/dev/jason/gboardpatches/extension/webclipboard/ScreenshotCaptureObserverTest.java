@@ -18,6 +18,7 @@ public final class ScreenshotCaptureObserverTest {
     public void testIsScreenshotFileRejectsNonScreenshots() {
         Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile("IMG_20260825.jpg", "/storage/emulated/0/DCIM/Camera"));
         Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile("photo.png", "/storage/emulated/0/Download"));
+        Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile("Screenshot_WebClip_1724500000000.png", "/storage/emulated/0/Pictures/Screenshots"));
         Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile("Screenshot_2026.png.tmp", "/storage/emulated/0/Pictures/Screenshots"));
         Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile(".pending-123-Screenshot.png", "/storage/emulated/0/Pictures/Screenshots"));
         Assert.assertFalse(ScreenshotCaptureObserver.isScreenshotFile(null, null));

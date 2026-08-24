@@ -16,6 +16,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.os.Environment;
+import android.provider.MediaStore;
+import java.io.OutputStream;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -473,9 +478,6 @@ public final class ClipboardSyncService extends Service {
         if (clipboardManager == null) {
             clipboardManager = getSystemService(ClipboardManager.class);
         }
-        if (clipboardManager == null) {
-            return;
-        }
         try {
             File cacheFile = new File(getCacheDir(), GboardPatchesSettingsProvider.CLIPBOARD_IMAGE_FILE_NAME);
             try (FileOutputStream out = new FileOutputStream(cacheFile)) {
@@ -484,19 +486,71 @@ public final class ClipboardSyncService extends Service {
             String hash = "img:" + sha256Hex(imageBytes);
             webClipboardEchoSuppressor.markWebApplied(hash, SystemClock.elapsedRealtime());
 
-            Uri contentUri = Uri.parse("content://" + getPackageName()
-                    + GboardPatchesSettingsProvider.AUTHORITY_SUFFIX + "/"
-                    + GboardPatchesSettingsProvider.PATH_CLIPBOARD_IMAGE);
-            String effectiveMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
-            ClipData clipData = new ClipData(
-                    ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL,
-                    new String[] { effectiveMime, "image/*" },
-                    new ClipData.Item(contentUri));
-            clipboardManager.setPrimaryClip(clipData);
+            // Save to MediaStore (Pictures/Screenshots) to trigger Gboard native screenshot suggestion chip
+            saveToMediaStoreScreenshots(imageBytes, mimeType);
+
+            if (clipboardManager != null) {
+                Uri contentUri = Uri.parse("content://" + getPackageName()
+                        + GboardPatchesSettingsProvider.AUTHORITY_SUFFIX + "/"
+                        + GboardPatchesSettingsProvider.PATH_CLIPBOARD_IMAGE);
+                String effectiveMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+                ClipData clipData = new ClipData(
+                        ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL,
+                        new String[] { effectiveMime, "image/*" },
+                        new ClipData.Item(contentUri));
+                try {
+                    clipboardManager.setPrimaryClip(clipData);
+                } catch (Throwable t) {
+                    Log.w(TAG, "setPrimaryClip failed (likely background restriction); MediaStore screenshot saved", t);
+                }
+            }
             updateNotification("Image copied from Web");
         } catch (Throwable throwable) {
             webClipboardEchoSuppressor.clearWebApplied();
             Log.w(TAG, "Failed to apply web image to phone", throwable);
+        }
+    }
+
+    private void saveToMediaStoreScreenshots(byte[] imageBytes, String mimeType) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return;
+        }
+        String effectiveMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+        String ext = effectiveMime.contains("jpeg") ? ".jpg" : (effectiveMime.contains("webp") ? ".webp" : ".png");
+        String fileName = "Screenshot_WebClip_" + System.currentTimeMillis() + ext;
+
+        try {
+            ContentResolver resolver = getContentResolver();
+            if (resolver == null) return;
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, effectiveMime);
+            long nowSec = System.currentTimeMillis() / 1000L;
+            values.put(MediaStore.Images.Media.DATE_ADDED, nowSec);
+            values.put(MediaStore.Images.Media.DATE_MODIFIED, nowSec);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Screenshots");
+                values.put(MediaStore.Images.Media.IS_PENDING, 1);
+            }
+
+            Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            if (uri != null) {
+                try (OutputStream out = resolver.openOutputStream(uri)) {
+                    if (out != null) {
+                        out.write(imageBytes);
+                        out.flush();
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear();
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                    resolver.update(uri, values, null, null);
+                }
+                Log.i(TAG, LOG_PREFIX + " screenshot spoof saved to MediaStore: " + uri + " (" + fileName + ")");
+            }
+        } catch (Throwable throwable) {
+            Log.w(TAG, LOG_PREFIX + " failed to save screenshot to MediaStore", throwable);
         }
     }
 
