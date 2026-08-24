@@ -45,14 +45,10 @@ final class WebClipboardEchoSuppressor {
         }
         long timestampMs = sanitizeTimestamp(nowMs);
         pruneExpired(timestampMs);
-        Iterator<PendingEcho> iterator = pendingEchoes.iterator();
-        while (iterator.hasNext()) {
-            PendingEcho echo = iterator.next();
-            if (!echo.text.equals(normalized)) {
-                continue;
+        for (PendingEcho echo : pendingEchoes) {
+            if (echo.text.equals(normalized) && (timestampMs - echo.appliedAtMs) <= suppressionWindowMs) {
+                return true;
             }
-            iterator.remove();
-            return true;
         }
         return false;
     }
@@ -94,4 +90,3 @@ final class WebClipboardEchoSuppressor {
         }
     }
 }
-

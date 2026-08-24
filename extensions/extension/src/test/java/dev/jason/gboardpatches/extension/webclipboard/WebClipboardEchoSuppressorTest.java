@@ -11,7 +11,8 @@ public final class WebClipboardEchoSuppressorTest {
         suppressor.markWebApplied("web sent text", 1_000L);
 
         Assert.assertTrue(suppressor.shouldSuppressClipboardEvent("web sent text", 1_250L));
-        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent("web sent text", 1_300L));
+        Assert.assertTrue(suppressor.shouldSuppressClipboardEvent("web sent text", 1_300L));
+        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent("web sent text", 3_100L));
     }
 
     @Test
@@ -43,7 +44,7 @@ public final class WebClipboardEchoSuppressorTest {
 
         Assert.assertTrue(suppressor.shouldSuppressClipboardEvent("first web text", 1_250L));
         Assert.assertTrue(suppressor.shouldSuppressClipboardEvent("second web text", 1_300L));
-        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent("first web text", 1_350L));
+        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent("first web text", 3_500L));
     }
 
     @Test
@@ -54,6 +55,7 @@ public final class WebClipboardEchoSuppressorTest {
         suppressor.markWebApplied(imageHash, 1_000L);
 
         Assert.assertTrue(suppressor.shouldSuppressClipboardEvent(imageHash, 1_250L));
-        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent(imageHash, 1_300L));
+        Assert.assertTrue(suppressor.shouldSuppressClipboardEvent(imageHash, 1_300L));
+        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent(imageHash, 3_500L));
     }
 }

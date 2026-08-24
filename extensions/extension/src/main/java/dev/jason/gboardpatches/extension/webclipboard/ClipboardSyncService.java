@@ -56,7 +56,7 @@ public final class ClipboardSyncService extends Service {
     private static final String EXTRA_TEXT = "text";
     private static final String NOTIFICATION_CHANNEL_ID = "web_clipboard";
     private static final int NOTIFICATION_ID = 1002;
-    private static final long DUPLICATE_SUPPRESSION_WINDOW_MS = 750L;
+    private static final long DUPLICATE_SUPPRESSION_WINDOW_MS = 3_500L;
     private static final AtomicLong START_COMMAND_SEQUENCE = new AtomicLong(1L);
     private static volatile ClipboardSyncService activeService;
     private static volatile ClipboardSyncWebPortal activePortal;
@@ -72,6 +72,8 @@ public final class ClipboardSyncService extends Service {
             WebClipboardPreferences.DEFAULT_LOOPBACK_INGRESS_TOKEN;
     private String lastPublishedText = "";
     private long lastPublishedAtElapsedMs;
+    private String lastPublishedImageHash = "";
+    private long lastPublishedImageAtElapsedMs;
     private final WebClipboardEchoSuppressor webClipboardEchoSuppressor =
             new WebClipboardEchoSuppressor(DUPLICATE_SUPPRESSION_WINDOW_MS);
     private final ExecutorService clipboardPublishExecutor = Executors.newSingleThreadExecutor();
@@ -569,6 +571,16 @@ public final class ClipboardSyncService extends Service {
         if (imageBytes == null || imageBytes.length == 0) {
             return;
         }
+        String hash = "img:" + sha256Hex(imageBytes);
+        long now = SystemClock.elapsedRealtime();
+        synchronized (this) {
+            if (hash.equals(lastPublishedImageHash) && (now - lastPublishedImageAtElapsedMs) < DUPLICATE_SUPPRESSION_WINDOW_MS) {
+                Log.i(TAG, LOG_PREFIX + " publishImageToPortal duplicate suppressed hash=" + hash);
+                return;
+            }
+            lastPublishedImageHash = hash;
+            lastPublishedImageAtElapsedMs = now;
+        }
         try {
             clipboardPublishExecutor.execute(() -> {
                 ClipboardSyncWebPortal portal = webPortal;
@@ -606,6 +618,15 @@ public final class ClipboardSyncService extends Service {
     private void publishClipboardToPortal(String text) {
         if (!hasClipboardText(text)) {
             return;
+        }
+        long now = SystemClock.elapsedRealtime();
+        synchronized (this) {
+            if (text.equals(lastPublishedText) && (now - lastPublishedAtElapsedMs) < DUPLICATE_SUPPRESSION_WINDOW_MS) {
+                Log.i(TAG, LOG_PREFIX + " publishClipboardToPortal duplicate suppressed len=" + text.length());
+                return;
+            }
+            lastPublishedText = text;
+            lastPublishedAtElapsedMs = now;
         }
         try {
             clipboardPublishExecutor.execute(() -> publishClipboardToPortalInternal(text));
