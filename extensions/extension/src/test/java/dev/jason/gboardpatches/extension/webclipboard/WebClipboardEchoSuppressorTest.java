@@ -45,4 +45,15 @@ public final class WebClipboardEchoSuppressorTest {
         Assert.assertTrue(suppressor.shouldSuppressClipboardEvent("second web text", 1_300L));
         Assert.assertFalse(suppressor.shouldSuppressClipboardEvent("first web text", 1_350L));
     }
+
+    @Test
+    public void suppressesImmediateImageClipboardEchoFromWebApply() {
+        WebClipboardEchoSuppressor suppressor = new WebClipboardEchoSuppressor(2_000L);
+        String imageHash = "img:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+
+        suppressor.markWebApplied(imageHash, 1_000L);
+
+        Assert.assertTrue(suppressor.shouldSuppressClipboardEvent(imageHash, 1_250L));
+        Assert.assertFalse(suppressor.shouldSuppressClipboardEvent(imageHash, 1_300L));
+    }
 }

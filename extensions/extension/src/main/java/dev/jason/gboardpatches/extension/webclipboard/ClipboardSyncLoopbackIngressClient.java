@@ -27,6 +27,11 @@ public final class ClipboardSyncLoopbackIngressClient {
         return submitPhoneClipboard(text, port, loopbackIngressToken, DEFAULT_TIMEOUT_MS);
     }
 
+    public static boolean submitPhoneImageClipboard(byte[] imageBytes, String mimeType, int port,
+            String loopbackIngressToken) {
+        return submitPhoneImageClipboard(imageBytes, mimeType, port, loopbackIngressToken, DEFAULT_TIMEOUT_MS);
+    }
+
     public static boolean isExpectedPortal(int port, String loopbackIngressToken) {
         return isExpectedPortal(port, loopbackIngressToken, DEFAULT_TIMEOUT_MS);
     }
@@ -59,6 +64,59 @@ public final class ClipboardSyncLoopbackIngressClient {
             }
             JSONObject payload = new JSONObject();
             payload.put("text", text);
+            byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
+
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress(LOOPBACK_HOST, safePort), safeTimeoutMs);
+                socket.setSoTimeout(safeTimeoutMs);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                        socket.getOutputStream(), StandardCharsets.UTF_8));
+                writer.write("POST " + INGRESS_PATH + " HTTP/1.1\r\n");
+                writer.write("Host: " + LOOPBACK_HOST + ":" + safePort + "\r\n");
+                writer.write("Content-Type: application/json; charset=utf-8\r\n");
+                writer.write(LOOPBACK_INGRESS_TOKEN_HEADER + ": " + safeToken + "\r\n");
+                writer.write("Content-Length: " + body.length + "\r\n");
+                writer.write("Connection: close\r\n");
+                writer.write("\r\n");
+                writer.flush();
+                socket.getOutputStream().write(body);
+                socket.getOutputStream().flush();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        socket.getInputStream(), StandardCharsets.UTF_8));
+                String statusLine = reader.readLine();
+                return statusLine != null && statusLine.contains(" 200 ");
+            }
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    static boolean submitPhoneImageClipboard(byte[] imageBytes, String mimeType, int port,
+            String loopbackIngressToken, int timeoutMs) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return false;
+        }
+        String safeToken = loopbackIngressToken == null ? "" : loopbackIngressToken;
+        if (!ClipboardSyncLoopbackAuth.isUsableToken(safeToken)) {
+            return false;
+        }
+        int safePort = WebClipboardPreferences.sanitizePort(port);
+        int safeTimeoutMs = Math.max(100, timeoutMs);
+        try {
+            if (!isExpectedPortal(safePort, safeToken, safeTimeoutMs)) {
+                return false;
+            }
+            String base64;
+            try {
+                base64 = android.util.Base64.encodeToString(imageBytes, android.util.Base64.NO_WRAP);
+            } catch (Throwable ignored) {
+                base64 = java.util.Base64.getEncoder().encodeToString(imageBytes);
+            }
+            JSONObject payload = new JSONObject();
+            payload.put("type", "image");
+            payload.put("mimeType", mimeType != null ? mimeType : "image/png");
+            payload.put("data", base64);
             byte[] body = payload.toString().getBytes(StandardCharsets.UTF_8);
 
             try (Socket socket = new Socket()) {

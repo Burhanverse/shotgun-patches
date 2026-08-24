@@ -103,6 +103,41 @@ public final class GboardWebClipboardCaptureBootstrap {
         if (clipData == null || isWebClipboardEcho(clipData)) {
             return;
         }
+
+        // Check for image content in clipboard
+        if (hasImageContent(clipData)) {
+            android.net.Uri imageUri = currentClipboardImageUri(clipData);
+            if (imageUri != null) {
+                byte[] imageBytes = readImageBytes(context, imageUri, MAX_IMAGE_BYTES);
+                if (imageBytes != null && imageBytes.length > 0) {
+                    String mimeType = context.getContentResolver().getType(imageUri);
+                    if (mimeType == null || mimeType.isEmpty()) {
+                        mimeType = "image/png";
+                    }
+                    String hash = "img:" + sha256Hex(imageBytes);
+                    long now = SystemClock.elapsedRealtime();
+                    if (hash.equals(lastDispatchedHash)
+                            && now - lastDispatchedElapsedMs <= DUPLICATE_SUPPRESSION_WINDOW_MS) {
+                        return;
+                    }
+                    try {
+                        boolean accepted = ClipboardSyncLoopbackIngressClient.submitPhoneImageClipboard(
+                                imageBytes,
+                                mimeType,
+                                runtimeLookup.config.port,
+                                runtimeLookup.config.loopbackIngressToken);
+                        if (accepted) {
+                            lastDispatchedHash = hash;
+                            lastDispatchedElapsedMs = SystemClock.elapsedRealtime();
+                        }
+                    } catch (Throwable ignored) {
+                        // Best effort.
+                    }
+                    return;
+                }
+            }
+        }
+
         CharSequence text = currentClipboardText(context, clipData);
         if (text == null) {
             return;
@@ -207,6 +242,80 @@ public final class GboardWebClipboardCaptureBootstrap {
             return clipData.getItemAt(0).coerceToText(context);
         } catch (Throwable ignored) {
             return null;
+        }
+    }
+
+    private static final int MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+    private static boolean hasImageContent(ClipData clipData) {
+        try {
+            if (clipData == null || clipData.getItemCount() <= 0) {
+                return false;
+            }
+            ClipDescription description = clipData.getDescription();
+            if (description != null) {
+                if (description.hasMimeType("image/*")
+                        || description.hasMimeType("image/png")
+                        || description.hasMimeType("image/jpeg")
+                        || description.hasMimeType("image/webp")) {
+                    return true;
+                }
+            }
+            android.net.Uri uri = clipData.getItemAt(0).getUri();
+            return uri != null;
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static android.net.Uri currentClipboardImageUri(ClipData clipData) {
+        try {
+            if (clipData == null || clipData.getItemCount() <= 0) {
+                return null;
+            }
+            return clipData.getItemAt(0).getUri();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static byte[] readImageBytes(Context context, android.net.Uri uri, int maxBytes) {
+        if (context == null || uri == null) {
+            return null;
+        }
+        try (java.io.InputStream input = context.getContentResolver().openInputStream(uri)) {
+            if (input == null) {
+                return null;
+            }
+            java.io.ByteArrayOutputStream output = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read;
+            int total = 0;
+            while ((read = input.read(buffer)) != -1) {
+                total += read;
+                if (total > maxBytes) {
+                    return null;
+                }
+                output.write(buffer, 0, read);
+            }
+            return output.toByteArray();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static String sha256Hex(byte[] bytes) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(bytes);
+            StringBuilder builder = new StringBuilder(hash.length * 2);
+            for (byte current : hash) {
+                builder.append(Character.forDigit((current >> 4) & 0xF, 16));
+                builder.append(Character.forDigit(current & 0xF, 16));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException exception) {
+            return Integer.toHexString(java.util.Arrays.hashCode(bytes));
         }
     }
 

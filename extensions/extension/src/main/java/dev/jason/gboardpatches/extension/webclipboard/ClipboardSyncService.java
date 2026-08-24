@@ -6,17 +6,26 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +34,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsActivity;
+import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsProvider;
 
 public final class ClipboardSyncService extends Service {
     private static final String TAG = "GboardWebClipboard";
@@ -279,7 +289,17 @@ public final class ClipboardSyncService extends Service {
             String loopbackIngressToken) {
         ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
                 port,
-                this::applyWebClipboardToPhone,
+                new ClipboardSyncWebPortal.ClipboardBridge() {
+                    @Override
+                    public void applyDesktopClipboard(String text) {
+                        applyWebClipboardToPhone(text);
+                    }
+
+                    @Override
+                    public void applyDesktopImage(byte[] imageBytes, String mimeType) {
+                        applyWebImageToPhone(imageBytes, mimeType);
+                    }
+                },
                 ClipboardSyncWebPortal.WebAssets.from(this),
                 new ClipboardSyncWebPortal.SecurityConfig(
                         pairingRequired,
@@ -346,6 +366,29 @@ public final class ClipboardSyncService extends Service {
             return;
         }
         ClipboardManager.OnPrimaryClipChangedListener listener = () -> {
+            ClipData clipData = currentClipboardData(clipboardManager);
+            if (clipData != null && !isWebClipboardEcho(clipData)) {
+                if (hasImageContent(clipData)) {
+                    Uri imageUri = currentClipboardImageUri(clipData);
+                    if (imageUri != null) {
+                        byte[] imageBytes = readImageBytes(this, imageUri, MAX_IMAGE_BYTES);
+                        if (imageBytes != null && imageBytes.length > 0) {
+                            String mimeType = getContentResolver().getType(imageUri);
+                            if (mimeType == null || mimeType.isEmpty()) {
+                                mimeType = "image/png";
+                            }
+                            String hash = "img:" + sha256Hex(imageBytes);
+                            if (!webClipboardEchoSuppressor.shouldSuppressClipboardEvent(hash, SystemClock.elapsedRealtime())) {
+                                Log.i(TAG, LOG_PREFIX + " service clipboard listener fired for image"
+                                        + " bytes=" + imageBytes.length
+                                        + ", portal=" + describePortal(webPortal));
+                                publishImageToPortal(imageBytes, mimeType);
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
             CharSequence currentText = currentClipboardText(clipboardManager);
             if (currentText != null) {
                 Log.i(TAG, LOG_PREFIX + " service clipboard listener fired"
@@ -400,6 +443,40 @@ public final class ClipboardSyncService extends Service {
         updateNotification("Clipboard applied from Web");
     }
 
+    private void applyWebImageToPhone(byte[] imageBytes, String mimeType) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return;
+        }
+        ClipboardManager clipboardManager = serviceClipboardManager;
+        if (clipboardManager == null) {
+            clipboardManager = getSystemService(ClipboardManager.class);
+        }
+        if (clipboardManager == null) {
+            return;
+        }
+        try {
+            File cacheFile = new File(getCacheDir(), GboardPatchesSettingsProvider.CLIPBOARD_IMAGE_FILE_NAME);
+            try (FileOutputStream out = new FileOutputStream(cacheFile)) {
+                out.write(imageBytes);
+            }
+            String hash = "img:" + sha256Hex(imageBytes);
+            webClipboardEchoSuppressor.markWebApplied(hash, SystemClock.elapsedRealtime());
+
+            Uri contentUri = Uri.parse("content://" + getPackageName()
+                    + GboardPatchesSettingsProvider.AUTHORITY_SUFFIX + "/"
+                    + GboardPatchesSettingsProvider.PATH_CLIPBOARD_IMAGE);
+            ClipData clipData = ClipData.newUri(
+                    getContentResolver(),
+                    ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL,
+                    contentUri);
+            clipboardManager.setPrimaryClip(clipData);
+            updateNotification("Image copied from Web");
+        } catch (Throwable throwable) {
+            webClipboardEchoSuppressor.clearWebApplied();
+            Log.w(TAG, "Failed to apply web image to phone", throwable);
+        }
+    }
+
     private void publishClipboardToPortalIfNotWebEcho(String text) {
         if (webClipboardEchoSuppressor.shouldSuppressClipboardEvent(
                 text,
@@ -409,6 +486,23 @@ public final class ClipboardSyncService extends Service {
             return;
         }
         publishClipboardToPortal(text);
+    }
+
+    private void publishImageToPortal(byte[] imageBytes, String mimeType) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return;
+        }
+        try {
+            clipboardPublishExecutor.execute(() -> {
+                ClipboardSyncWebPortal portal = webPortal;
+                if (portal != null) {
+                    portal.publishPhoneImageClipboard(imageBytes, mimeType);
+                    updateNotification("Image clipboard available");
+                }
+            });
+        } catch (RejectedExecutionException ignored) {
+            Log.i(TAG, LOG_PREFIX + " portal publish image ignored during teardown");
+        }
     }
 
     private void seedPortalFromCurrentClipboard(ClipboardSyncWebPortal portal) {
@@ -572,5 +666,100 @@ public final class ClipboardSyncService extends Service {
         return text != null && !text.isEmpty();
     }
 
+    private static final int MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+    private static ClipData currentClipboardData(ClipboardManager clipboardManager) {
+        try {
+            if (!clipboardManager.hasPrimaryClip()) {
+                return null;
+            }
+            return clipboardManager.getPrimaryClip();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static boolean isWebClipboardEcho(ClipData clipData) {
+        try {
+            ClipDescription description = clipData.getDescription();
+            CharSequence label = description == null ? null : description.getLabel();
+            return ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL.contentEquals(
+                    label == null ? "" : label);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static boolean hasImageContent(ClipData clipData) {
+        try {
+            if (clipData == null || clipData.getItemCount() <= 0) {
+                return false;
+            }
+            ClipDescription description = clipData.getDescription();
+            if (description != null) {
+                if (description.hasMimeType("image/*")
+                        || description.hasMimeType("image/png")
+                        || description.hasMimeType("image/jpeg")
+                        || description.hasMimeType("image/webp")) {
+                    return true;
+                }
+            }
+            Uri uri = clipData.getItemAt(0).getUri();
+            return uri != null;
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    private static Uri currentClipboardImageUri(ClipData clipData) {
+        try {
+            if (clipData == null || clipData.getItemCount() <= 0) {
+                return null;
+            }
+            return clipData.getItemAt(0).getUri();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static byte[] readImageBytes(Context context, Uri uri, int maxBytes) {
+        if (context == null || uri == null) {
+            return null;
+        }
+        try (InputStream input = context.getContentResolver().openInputStream(uri)) {
+            if (input == null) {
+                return null;
+            }
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int read;
+            int total = 0;
+            while ((read = input.read(buffer)) != -1) {
+                total += read;
+                if (total > maxBytes) {
+                    return null;
+                }
+                output.write(buffer, 0, read);
+            }
+            return output.toByteArray();
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static String sha256Hex(byte[] bytes) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(bytes);
+            StringBuilder builder = new StringBuilder(hash.length * 2);
+            for (byte current : hash) {
+                builder.append(Character.forDigit((current >> 4) & 0xF, 16));
+                builder.append(Character.forDigit(current & 0xF, 16));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException exception) {
+            return Integer.toHexString(Arrays.hashCode(bytes));
+        }
+    }
 }
 

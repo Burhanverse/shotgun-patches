@@ -17,7 +17,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +38,7 @@ public final class ClipboardSyncWebPortal {
     private static final long DUPLICATE_SUPPRESSION_WINDOW_MS = 5_000L;
     private static final long WEB_ECHO_SUPPRESSION_WINDOW_MS = 2 * 60_000L;
     private static final long CLIENT_HEARTBEAT_INTERVAL_MS = 1_000L;
-    private static final int MAX_REQUEST_BODY_BYTES = 1024 * 1024;
+    private static final int MAX_REQUEST_BODY_BYTES = 15 * 1024 * 1024;
     private static final AtomicLong NEXT_PORTAL_INSTANCE_SEQUENCE = new AtomicLong(1L);
 
     private final int requestedPort;
@@ -59,8 +62,14 @@ public final class ClipboardSyncWebPortal {
     private Thread clientHeartbeatThread;
     private volatile boolean stopped = true;
     private volatile String latestPhoneClipboardText = "";
+    private volatile byte[] latestPhoneClipboardImage = null;
+    private volatile String latestPhoneClipboardImageMime = "";
+    private volatile String latestPhoneClipboardType = "text";
     private volatile long latestPhoneClipboardAtMs;
     private volatile String latestWebClipboardText = "";
+    private volatile byte[] latestWebClipboardImage = null;
+    private volatile String latestWebClipboardImageMime = "";
+    private volatile String latestWebClipboardType = "text";
     private volatile long latestWebClipboardAtMs;
     private long nextEventClientId = 1L;
 
@@ -91,8 +100,10 @@ public final class ClipboardSyncWebPortal {
         this.securityConfig = securityConfig == null ? SecurityConfig.disabled() : securityConfig;
     }
 
-    interface ClipboardBridge {
+    public interface ClipboardBridge {
         void applyDesktopClipboard(String text);
+        default void applyDesktopImage(byte[] imageBytes, String mimeType) {
+        }
     }
 
     interface WebAssets {
@@ -298,8 +309,35 @@ public final class ClipboardSyncWebPortal {
             return;
         }
         latestPhoneClipboardText = text;
+        latestPhoneClipboardImage = null;
+        latestPhoneClipboardImageMime = "";
+        latestPhoneClipboardType = "text";
         latestPhoneClipboardAtMs = nowMs;
         broadcastClipboardEvent(text, latestPhoneClipboardAtMs, "phone", "Phone", null);
+    }
+
+    public void publishPhoneImageClipboard(byte[] imageBytes, String mimeType) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return;
+        }
+        long nowMs = System.currentTimeMillis();
+        String hash = "img:" + sha256Hex(imageBytes);
+        if (webEchoSuppressor.shouldSuppressClipboardEvent(hash, nowMs)) {
+            logInfo(LOG_PREFIX + " portal publish suppressed web image echo bytes=" + imageBytes.length);
+            return;
+        }
+        if (latestPhoneClipboardImage != null
+                && hash.equals("img:" + sha256Hex(latestPhoneClipboardImage))
+                && nowMs - latestPhoneClipboardAtMs <= DUPLICATE_SUPPRESSION_WINDOW_MS) {
+            logInfo(LOG_PREFIX + " portal publish suppressed duplicate image bytes=" + imageBytes.length);
+            return;
+        }
+        latestPhoneClipboardImage = imageBytes;
+        latestPhoneClipboardImageMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+        latestPhoneClipboardType = "image";
+        latestPhoneClipboardText = "";
+        latestPhoneClipboardAtMs = nowMs;
+        broadcastImageClipboardEvent(imageBytes, latestPhoneClipboardImageMime, latestPhoneClipboardAtMs, "phone", "Phone", null);
     }
 
     private long publishWebClipboard(String text, String senderLabel, String clientId) {
@@ -307,9 +345,27 @@ public final class ClipboardSyncWebPortal {
             return 0L;
         }
         latestWebClipboardText = text;
+        latestWebClipboardImage = null;
+        latestWebClipboardImageMime = "";
+        latestWebClipboardType = "text";
         latestWebClipboardAtMs = System.currentTimeMillis();
         webEchoSuppressor.markWebApplied(text, latestWebClipboardAtMs);
         broadcastClipboardEvent(text, latestWebClipboardAtMs, "web", senderLabel, clientId);
+        return latestWebClipboardAtMs;
+    }
+
+    private long publishWebImageClipboard(byte[] imageBytes, String mimeType, String senderLabel, String clientId) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return 0L;
+        }
+        latestWebClipboardImage = imageBytes;
+        latestWebClipboardImageMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+        latestWebClipboardType = "image";
+        latestWebClipboardText = "";
+        latestWebClipboardAtMs = System.currentTimeMillis();
+        String hash = "img:" + sha256Hex(imageBytes);
+        webEchoSuppressor.markWebApplied(hash, latestWebClipboardAtMs);
+        broadcastImageClipboardEvent(imageBytes, latestWebClipboardImageMime, latestWebClipboardAtMs, "web", senderLabel, clientId);
         return latestWebClipboardAtMs;
     }
 
@@ -317,6 +373,7 @@ public final class ClipboardSyncWebPortal {
             String senderLabel, String clientId) {
         JSONObject payload = new JSONObject();
         try {
+            payload.put("type", "text");
             payload.put("text", text);
             payload.put("updatedAtMs", updatedAtMs);
             payload.put("source", source);
@@ -336,6 +393,46 @@ public final class ClipboardSyncWebPortal {
                 + " instance=" + portalInstanceId
                 + " source=" + source
                 + " len=" + text.length()
+                + ", clients=" + clients.size());
+        List<EventClient> failedClients = writeFrameToClients(clients, frame, "clipboard");
+        removeFailedEventClients(failedClients);
+    }
+
+    private void broadcastImageClipboardEvent(byte[] imageBytes, String mimeType, long updatedAtMs,
+            String source, String senderLabel, String clientId) {
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("type", "image");
+            payload.put("mimeType", mimeType);
+            payload.put("imageSize", imageBytes.length);
+            payload.put("imageUrl", "/image/latest?source=" + source);
+            if (imageBytes.length <= 4 * 1024 * 1024) {
+                String base64;
+                try {
+                    base64 = android.util.Base64.encodeToString(imageBytes, android.util.Base64.NO_WRAP);
+                } catch (Throwable ignored) {
+                    base64 = java.util.Base64.getEncoder().encodeToString(imageBytes);
+                }
+                payload.put("data", "data:" + mimeType + ";base64," + base64);
+            }
+            payload.put("updatedAtMs", updatedAtMs);
+            payload.put("source", source);
+            if (senderLabel != null && !senderLabel.isBlank()) {
+                payload.put("senderLabel", senderLabel);
+            }
+            if (clientId != null && !clientId.isBlank()) {
+                payload.put("clientId", clientId);
+            }
+        } catch (Throwable ignored) {
+            return;
+        }
+        String frame = "event: clipboard\r\n"
+                + "data: " + payload.toString() + "\r\n\r\n";
+        List<EventClient> clients = snapshotEventClients();
+        logInfo(LOG_PREFIX + " portal published image clipboard"
+                + " instance=" + portalInstanceId
+                + " source=" + source
+                + " bytes=" + imageBytes.length
                 + ", clients=" + clients.size());
         List<EventClient> failedClients = writeFrameToClients(clients, frame, "clipboard");
         removeFailedEventClients(failedClients);
@@ -571,6 +668,10 @@ public final class ClipboardSyncWebPortal {
                         buildLatestStateJson());
                 return;
             }
+            if ("GET".equals(request.method) && "/image/latest".equals(request.path)) {
+                handleGetLatestImage(socket, request);
+                return;
+            }
             if ("GET".equals(request.method) && "/clients".equals(request.path)) {
                 synchronized (clientsLock) {
                     writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
@@ -739,14 +840,43 @@ public final class ClipboardSyncWebPortal {
     }
 
     private void handleClipboardPost(Socket socket, String body) throws Exception {
+        String type = extractField(body, "type");
+        String mimeType = extractField(body, "mimeType");
+        String data = extractField(body, "data");
         String text = extractText(body);
+        String clientId = sanitizeClientId(extractClientId(body));
+        String messageId = sanitizeMessageId(extractField(body, "messageId"));
+
+        boolean isImage = "image".equalsIgnoreCase(type) || (data != null && data.startsWith("data:image/"));
+        if (isImage) {
+            byte[] imageBytes = extractImageBytesFromPayload(body, data);
+            if (imageBytes == null || imageBytes.length == 0) {
+                writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                        "{\"ok\":false,\"error\":\"empty_image\"}");
+                return;
+            }
+            if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = extractMimeTypeFromDataUrl(data, "image/png");
+            }
+            try {
+                bridge.applyDesktopImage(imageBytes, mimeType);
+            } catch (Throwable throwable) {
+                writeResponse(socket, 500, "Internal Server Error", "application/json; charset=utf-8",
+                        buildAckJson(false, messageId, clientId, "failed", 0L, "apply_failed"));
+                return;
+            }
+            long appliedAtMs = publishWebImageClipboard(imageBytes, mimeType, senderLabelFor(socket), clientId);
+            String ackJson = buildAckJson(true, messageId, clientId, "applied", appliedAtMs, "");
+            broadcastAckEvent(ackJson);
+            writeResponse(socket, 200, "OK", "application/json; charset=utf-8", ackJson);
+            return;
+        }
+
         if (!hasClipboardText(text)) {
             writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
                     "{\"ok\":false,\"error\":\"empty_text\"}");
             return;
         }
-        String clientId = sanitizeClientId(extractClientId(body));
-        String messageId = sanitizeMessageId(extractField(body, "messageId"));
         try {
             bridge.applyDesktopClipboard(text);
         } catch (Throwable throwable) {
@@ -784,6 +914,23 @@ public final class ClipboardSyncWebPortal {
                     "{\"ok\":false,\"error\":\"invalid_loopback_token\"}");
             return;
         }
+        String type = extractField(request.body, "type");
+        if ("image".equalsIgnoreCase(type)) {
+            String data = extractField(request.body, "data");
+            String mimeType = extractField(request.body, "mimeType");
+            byte[] imageBytes = extractImageBytesFromPayload(request.body, data);
+            if (imageBytes == null || imageBytes.length == 0) {
+                writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                        "{\"ok\":false,\"error\":\"empty_image\"}");
+                return;
+            }
+            if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = "image/png";
+            }
+            publishPhoneImageClipboard(imageBytes, mimeType);
+            writeResponse(socket, 200, "OK", "application/json; charset=utf-8", "{\"ok\":true}");
+            return;
+        }
         String text = extractText(request.body);
         if (!hasClipboardText(text)) {
             writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
@@ -795,13 +942,40 @@ public final class ClipboardSyncWebPortal {
                 "{\"ok\":true}");
     }
 
+    private void handleGetLatestImage(Socket socket, Request request) throws Exception {
+        String source = request.query != null ? request.query.get("source") : null;
+        byte[] imageBytes;
+        String mimeType;
+        if ("web".equalsIgnoreCase(source)) {
+            imageBytes = latestWebClipboardImage;
+            mimeType = latestWebClipboardImageMime;
+        } else {
+            imageBytes = latestPhoneClipboardImage;
+            mimeType = latestPhoneClipboardImageMime;
+        }
+        if (imageBytes == null || imageBytes.length == 0) {
+            writeResponse(socket, 404, "Not Found", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"no_image\"}");
+            return;
+        }
+        String contentType = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+        writeResponse(socket, 200, "OK", contentType, imageBytes);
+    }
+
     private String buildLatestStateJson() {
         JSONObject payload = new JSONObject();
         try {
+            payload.put("type", latestPhoneClipboardType);
             payload.put("text", latestPhoneClipboardText == null ? "" : latestPhoneClipboardText);
+            payload.put("hasImage", latestPhoneClipboardImage != null && latestPhoneClipboardImage.length > 0);
+            payload.put("mimeType", latestPhoneClipboardImageMime == null ? "" : latestPhoneClipboardImageMime);
+            payload.put("imageSize", latestPhoneClipboardImage != null ? latestPhoneClipboardImage.length : 0);
+            if (latestPhoneClipboardImage != null && latestPhoneClipboardImage.length > 0) {
+                payload.put("imageUrl", "/image/latest?source=phone");
+            }
             payload.put("updatedAtMs", Math.max(0L, latestPhoneClipboardAtMs));
         } catch (Throwable ignored) {
-            return "{\"text\":\"\",\"updatedAtMs\":0}";
+            return "{\"type\":\"text\",\"text\":\"\",\"updatedAtMs\":0}";
         }
         return payload.toString();
     }
@@ -813,6 +987,7 @@ public final class ClipboardSyncWebPortal {
         return "/status".equals(request.path)
                 || "/events".equals(request.path)
                 || "/state".equals(request.path)
+                || "/image/latest".equals(request.path)
                 || "/clipboard".equals(request.path)
                 || "/clients".equals(request.path)
                 || "/clients/kick".equals(request.path);
@@ -895,6 +1070,76 @@ public final class ClipboardSyncWebPortal {
             return json.optString("text", "");
         } catch (Throwable ignored) {
             return decodeFormText(body);
+        }
+    }
+
+    private static byte[] extractImageBytesFromPayload(String body, String dataField) {
+        String base64 = dataField;
+        if (base64 == null || base64.isEmpty()) {
+            base64 = extractFieldStatic(body, "data");
+        }
+        if (base64 == null || base64.isEmpty()) {
+            base64 = extractFieldStatic(body, "image");
+        }
+        if (base64 == null || base64.isEmpty()) {
+            return null;
+        }
+        int comma = base64.indexOf(',');
+        if (comma >= 0) {
+            base64 = base64.substring(comma + 1);
+        }
+        base64 = base64.trim();
+        if (base64.isEmpty()) {
+            return null;
+        }
+        try {
+            return java.util.Base64.getDecoder().decode(base64);
+        } catch (Throwable ignored) {
+            try {
+                return android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+            } catch (Throwable ignoredAgain) {
+                return null;
+            }
+        }
+    }
+
+    private static String extractMimeTypeFromDataUrl(String dataUrl, String fallback) {
+        if (dataUrl != null && dataUrl.startsWith("data:") && dataUrl.contains(";")) {
+            int semi = dataUrl.indexOf(';');
+            if (semi > 5) {
+                return dataUrl.substring(5, semi).trim();
+            }
+        }
+        return fallback;
+    }
+
+    private static String extractFieldStatic(String body, String fieldName) {
+        if (body == null || body.isBlank()) {
+            return "";
+        }
+        try {
+            JSONObject json = new JSONObject(body);
+            return json.optString(fieldName, "");
+        } catch (Throwable ignored) {
+            return "";
+        }
+    }
+
+    private static String sha256Hex(byte[] bytes) {
+        if (bytes == null) {
+            return "";
+        }
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(bytes);
+            StringBuilder builder = new StringBuilder(hash.length * 2);
+            for (byte current : hash) {
+                builder.append(Character.forDigit((current >> 4) & 0xF, 16));
+                builder.append(Character.forDigit(current & 0xF, 16));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException exception) {
+            return Integer.toHexString(Arrays.hashCode(bytes));
         }
     }
 
@@ -1377,11 +1622,11 @@ public final class ClipboardSyncWebPortal {
 
     private static final String INDEX_HTML = """
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clipboard</title>
+  <title>Gboard Clipboard Glass</title>
   <style>
     :root {
       color-scheme: light;
@@ -1425,7 +1670,7 @@ public final class ClipboardSyncWebPortal {
 
     main {
       position: relative;
-      width: min(920px, calc(100vw - 28px));
+      width: min(960px, calc(100vw - 28px));
       min-height: min(760px, calc(100dvh - 28px));
       padding: 28px;
       border: 1px solid rgba(255, 255, 255, .48);
@@ -1517,7 +1762,7 @@ public final class ClipboardSyncWebPortal {
     }
     .metric {
       color: var(--blue);
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 900;
     }
     textarea, .clip-view {
@@ -1540,6 +1785,46 @@ public final class ClipboardSyncWebPortal {
     .clip-view {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+    }
+    .image-preview-container {
+      display: none;
+      width: 100%;
+      min-height: 214px;
+      max-height: 380px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, .58);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .38);
+      box-shadow: inset 0 1px 18px rgba(86, 145, 191, .14);
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      text-align: center;
+    }
+    .image-preview-container img {
+      max-width: 100%;
+      max-height: 320px;
+      border-radius: 14px;
+      object-fit: contain;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+    }
+    .drop-zone {
+      margin-top: 10px;
+      padding: 12px;
+      border: 2px dashed rgba(20, 126, 234, .4);
+      border-radius: 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .25);
+      transition: background .2s ease, border-color .2s ease;
+      cursor: pointer;
+    }
+    .drop-zone.dragover {
+      background: rgba(20, 126, 234, .12);
+      border-color: var(--blue);
+      color: var(--blue);
     }
     .hint {
       margin: 12px 0 0;
@@ -1620,24 +1905,31 @@ public final class ClipboardSyncWebPortal {
       <article class="card large">
         <div class="card-header">
           <div class="title">Desktop → Phone</div>
-          <div class="metric" id="desktopCount">0</div>
+          <div class="metric" id="desktopCount">0 chars</div>
         </div>
-        <textarea id="desktopText" placeholder="在這裡 Ctrl+V 貼上 Windows / macOS / Linux 剪貼簿，會直接送到手機。"></textarea>
+        <textarea id="desktopText" placeholder="Paste text or screenshot (Ctrl+V) from Windows / macOS / Linux to sync to phone."></textarea>
+        <div class="drop-zone" id="dropZone">Drop image / screenshot file here or paste directly (Ctrl+V)</div>
         <div class="actions">
-          <button id="sendButton">Send to phone</button>
+          <button id="sendButton">Send text to phone</button>
           <button class="secondary" id="pasteButton">Paste from browser</button>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+          <button class="secondary" id="uploadImageButton">Send image file</button>
         </div>
-        <p class="hint">HTTP 模式下瀏覽器可能不允許自動讀剪貼簿；手動 Ctrl+V 永遠可用。</p>
+        <p class="hint">Supports text, screenshots, and image files up to 10MB.</p>
       </article>
 
       <article class="card">
         <div class="card-header">
           <div class="title">Phone → Web</div>
-          <div class="metric" id="phoneCount">0</div>
+          <div class="metric" id="phoneCount">0 chars</div>
         </div>
-        <div id="phoneText" class="clip-view">等待手機剪貼簿...</div>
+        <div id="phoneText" class="clip-view">Waiting for phone clipboard / screenshot...</div>
+        <div id="imagePreviewContainer" class="image-preview-container">
+          <img id="phoneImage" alt="Phone Screenshot / Image">
+        </div>
         <div class="actions">
           <button id="copyButton">Copy on desktop</button>
+          <button class="secondary" id="downloadImageButton" style="display:none">Save image</button>
         </div>
       </article>
 
@@ -1646,26 +1938,33 @@ public final class ClipboardSyncWebPortal {
           <div class="title">Live Link</div>
           <div class="metric">LAN</div>
         </div>
-        <p class="hint">保持這個分頁開啟。手機複製文字後會透過 Server-Sent Events 即時顯示在這裡。</p>
+        <p class="hint">Keep this tab open. Phone copies & screenshots sync instantly via Server-Sent Events.</p>
         <p class="hint" id="lastUpdated">No clipboard received yet.</p>
       </article>
     </section>
 
     <section class="dock">
-      <span>頁面開著就可用，不需要安裝桌面 APP</span>
+      <span>Zero-install real-time clipboard sync for text and screenshots</span>
       <small id="endpoint"></small>
     </section>
   </main>
   <script>
     const desktopText = document.getElementById("desktopText");
     const phoneText = document.getElementById("phoneText");
+    const phoneImage = document.getElementById("phoneImage");
+    const imagePreviewContainer = document.getElementById("imagePreviewContainer");
     const desktopCount = document.getElementById("desktopCount");
     const phoneCount = document.getElementById("phoneCount");
     const statusText = document.getElementById("status");
     const dot = document.getElementById("dot");
     const lastUpdated = document.getElementById("lastUpdated");
     const endpoint = document.getElementById("endpoint");
-    let lastPhoneText = "";
+    const copyButton = document.getElementById("copyButton");
+    const downloadImageButton = document.getElementById("downloadImageButton");
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+
+    let lastPhonePayload = null;
     let lastPhoneUpdatedAtMs = 0;
 
     endpoint.textContent = location.host;
@@ -1675,23 +1974,43 @@ public final class ClipboardSyncWebPortal {
       dot.classList.toggle("online", online);
     }
 
-    function applyPhoneClipboard(text, updatedAtMs) {
-      const nextText = text || "";
-      const nextUpdatedAtMs = Number(updatedAtMs || 0);
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function applyPhoneClipboard(payload) {
+      if (!payload) return;
+      const nextUpdatedAtMs = Number(payload.updatedAtMs || 0);
       if (nextUpdatedAtMs > 0 && nextUpdatedAtMs < lastPhoneUpdatedAtMs) {
         return;
       }
-      if (nextUpdatedAtMs === lastPhoneUpdatedAtMs && nextText === lastPhoneText) {
-        return;
-      }
-      lastPhoneText = nextText;
+      lastPhonePayload = payload;
       lastPhoneUpdatedAtMs = nextUpdatedAtMs;
-      phoneText.textContent = lastPhoneText || "空剪貼簿";
-      phoneCount.textContent = String(lastPhoneText.length);
+
+      if (payload.type === "image" || payload.hasImage) {
+        phoneText.style.display = "none";
+        imagePreviewContainer.style.display = "flex";
+        phoneImage.src = payload.data || (payload.imageUrl ? payload.imageUrl + "&t=" + Date.now() : "/image/latest?source=phone&t=" + Date.now());
+        phoneCount.textContent = formatBytes(payload.imageSize || 0);
+        downloadImageButton.style.display = "inline-block";
+        copyButton.textContent = "Copy image";
+        setOnline(true, "Phone image copied");
+      } else {
+        imagePreviewContainer.style.display = "none";
+        phoneText.style.display = "block";
+        const text = payload.text || "";
+        phoneText.textContent = text || "Empty clipboard";
+        phoneCount.textContent = text.length + " chars";
+        downloadImageButton.style.display = "none";
+        copyButton.textContent = "Copy on desktop";
+        if (text) setOnline(true, "Phone text copied");
+      }
+
       lastUpdated.textContent = nextUpdatedAtMs > 0
         ? "Updated " + new Date(nextUpdatedAtMs).toLocaleTimeString()
         : "Updated " + new Date().toLocaleTimeString();
-      setOnline(true, "Phone copied");
     }
 
     async function pollLatestClipboard() {
@@ -1699,53 +2018,165 @@ public final class ClipboardSyncWebPortal {
         const response = await fetch("/state", { cache: "no-store" });
         if (!response.ok) return;
         const payload = await response.json();
-        applyPhoneClipboard(payload.text, payload.updatedAtMs);
+        applyPhoneClipboard(payload);
       } catch {
-        // Keep SSE as the primary path; polling is best effort fallback.
+        // Fallback
       }
     }
 
-    async function sendToPhone() {
+    async function sendTextToPhone() {
       const text = desktopText.value;
       if (text.length === 0) return;
       const response = await fetch("/clipboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ type: "text", text: text })
       });
       if (!response.ok) throw new Error("send failed");
-      desktopCount.textContent = String(text.length);
-      setOnline(true, "Sent");
+      desktopCount.textContent = text.length + " chars";
+      setOnline(true, "Text sent");
+    }
+
+    async function sendImageToPhone(fileOrBlob) {
+      if (!fileOrBlob) return;
+      setOnline(true, "Sending image...");
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = reader.result;
+        try {
+          const response = await fetch("/clipboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "image",
+              mimeType: fileOrBlob.type || "image/png",
+              data: dataUrl
+            })
+          });
+          if (!response.ok) throw new Error("send image failed");
+          desktopCount.textContent = formatBytes(fileOrBlob.size);
+          setOnline(true, "Image sent");
+        } catch (e) {
+          setOnline(false, "Image send failed");
+        }
+      };
+      reader.readAsDataURL(fileOrBlob);
     }
 
     document.getElementById("sendButton").addEventListener("click", () => {
-      sendToPhone().catch(() => setOnline(false, "Send failed"));
+      sendTextToPhone().catch(() => setOnline(false, "Send failed"));
     });
-    desktopText.addEventListener("paste", () => {
-      setTimeout(() => sendToPhone().catch(() => setOnline(false, "Send failed")), 20);
+
+    document.getElementById("uploadImageButton").addEventListener("click", () => {
+      fileInput.click();
     });
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files && fileInput.files[0]) {
+        sendImageToPhone(fileInput.files[0]);
+      }
+    });
+
+    // Paste handling on textarea and whole document
+    desktopText.addEventListener("paste", (event) => {
+      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const blob = item.getAsFile();
+          event.preventDefault();
+          sendImageToPhone(blob);
+          return;
+        }
+      }
+      setTimeout(() => sendTextToPhone().catch(() => setOnline(false, "Send failed")), 20);
+    });
+
+    // Drag and drop support
+    dropZone.addEventListener("click", () => fileInput.click());
+    ["dragenter", "dragover"].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("dragover");
+      });
+    });
+    ["dragleave", "drop"].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("dragover");
+      });
+    });
+    dropZone.addEventListener("drop", (e) => {
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0 && files[0].type.startsWith("image/")) {
+        sendImageToPhone(files[0]);
+      }
+    });
+
     document.getElementById("pasteButton").addEventListener("click", async () => {
       try {
+        if (navigator.clipboard && navigator.clipboard.read) {
+          const items = await navigator.clipboard.read();
+          for (const item of items) {
+            const imageType = item.types.find(type => type.startsWith("image/"));
+            if (imageType) {
+              const blob = await item.getType(imageType);
+              await sendImageToPhone(blob);
+              return;
+            }
+          }
+        }
         desktopText.value = await navigator.clipboard.readText();
-        await sendToPhone();
+        await sendTextToPhone();
       } catch {
         desktopText.focus();
         setOnline(false, "Use Ctrl+V");
       }
     });
-    document.getElementById("copyButton").addEventListener("click", async () => {
-      if (!lastPhoneText) return;
-      try {
-        await navigator.clipboard.writeText(lastPhoneText);
-        setOnline(true, "Copied");
-      } catch {
-        const range = document.createRange();
-        range.selectNodeContents(phoneText);
-        const selection = getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        setOnline(false, "Press Ctrl+C");
+
+    copyButton.addEventListener("click", async () => {
+      if (!lastPhonePayload) return;
+      if (lastPhonePayload.type === "image" || lastPhonePayload.hasImage) {
+        try {
+          const imgUrl = lastPhonePayload.data || (lastPhonePayload.imageUrl ? lastPhonePayload.imageUrl : "/image/latest?source=phone");
+          const res = await fetch(imgUrl);
+          const blob = await res.blob();
+          const pngBlob = blob.type === "image/png" ? blob : new Blob([blob], { type: "image/png" });
+          await navigator.clipboard.write([
+            new ClipboardItem({ [pngBlob.type]: pngBlob })
+          ]);
+          setOnline(true, "Image copied");
+        } catch {
+          window.open(lastPhonePayload.imageUrl || "/image/latest?source=phone", "_blank");
+          setOnline(false, "Opened in new tab");
+        }
+      } else {
+        const text = lastPhonePayload.text || "";
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          setOnline(true, "Text copied");
+        } catch {
+          const range = document.createRange();
+          range.selectNodeContents(phoneText);
+          const selection = getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          setOnline(false, "Press Ctrl+C");
+        }
       }
+    });
+
+    downloadImageButton.addEventListener("click", () => {
+      const url = phoneImage.src || "/image/latest?source=phone";
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "screenshot-" + Date.now() + ".png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
 
     const events = new EventSource("/events");
@@ -1755,14 +2186,19 @@ public final class ClipboardSyncWebPortal {
       void pollLatestClipboard();
     };
     events.addEventListener("clipboard", event => {
-      const payload = JSON.parse(event.data);
-      applyPhoneClipboard(payload.text, payload.updatedAtMs);
+      try {
+        const payload = JSON.parse(event.data);
+        applyPhoneClipboard(payload);
+      } catch (e) {
+        // Ignore
+      }
     });
     void pollLatestClipboard();
-    setInterval(() => { void pollLatestClipboard(); }, 1500);
+    setInterval(() => { void pollLatestClipboard(); }, 2000);
   </script>
 </body>
 </html>
 """;
 }
+
 
