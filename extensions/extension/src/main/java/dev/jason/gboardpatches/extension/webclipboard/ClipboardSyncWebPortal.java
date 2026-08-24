@@ -313,7 +313,8 @@ public final class ClipboardSyncWebPortal {
         latestPhoneClipboardImageMime = "";
         latestPhoneClipboardType = "text";
         latestPhoneClipboardAtMs = nowMs;
-        broadcastClipboardEvent(text, latestPhoneClipboardAtMs, "phone", "Phone", null);
+        String clipId = "phone-" + nowMs + "-" + Long.toHexString(System.nanoTime());
+        broadcastClipboardEvent(text, latestPhoneClipboardAtMs, "phone", "Phone", null, clipId);
     }
 
     public void publishPhoneImageClipboard(byte[] imageBytes, String mimeType) {
@@ -337,10 +338,11 @@ public final class ClipboardSyncWebPortal {
         latestPhoneClipboardType = "image";
         latestPhoneClipboardText = "";
         latestPhoneClipboardAtMs = nowMs;
-        broadcastImageClipboardEvent(imageBytes, latestPhoneClipboardImageMime, latestPhoneClipboardAtMs, "phone", "Phone", null);
+        String clipId = "phone-img-" + nowMs + "-" + Long.toHexString(System.nanoTime());
+        broadcastImageClipboardEvent(imageBytes, latestPhoneClipboardImageMime, latestPhoneClipboardAtMs, "phone", "Phone", null, clipId);
     }
 
-    private long publishWebClipboard(String text, String senderLabel, String clientId) {
+    private long publishWebClipboard(String text, String senderLabel, String clientId, String clipId) {
         if (!hasClipboardText(text)) {
             return 0L;
         }
@@ -350,11 +352,11 @@ public final class ClipboardSyncWebPortal {
         latestWebClipboardType = "text";
         latestWebClipboardAtMs = System.currentTimeMillis();
         webEchoSuppressor.markWebApplied(text, latestWebClipboardAtMs);
-        broadcastClipboardEvent(text, latestWebClipboardAtMs, "web", senderLabel, clientId);
+        broadcastClipboardEvent(text, latestWebClipboardAtMs, "web", senderLabel, clientId, clipId);
         return latestWebClipboardAtMs;
     }
 
-    private long publishWebImageClipboard(byte[] imageBytes, String mimeType, String senderLabel, String clientId) {
+    private long publishWebImageClipboard(byte[] imageBytes, String mimeType, String senderLabel, String clientId, String clipId) {
         if (imageBytes == null || imageBytes.length == 0) {
             return 0L;
         }
@@ -365,12 +367,12 @@ public final class ClipboardSyncWebPortal {
         latestWebClipboardAtMs = System.currentTimeMillis();
         String hash = "img:" + sha256Hex(imageBytes);
         webEchoSuppressor.markWebApplied(hash, latestWebClipboardAtMs);
-        broadcastImageClipboardEvent(imageBytes, latestWebClipboardImageMime, latestWebClipboardAtMs, "web", senderLabel, clientId);
+        broadcastImageClipboardEvent(imageBytes, latestWebClipboardImageMime, latestWebClipboardAtMs, "web", senderLabel, clientId, clipId);
         return latestWebClipboardAtMs;
     }
 
     private void broadcastClipboardEvent(String text, long updatedAtMs, String source,
-            String senderLabel, String clientId) {
+            String senderLabel, String clientId, String clipId) {
         JSONObject payload = new JSONObject();
         try {
             payload.put("type", "text");
@@ -382,6 +384,9 @@ public final class ClipboardSyncWebPortal {
             }
             if (clientId != null && !clientId.isBlank()) {
                 payload.put("clientId", clientId);
+            }
+            if (clipId != null && !clipId.isBlank()) {
+                payload.put("clipId", clipId);
             }
         } catch (Throwable ignored) {
             return;
@@ -399,7 +404,7 @@ public final class ClipboardSyncWebPortal {
     }
 
     private void broadcastImageClipboardEvent(byte[] imageBytes, String mimeType, long updatedAtMs,
-            String source, String senderLabel, String clientId) {
+            String source, String senderLabel, String clientId, String clipId) {
         JSONObject payload = new JSONObject();
         try {
             payload.put("type", "image");
@@ -422,6 +427,9 @@ public final class ClipboardSyncWebPortal {
             }
             if (clientId != null && !clientId.isBlank()) {
                 payload.put("clientId", clientId);
+            }
+            if (clipId != null && !clipId.isBlank()) {
+                payload.put("clipId", clipId);
             }
         } catch (Throwable ignored) {
             return;
@@ -846,6 +854,7 @@ public final class ClipboardSyncWebPortal {
         String text = extractText(body);
         String clientId = sanitizeClientId(extractClientId(body));
         String messageId = sanitizeMessageId(extractField(body, "messageId"));
+        String clipId = extractField(body, "clipId");
 
         boolean isImage = "image".equalsIgnoreCase(type) || (data != null && data.startsWith("data:image/"));
         if (isImage) {
@@ -865,7 +874,7 @@ public final class ClipboardSyncWebPortal {
                         buildAckJson(false, messageId, clientId, "failed", 0L, "apply_failed"));
                 return;
             }
-            long appliedAtMs = publishWebImageClipboard(imageBytes, mimeType, senderLabelFor(socket), clientId);
+            long appliedAtMs = publishWebImageClipboard(imageBytes, mimeType, senderLabelFor(socket), clientId, clipId);
             String ackJson = buildAckJson(true, messageId, clientId, "applied", appliedAtMs, "");
             broadcastAckEvent(ackJson);
             writeResponse(socket, 200, "OK", "application/json; charset=utf-8", ackJson);
@@ -884,7 +893,7 @@ public final class ClipboardSyncWebPortal {
                     buildAckJson(false, messageId, clientId, "failed", 0L, "apply_failed"));
             return;
         }
-        long appliedAtMs = publishWebClipboard(text, senderLabelFor(socket), clientId);
+        long appliedAtMs = publishWebClipboard(text, senderLabelFor(socket), clientId, clipId);
         String ackJson = buildAckJson(true, messageId, clientId, "applied", appliedAtMs, "");
         broadcastAckEvent(ackJson);
         writeResponse(socket, 200, "OK", "application/json; charset=utf-8",

@@ -74,6 +74,8 @@ public final class ClipboardSyncService extends Service {
     private long lastPublishedAtElapsedMs;
     private String lastPublishedImageHash = "";
     private long lastPublishedImageAtElapsedMs;
+    private String lastAppliedText = "";
+    private String lastAppliedImageHash = "";
     private final WebClipboardEchoSuppressor webClipboardEchoSuppressor =
             new WebClipboardEchoSuppressor(DUPLICATE_SUPPRESSION_WINDOW_MS);
     private final ExecutorService clipboardPublishExecutor = Executors.newSingleThreadExecutor();
@@ -375,34 +377,42 @@ public final class ClipboardSyncService extends Service {
         }
         ClipboardManager.OnPrimaryClipChangedListener listener = () -> {
             ClipData clipData = currentClipboardData(clipboardManager);
-            if (clipData != null && !isWebClipboardEcho(clipData)) {
-                if (hasImageContent(clipData)) {
-                    Uri imageUri = currentClipboardImageUri(clipData);
-                    if (imageUri != null) {
-                        byte[] imageBytes = readImageBytes(this, imageUri, MAX_IMAGE_BYTES);
-                        if (imageBytes != null && imageBytes.length > 0) {
-                            String mimeType = getContentResolver().getType(imageUri);
-                            if (mimeType == null || mimeType.isEmpty()) {
-                                mimeType = "image/png";
-                            }
-                            String hash = "img:" + sha256Hex(imageBytes);
-                            if (!webClipboardEchoSuppressor.shouldSuppressClipboardEvent(hash, SystemClock.elapsedRealtime())) {
-                                Log.i(TAG, LOG_PREFIX + " service clipboard listener fired for image"
-                                        + " bytes=" + imageBytes.length
-                                        + ", portal=" + describePortal(webPortal));
-                                publishImageToPortal(imageBytes, mimeType);
-                            }
+            if (clipData == null || isWebClipboardEcho(clipData)) {
+                return;
+            }
+            if (hasImageContent(clipData)) {
+                Uri imageUri = currentClipboardImageUri(clipData);
+                if (imageUri != null) {
+                    byte[] imageBytes = readImageBytes(this, imageUri, MAX_IMAGE_BYTES);
+                    if (imageBytes != null && imageBytes.length > 0) {
+                        String mimeType = getContentResolver().getType(imageUri);
+                        if (mimeType == null || mimeType.isEmpty()) {
+                            mimeType = "image/png";
+                        }
+                        String hash = "img:" + sha256Hex(imageBytes);
+                        if (hash.equals(lastPublishedImageHash) || hash.equals(lastAppliedImageHash)) {
                             return;
                         }
+                        if (!webClipboardEchoSuppressor.shouldSuppressClipboardEvent(hash, SystemClock.elapsedRealtime())) {
+                            Log.i(TAG, LOG_PREFIX + " service clipboard listener fired for image"
+                                    + " bytes=" + imageBytes.length
+                                    + ", portal=" + describePortal(webPortal));
+                            publishImageToPortal(imageBytes, mimeType);
+                        }
+                        return;
                     }
                 }
             }
             CharSequence currentText = currentClipboardText(clipboardManager);
             if (currentText != null) {
+                String text = currentText.toString();
+                if (text.equals(lastPublishedText) || text.equals(lastAppliedText)) {
+                    return;
+                }
                 Log.i(TAG, LOG_PREFIX + " service clipboard listener fired"
                         + " len=" + currentText.length()
                         + ", portal=" + describePortal(webPortal));
-                publishClipboardToPortalIfNotWebEcho(currentText.toString());
+                publishClipboardToPortalIfNotWebEcho(text);
             }
         };
         try {
@@ -416,6 +426,9 @@ public final class ClipboardSyncService extends Service {
         try {
             serviceScreenshotObserver = ScreenshotCaptureObserver.register(this, (imageBytes, mimeType, uri) -> {
                 String hash = "img:" + sha256Hex(imageBytes);
+                if (hash.equals(lastPublishedImageHash) || hash.equals(lastAppliedImageHash)) {
+                    return;
+                }
                 if (!webClipboardEchoSuppressor.shouldSuppressClipboardEvent(hash, SystemClock.elapsedRealtime())) {
                     Log.i(TAG, LOG_PREFIX + " service screenshot observer captured image bytes=" + imageBytes.length
                             + ", mime=" + mimeType
@@ -460,6 +473,8 @@ public final class ClipboardSyncService extends Service {
             return;
         }
         try {
+            lastAppliedText = text;
+            lastPublishedText = text;
             webClipboardEchoSuppressor.markWebApplied(text, SystemClock.elapsedRealtime());
             clipboardManager.setPrimaryClip(ClipData.newPlainText(
                     ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL,
@@ -486,6 +501,8 @@ public final class ClipboardSyncService extends Service {
                 out.write(imageBytes);
             }
             String hash = "img:" + sha256Hex(imageBytes);
+            lastAppliedImageHash = hash;
+            lastPublishedImageHash = hash;
             webClipboardEchoSuppressor.markWebApplied(hash, SystemClock.elapsedRealtime());
 
             // Save to MediaStore (Pictures/Screenshots) to trigger Gboard native screenshot suggestion chip
