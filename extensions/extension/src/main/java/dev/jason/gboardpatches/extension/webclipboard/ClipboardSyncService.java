@@ -58,6 +58,7 @@ public final class ClipboardSyncService extends Service {
 
     private ClipboardManager serviceClipboardManager;
     private ClipboardManager.OnPrimaryClipChangedListener serviceClipboardListener;
+    private ScreenshotCaptureObserver serviceScreenshotObserver;
     private ClipboardSyncWebPortal webPortal;
     private int currentPortalPort;
     private boolean currentPairingRequired;
@@ -404,9 +405,30 @@ public final class ClipboardSyncService extends Service {
         } catch (Throwable throwable) {
             Log.w(TAG, "Failed to register clipboard listener", throwable);
         }
+
+        try {
+            serviceScreenshotObserver = ScreenshotCaptureObserver.register(this, (imageBytes, mimeType, uri) -> {
+                String hash = "img:" + sha256Hex(imageBytes);
+                if (!webClipboardEchoSuppressor.shouldSuppressClipboardEvent(hash, SystemClock.elapsedRealtime())) {
+                    Log.i(TAG, LOG_PREFIX + " service screenshot observer captured image bytes=" + imageBytes.length
+                            + ", mime=" + mimeType
+                            + ", portal=" + describePortal(webPortal));
+                    publishImageToPortal(imageBytes, mimeType);
+                }
+            });
+        } catch (Throwable throwable) {
+            Log.w(TAG, "Failed to register screenshot observer", throwable);
+        }
     }
 
     private void unregisterClipboardListener() {
+        if (serviceScreenshotObserver != null) {
+            try {
+                serviceScreenshotObserver.unregister();
+            } catch (Throwable ignored) {
+            }
+            serviceScreenshotObserver = null;
+        }
         if (serviceClipboardManager == null || serviceClipboardListener == null) {
             return;
         }

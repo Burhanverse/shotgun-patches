@@ -30,6 +30,7 @@ public final class GboardWebClipboardCaptureBootstrap {
     private static volatile Context installedContext;
     private static volatile ClipboardManager installedClipboardManager;
     private static volatile ClipboardManager.OnPrimaryClipChangedListener installedListener;
+    private static volatile ScreenshotCaptureObserver installedScreenshotObserver;
     private static volatile String lastDispatchedHash;
     private static volatile long lastDispatchedElapsedMs;
 
@@ -52,6 +53,11 @@ public final class GboardWebClipboardCaptureBootstrap {
                 ? context.getApplicationContext()
                 : context;
         synchronized (LISTENER_LOCK) {
+            if (installedScreenshotObserver == null) {
+                installedScreenshotObserver = ScreenshotCaptureObserver.register(appContext,
+                        (imageBytes, mimeType, uri) -> dispatchScreenshotEvent(appContext, imageBytes, mimeType));
+            }
+
             if (installedContext == appContext && installedListener != null) {
                 return;
             }
@@ -85,6 +91,49 @@ public final class GboardWebClipboardCaptureBootstrap {
         try {
             LOOPBACK_DISPATCH_EXECUTOR.execute(
                     () -> dispatchLoopbackIngress(context, clipboardManager));
+        } catch (Throwable ignored) {
+            // Best effort.
+        }
+    }
+
+    private static void dispatchScreenshotEvent(Context context, byte[] imageBytes, String mimeType) {
+        if (context == null || imageBytes == null || imageBytes.length == 0) {
+            return;
+        }
+        try {
+            LOOPBACK_DISPATCH_EXECUTOR.execute(
+                    () -> dispatchScreenshotLoopbackIngress(context, imageBytes, mimeType));
+        } catch (Throwable ignored) {
+            // Best effort.
+        }
+    }
+
+    private static void dispatchScreenshotLoopbackIngress(Context context, byte[] imageBytes,
+            String mimeType) {
+        RuntimeLookup runtimeLookup = webClipboardRuntimeConfig(context);
+        if (runtimeLookup.config == null) {
+            return;
+        }
+        if (!isExpectedPortalWithRetry(runtimeLookup.config)) {
+            return;
+        }
+        String effectiveMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+        String hash = "img:" + sha256Hex(imageBytes);
+        long now = SystemClock.elapsedRealtime();
+        if (hash.equals(lastDispatchedHash)
+                && now - lastDispatchedElapsedMs <= DUPLICATE_SUPPRESSION_WINDOW_MS) {
+            return;
+        }
+        try {
+            boolean accepted = ClipboardSyncLoopbackIngressClient.submitPhoneImageClipboard(
+                    imageBytes,
+                    effectiveMime,
+                    runtimeLookup.config.port,
+                    runtimeLookup.config.loopbackIngressToken);
+            if (accepted) {
+                lastDispatchedHash = hash;
+                lastDispatchedElapsedMs = SystemClock.elapsedRealtime();
+            }
         } catch (Throwable ignored) {
             // Best effort.
         }
