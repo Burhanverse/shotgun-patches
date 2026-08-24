@@ -1,7 +1,7 @@
 {
-    "created_at": "2026-08-25T00:50:00",
-    "description": "### 🐛 Bug Fixes\n\n* **Web Clipboard:** grant URI read permissions and add explicit MIME type array for desktop image synchronization.\n\n### 🐛 修復\n\n* **Web Clipboard:** 加入 URI 讀取授權與明確 MIME 類型陣列，修正電腦圖片同步至剪貼簿的權限問題。",
-    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.3.1/patches-3.3.1.mpp",
+    "created_at": "2026-08-25T01:30:00",
+    "description": "### ✨ New Features\n\n* **Web Clipboard:** add MediaStore observer to detect and synchronize new screenshots in real time between Gboard and desktop Web Clipboard clients.\n\n### ✨ 新功能\n\n* **Web Clipboard:** 加入 MediaStore 監聽器，即時偵測並在 Gboard 與電腦剪貼簿之間同步最新的螢幕截圖。",
+    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.4.0-dev.1/patches-3.4.0-dev.1.mpp",
     "signature_download_url": "",
-    "version": "3.3.1"
+    "version": "3.4.0-dev.1"
 }

@@ -1,3 +1,13 @@
+## [3.4.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.3.1...v3.4.0-dev.1) (2026-08-25)
+
+### ✨ New Features
+
+* **Web Clipboard:** add MediaStore observer to detect and synchronize new screenshots in real time between Gboard and desktop Web Clipboard clients.
+
+### ✨ 新功能
+
+* **Web Clipboard:** 加入 MediaStore 監聽器，即時偵測並在 Gboard 與電腦剪貼簿之間同步最新的螢幕截圖。
+
 ## [3.3.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.3.0...v3.3.1) (2026-08-25)
 
 ### 🐛 Bug Fixes
