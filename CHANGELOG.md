@@ -1,3 +1,13 @@
+## [3.4.0-dev.5](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.4...v3.4.0-dev.5) (2026-08-25)
+
+### 🐛 Bug Fixes
+
+* **Web Clipboard:** ensure monotonic image ID tracking in ScreenshotCaptureObserver to prevent historical screenshot resends.
+
+### 🐛 修復
+
+* **Web Clipboard:** 在 ScreenshotCaptureObserver 中確保單調遞增的圖片 ID 追蹤，以避免歷史螢幕截圖被重複發送。
+
 ## [3.4.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.3...v3.4.0-dev.4) (2026-08-25)
 
 ### 🐛 Bug Fixes
