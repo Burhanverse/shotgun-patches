@@ -1,7 +1,7 @@
 {
-    "created_at": "2026-08-25T02:20:00",
-    "description": "### ✨ New Features\n\n* **Web Clipboard:** save incoming desktop images into MediaStore Screenshots directory to trigger Gboard's native screenshot suggestion chip.\n\n### ✨ 新功能\n\n* **Web Clipboard:** 將電腦端傳送的圖片儲存至 MediaStore 螢幕截圖目錄，以觸發 Gboard 原生螢幕截圖建議卡片。",
-    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.4.0-dev.2/patches-3.4.0-dev.2.mpp",
+    "created_at": "2026-08-25T02:35:00",
+    "description": "### 🐛 Bug Fixes\n\n* **Web Clipboard:** preserve echo suppression across multiple system listeners and expand suppression window to prevent feedback loops.\n\n### 🐛 修復\n\n* **Web Clipboard:** 在多個系統監聽器之間保持回音抑制狀態，並擴大抑制時間範圍以避免循環回饋。",
+    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.4.0-dev.3/patches-3.4.0-dev.3.mpp",
     "signature_download_url": "",
-    "version": "3.4.0-dev.2"
+    "version": "3.4.0-dev.3"
 }

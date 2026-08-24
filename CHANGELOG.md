@@ -1,3 +1,13 @@
+## [3.4.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.2...v3.4.0-dev.3) (2026-08-25)
+
+### 🐛 Bug Fixes
+
+* **Web Clipboard:** preserve echo suppression across multiple system listeners and expand suppression window to prevent feedback loops.
+
+### 🐛 修復
+
+* **Web Clipboard:** 在多個系統監聽器之間保持回音抑制狀態，並擴大抑制時間範圍以避免循環回饋。
+
 ## [3.4.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.1...v3.4.0-dev.2) (2026-08-25)
 
 ### ✨ New Features
