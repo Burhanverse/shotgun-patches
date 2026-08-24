@@ -1,3 +1,13 @@
+## [3.4.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.3...v3.4.0-dev.4) (2026-08-25)
+
+### 🐛 Bug Fixes
+
+* **Web Clipboard:** implement unique clipId propagation and permanent state echo suppression on Android.
+
+### 🐛 修復
+
+* **Web Clipboard:** 實作唯一 clipId 傳遞機制與 Android 端永久狀態回音抑制。
+
 ## [3.4.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.2...v3.4.0-dev.3) (2026-08-25)
 
 ### 🐛 Bug Fixes
