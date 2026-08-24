@@ -1,3 +1,13 @@
+## [3.3.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.3.0...v3.3.1) (2026-08-25)
+
+### 🐛 Bug Fixes
+
+* **Web Clipboard:** grant URI read permissions and add explicit MIME type array for desktop image synchronization.
+
+### 🐛 修復
+
+* **Web Clipboard:** 加入 URI 讀取授權與明確 MIME 類型陣列，修正電腦圖片同步至剪貼簿的權限問題。
+
 ## [3.3.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.2.0...v3.3.0) (2026-08-25)
 
 ### ✨ New Features
