@@ -237,6 +237,37 @@ public final class GboardPatchesSettingsProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         if (uri != null && PATH_CLIPBOARD_IMAGE.equals(uri.getLastPathSegment())) {
+            android.content.Context context = getContext();
+            if (context != null) {
+                java.io.File imageFile = new java.io.File(context.getCacheDir(), CLIPBOARD_IMAGE_FILE_NAME);
+                if (imageFile.exists()) {
+                    try (java.io.FileInputStream in = new java.io.FileInputStream(imageFile)) {
+                        byte[] header = new byte[12];
+                        int count = in.read(header);
+                        if (count >= 4) {
+                            if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50
+                                    && header[2] == (byte) 0x4E && header[3] == (byte) 0x47) {
+                                return "image/png";
+                            }
+                            if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8
+                                    && header[2] == (byte) 0xFF) {
+                                return "image/jpeg";
+                            }
+                            if (header[0] == (byte) 0x47 && header[1] == (byte) 0x49
+                                    && header[2] == (byte) 0x46 && header[3] == (byte) 0x38) {
+                                return "image/gif";
+                            }
+                            if (count >= 12 && header[0] == 'R' && header[1] == 'I'
+                                    && header[2] == 'F' && header[3] == 'F'
+                                    && header[8] == 'W' && header[9] == 'E'
+                                    && header[10] == 'B' && header[11] == 'P') {
+                                return "image/webp";
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
             return "image/png";
         }
         return null;

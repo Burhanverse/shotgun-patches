@@ -465,10 +465,11 @@ public final class ClipboardSyncService extends Service {
             Uri contentUri = Uri.parse("content://" + getPackageName()
                     + GboardPatchesSettingsProvider.AUTHORITY_SUFFIX + "/"
                     + GboardPatchesSettingsProvider.PATH_CLIPBOARD_IMAGE);
-            ClipData clipData = ClipData.newUri(
-                    getContentResolver(),
+            String effectiveMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/png";
+            ClipData clipData = new ClipData(
                     ClipboardSyncIngressContract.WEB_CLIPBOARD_LABEL,
-                    contentUri);
+                    new String[] { effectiveMime, "image/*" },
+                    new ClipData.Item(contentUri));
             clipboardManager.setPrimaryClip(clipData);
             updateNotification("Image copied from Web");
         } catch (Throwable throwable) {

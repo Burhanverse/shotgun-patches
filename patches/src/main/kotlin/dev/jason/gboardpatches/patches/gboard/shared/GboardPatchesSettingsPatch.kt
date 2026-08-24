@@ -73,6 +73,7 @@ internal fun applyGboardPatchesSettings(
         packageName + GBOARD_PATCHES_SETTINGS_PROVIDER_AUTHORITY_SUFFIX,
     )
     provider.setAndroidAttribute("exported", "false")
+    provider.setAndroidAttribute("grantUriPermissions", "true")
 
     settingsDocuments.forEach { document ->
         val root = document.documentElement
