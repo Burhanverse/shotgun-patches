@@ -1,3 +1,13 @@
+## [3.4.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.1...v3.4.0-dev.2) (2026-08-25)
+
+### ✨ New Features
+
+* **Web Clipboard:** save incoming desktop images into MediaStore Screenshots directory to trigger Gboard's native screenshot suggestion chip.
+
+### ✨ 新功能
+
+* **Web Clipboard:** 將電腦端傳送的圖片儲存至 MediaStore 螢幕截圖目錄，以觸發 Gboard 原生螢幕截圖建議卡片。
+
 ## [3.4.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.3.1...v3.4.0-dev.1) (2026-08-25)
 
 ### ✨ New Features
