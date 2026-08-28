@@ -7,6 +7,7 @@ import org.w3c.dom.Node
 private data class LocalizedSettingsText(
     val type: String,
     val name: String,
+    val formatted: Boolean,
     val translations: Map<String, String>,
     val quantities: List<Pair<String, Map<String, String>>>,
 )
@@ -214,6 +215,7 @@ val generateSettingsText = tasks.register("generateSettingsText") {
                 LocalizedSettingsText(
                     type = type,
                     name = name,
+                    formatted = entry.getAttribute("formatted") != "false",
                     translations = entry.requiredTranslations(name, requiredLocales),
                     quantities = emptyList(),
                 )
@@ -229,6 +231,7 @@ val generateSettingsText = tasks.register("generateSettingsText") {
                 LocalizedSettingsText(
                     type = type,
                     name = name,
+                    formatted = true,
                     translations = emptyMap(),
                     quantities = quantities,
                 )
@@ -247,6 +250,9 @@ val generateSettingsText = tasks.register("generateSettingsText") {
                     if (entry.type == "string") {
                         append("    <string name=\"")
                         append(entry.name)
+                        if (!entry.formatted) {
+                            append("\" formatted=\"false")
+                        }
                         append("\">")
                         append(escapeXmlText(entry.translations.getValue(locale)))
                         appendLine("</string>")

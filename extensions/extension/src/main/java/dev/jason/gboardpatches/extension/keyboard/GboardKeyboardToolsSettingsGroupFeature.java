@@ -3,6 +3,7 @@ package dev.jason.gboardpatches.extension.keyboard;
 import android.content.Context;
 
 import java.util.Arrays;
+import java.util.List;
 
 import dev.jason.gboardpatches.extension.R;
 import dev.jason.gboardpatches.extension.cursortrackpad.GboardCursorTrackpadSettingsFeature;
@@ -15,6 +16,7 @@ import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsContract;
 import dev.jason.gboardpatches.extension.settings.GboardSettingsText;
 import dev.jason.gboardpatches.extension.shotgunkeyboard.GboardShotgunKeyboardSettingsFeature;
 import dev.jason.gboardpatches.extension.toprowswipe.GboardTopRowSwipeSettingsFeature;
+import dev.jason.gboardpatches.extension.websearch.GboardFloatingWebSearchSettingsFeature;
 
 public final class GboardKeyboardToolsSettingsGroupFeature
         implements GboardPatchesSettingsContract.Feature {
@@ -40,7 +42,8 @@ public final class GboardKeyboardToolsSettingsGroupFeature
                         new GboardLongPressQuickActionsSettingsFeature(context),
                         new GboardCursorTrackpadSettingsFeature(context),
                         new GboardOcrSettingsFeature(context),
-                        new GboardQuickInsertSettingsFeature(context)));
+                        new GboardQuickInsertSettingsFeature(context),
+                        new GboardFloatingWebSearchSettingsFeature(context)));
     }
 
     @Override
@@ -56,6 +59,11 @@ public final class GboardKeyboardToolsSettingsGroupFeature
     @Override
     public boolean isAvailable(Context context) {
         return delegate.isAvailable(context);
+    }
+
+    @Override
+    public List<GboardPatchesSettingsContract.Feature> getNavigationChildren() {
+        return delegate.getNavigationChildren();
     }
 
     @Override

@@ -1,5 +1,5 @@
 {
-  "version": "3.4.0-dev.5",
+  "version": "3.6.0-dev.2",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -206,6 +206,18 @@
       "options": []
     },
     {
+      "name": "Floating Web Search",
+      "description": "直接從 Gboard 開啟懸浮網頁，快速搜尋需要的資訊。\nOpen a floating web page directly from Gboard to quickly search for the information you need.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
       "name": "G Logo on Spacebar",
       "description": "在空白鍵顯示 G Logo，並隱藏語言名稱\nShow the G Logo on the spacebar and hide the language label.",
       "use": true,
@@ -342,6 +354,18 @@
       "options": []
     },
     {
+      "name": "Rounded Keyboard Panel",
+      "description": "自訂鍵盤面板哪些角落呈現圓角，並分別設定上方與下方半徑。\nCustomize which corners of the keyboard panel are rounded, and set the top and bottom radii separately.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
       "name": "Settings Homepage Override",
       "description": "允許切換新版或舊版 Gboard 設定頁面\nAllow switching between the new and legacy Gboard settings pages.",
       "use": true,
@@ -368,6 +392,18 @@
     {
       "name": "Swipeable Custom Top Row",
       "description": "滑動鍵盤第一排，在原生列與可自訂文字/JavaScript 列之間切換\nSwipe the keyboard top row to switch between the stock row and a customizable text/JavaScript row.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Top Toolbar Item Count",
+      "description": "自訂 Gboard 頂端工具列項目數量\nCustomize the Gboard top toolbar item count.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {

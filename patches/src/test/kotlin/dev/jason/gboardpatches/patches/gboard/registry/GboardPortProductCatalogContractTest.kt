@@ -4,6 +4,7 @@ import app.morphe.patcher.patch.Patch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import dev.jason.gboardpatches.patches.gboard.features.accessibilitylayout.gboardAccessibilityLayoutFlagValuePatch
+import dev.jason.gboardpatches.patches.gboard.features.accesspointcount.gboardAccessPointCountFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.accesspointsmenu.gboardAccessPointsMenuFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.addsymbols.gboardZhuyinCustomSymbolsEntryPatch
 import dev.jason.gboardpatches.patches.gboard.features.advancedvoice.gboardAdvancedVoiceFlagValuePatch
@@ -50,7 +51,7 @@ class GboardPortProductCatalogContractTest {
     @Test
     fun catalogIsDeterministicAndDeclaresSelectedOnlyZeroSelectionComposition() {
         assertEquals("gboard-port-product-catalog.v1", catalog["format"].asString)
-        assertEquals("1.8.0", catalog["catalog_version"].asString)
+        assertEquals("1.10.0", catalog["catalog_version"].asString)
         val composition = catalog.getAsJsonObject("composition")
         assertEquals(
             setOf("selected_only_call_chain", "runtime_feature_mask"),
@@ -64,9 +65,9 @@ class GboardPortProductCatalogContractTest {
             features.map { feature -> feature["feature_id"].asString }.sorted(),
             features.map { feature -> feature["feature_id"].asString },
         )
-        assertEquals(35, features.size)
-        assertEquals(35, features.map { it["feature_id"].asString }.distinct().size)
-        assertEquals(35, features.map { it["public_patch_name"].asString }.distinct().size)
+        assertEquals(38, features.size)
+        assertEquals(38, features.map { it["feature_id"].asString }.distinct().size)
+        assertEquals(38, features.map { it["public_patch_name"].asString }.distinct().size)
 
         val expectedDigest = Files.readString(
             repositoryRoot().resolve(DIGEST_PATH),
@@ -175,7 +176,7 @@ class GboardPortProductCatalogContractTest {
                 }
         }.toSet()
 
-        assertEquals(21, authoritativeKeys.size)
+        assertEquals(32, authoritativeKeys.size)
         assertEquals(authoritativeKeys, requiredKeys)
         assertEquals(
             authoritativeKinds,
@@ -196,7 +197,7 @@ class GboardPortProductCatalogContractTest {
     }
 
     @Test
-    fun flagFamilyDeclaresSixteenSelectedOnlyComposerCallsInCanonicalOrder() {
+    fun flagFamilyDeclaresSeventeenSelectedOnlyComposerCallsInCanonicalOrder() {
         val flagContributions = features().flatMap { feature ->
             feature.getAsJsonArray("contributions")
                 .map { contribution -> contribution.asJsonObject }
@@ -206,18 +207,18 @@ class GboardPortProductCatalogContractTest {
                 .map { contribution -> feature["feature_id"].asString to contribution }
         }.sortedBy { (_, contribution) -> contribution["order"].asInt }
 
-        assertEquals(16, flagContributions.size)
+        assertEquals(17, flagContributions.size)
         assertEquals(
             listOf(
                 10, 20, 30, 40, 100, 200, 300, 400,
-                500, 600, 700, 800, 900, 1000, 1100, 1200,
+                500, 600, 700, 800, 900, 1000, 1100, 1200, 1300,
             ),
             flagContributions.map { (_, contribution) -> contribution["order"].asInt },
         )
         val runtimeCalls = flagContributions.map { (_, contribution) ->
             contribution.getAsJsonArray("runtime_calls").first().asString
         }
-        assertEquals(16, runtimeCalls.distinct().size)
+        assertEquals(17, runtimeCalls.distinct().size)
         assertFalse("FEATURE_FLAGS_RUNTIME_APPLY_OVERRIDDEN_FLAG_VALUE" in runtimeCalls)
         flagContributions.forEach { (_, contribution) ->
             assertEquals(
@@ -667,6 +668,7 @@ class GboardPortProductCatalogContractTest {
             "patches/src/main/kotlin/**/*.kt",
         )
         val EXPECTED_MIGRATION_SCOPES = mapOf(
+            "access_point_count" to "version-sensitive",
             "access_points_menu_style" to "version-sensitive",
             "add_gboard_signature_bypass" to "version-sensitive",
             "advanced_voice_typing" to "version-sensitive",
@@ -685,6 +687,7 @@ class GboardPortProductCatalogContractTest {
             "enable_split_keyboard" to "version-sensitive",
             "english_qwerty_up_flick_uppercase" to "version-sensitive",
             "flow_mode_animation" to "version-sensitive",
+            "floating_web_search" to "version-sensitive",
             "g_logo_on_spacebar" to "version-sensitive",
             "grammar_checker" to "version-sensitive",
             "incognito_mode_toggle" to "version-sensitive",
@@ -694,6 +697,7 @@ class GboardPortProductCatalogContractTest {
             "long_press_editing_shortcuts" to "version-sensitive",
             "package_rename" to "generic",
             "quick_insert" to "version-sensitive",
+            "rounded_keyboard_panel" to "version-sensitive",
             "settings_homepage_override" to "version-sensitive",
             "shotgun_keyboard" to "version-sensitive",
             "swipeable_custom_top_row" to "version-sensitive",
@@ -704,6 +708,14 @@ class GboardPortProductCatalogContractTest {
             "zhuyin_slide_input" to "version-sensitive",
         )
         val FLAG_FEATURE_CONTRACTS = listOf(
+            FlagFeatureContract(
+                "access_point_count",
+                GboardFlagFamilyFeature.ACCESS_POINT_COUNT,
+                gboardAccessPointCountFlagValuePatch,
+                "gboardAccessPointCountFlagValuePatch",
+                FEATURE_ROOT + "accesspointcount/GboardAccessPointCountFlagValuePatch.kt",
+                FEATURE_ROOT + "accesspointcount/GboardAccessPointCountFeatureMarkerPatch.kt",
+            ),
             FlagFeatureContract(
                 "access_points_menu_style",
                 GboardFlagFamilyFeature.ACCESS_POINTS_MENU_STYLE,

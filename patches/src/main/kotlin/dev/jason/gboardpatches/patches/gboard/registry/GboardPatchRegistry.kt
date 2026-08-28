@@ -8,6 +8,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import dev.jason.gboardpatches.patches.gboard.features.accessibilitylayout.gboardAccessibilityLayoutFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.accessibilitylayout.gboardAccessibilityLayoutFlagValuePatch
+import dev.jason.gboardpatches.patches.gboard.features.accesspointcount.gboardAccessPointCountFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.accesspointcount.gboardAccessPointCountFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.accesspointsmenu.gboardAccessPointsMenuFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.accesspointsmenu.gboardAccessPointsMenuFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.advancedvoice.gboardAdvancedVoiceFeatureMarkerPatch
@@ -34,6 +36,8 @@ import dev.jason.gboardpatches.patches.gboard.features.webclipboard.gboardWebCli
 import dev.jason.gboardpatches.patches.gboard.features.webclipboard.gboardWebClipboardCapturePatch
 import dev.jason.gboardpatches.patches.gboard.features.webclipboard.gboardWebClipboardFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.webclipboard.gboardWebClipboardManifestPatch
+import dev.jason.gboardpatches.patches.gboard.features.websearch.gboardFloatingWebSearchFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.websearch.gboardFloatingWebSearchManifestPatch
 import dev.jason.gboardpatches.patches.gboard.features.englishqwerty.gboardEnglishUppercaseToggleFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardDeviceIntelligenceFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardDeviceIntelligenceFlagValuePatch
@@ -47,7 +51,6 @@ import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeFe
 import dev.jason.gboardpatches.patches.gboard.features.latinglobe.gboardLatinGlobeKeyIgnoreIntervalBytecodePatch
 import dev.jason.gboardpatches.patches.gboard.features.latinglobe.gboardLatinGlobeKeyIgnoreIntervalFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.longpressquickactions.gboardLongPressQuickActionsFeatureMarkerPatch
-import dev.jason.gboardpatches.patches.gboard.features.manualincognito.gboardManualIncognitoAccessPointPatch
 import dev.jason.gboardpatches.patches.gboard.features.manualincognito.gboardManualIncognitoFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.manualincognito.gboardManualIncognitoLifecyclePatch
 import dev.jason.gboardpatches.patches.gboard.features.manualincognito.gboardManualIncognitoPolicyPatch
@@ -57,6 +60,7 @@ import dev.jason.gboardpatches.patches.gboard.features.packagerename.gboardPacka
 import dev.jason.gboardpatches.patches.gboard.features.packagerename.isValidGboardAppDisplayName
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFlagValuePatch
+import dev.jason.gboardpatches.patches.gboard.features.roundedkeyboard.gboardRoundedKeyboardFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.settingshomepage.gboardSettingsHomepageBytecodePatch
 import dev.jason.gboardpatches.patches.gboard.features.settingshomepage.gboardSettingsHomepageFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.signaturebypass.gboardSignatureBypassBytecodePatch
@@ -78,6 +82,7 @@ import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWrit
 import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingToolsFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesExtensionCarrierPatch
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesSettingsPatch
+import dev.jason.gboardpatches.patches.gboard.shared.accesspoint.gboardAccessPointContributions1803Patch
 import dev.jason.gboardpatches.patches.gboard.shared.generated.GboardTargetAdmission
 import dev.jason.gboardpatches.patches.gboard.features.zhuyinbottomrow.gboardZhuyinBottomRowWeightFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyinbottomrow.gboardZhuyinBottomRowWeightSoftKeyPatch
@@ -181,7 +186,25 @@ val gboardManualIncognitoModePatch = gboardPublicResourcePatch(
         gboardManualIncognitoFeatureMarkerPatch,
         gboardManualIncognitoLifecyclePatch,
         gboardManualIncognitoPolicyPatch,
-        gboardManualIncognitoAccessPointPatch,
+        gboardAccessPointContributions1803Patch,
+    )
+}
+
+@Suppress("unused")
+val gboardFloatingWebSearchPatch = gboardPublicResourcePatch(
+    featureId = "floating_web_search",
+    name = "Floating Web Search",
+    description = "直接從 Gboard 開啟懸浮網頁，快速搜尋需要的資訊。\n" +
+        "Open a floating web page directly from Gboard to quickly search for the information you need.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardFloatingWebSearchFeatureMarkerPatch,
+        gboardFloatingWebSearchManifestPatch,
+        gboardAccessPointContributions1803Patch,
     )
 }
 
@@ -298,6 +321,39 @@ val gboardAccessibilityLayoutPatch = gboardPublicResourcePatch(
         gboardPatchesSettingsPatch,
         gboardAccessibilityLayoutFeatureMarkerPatch,
         gboardAccessibilityLayoutFlagValuePatch,
+    )
+}
+
+@Suppress("unused")
+val gboardRoundedKeyboardPanelPatch = gboardPublicResourcePatch(
+    featureId = "rounded_keyboard_panel",
+    name = "Rounded Keyboard Panel",
+    description = "自訂鍵盤面板哪些角落呈現圓角，並分別設定上方與下方半徑。\n" +
+        "Customize which corners of the keyboard panel are rounded, and set the top and bottom radii separately.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardRoundedKeyboardFeatureMarkerPatch,
+    )
+}
+
+@Suppress("unused")
+val gboardAccessPointCountPatch = gboardPublicResourcePatch(
+    featureId = "access_point_count",
+    name = "Top Toolbar Item Count",
+    description = "自訂 Gboard 頂端工具列項目數量\n" +
+        "Customize the Gboard top toolbar item count.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardAccessPointCountFeatureMarkerPatch,
+        gboardAccessPointCountFlagValuePatch,
     )
 }
 
@@ -709,6 +765,7 @@ object GboardPublishedPatchCatalog {
         gboardLongPressQuickActionsPatch,
         gboardSpacebarLogoPatch,
         gboardManualIncognitoModePatch,
+        gboardFloatingWebSearchPatch,
         gboardAdvancedVoiceTypingPatch,
         gboardBluetoothMicrophonePatch,
         gboardEmojiSizePatch,
@@ -716,6 +773,8 @@ object GboardPublishedPatchCatalog {
         gboardAccessPointsMenuStylePatch,
         gboardSplitKeyboardPatch,
         gboardAccessibilityLayoutPatch,
+        gboardRoundedKeyboardPanelPatch,
+        gboardAccessPointCountPatch,
         gboardCloseProactiveSuggestionsPatch,
         gboardFlowModeAnimationPatch,
         gboardQuickInsertPatch,

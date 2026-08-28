@@ -1,3 +1,53 @@
+## [3.6.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.6.0-dev.1...v3.6.0-dev.2) (2026-08-29)
+
+### ✨ New Features
+
+* **Gboard:** merge upstream changes up to `v3.6.0-dev.1` including Floating Web Search, Top Toolbar Item Count, Rounded Keyboard Panel, and one-tap Gboard restart.
+
+### ✨ 新功能
+
+* **Gboard:** 合併上游更新至 `v3.6.0-dev.1`，包含懸浮網頁搜尋、頂端工具列項目數量設定、圓角鍵盤面板以及一鍵快速重新啟動 Gboard 功能。
+
+## [3.6.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.5.0...v3.6.0-dev.1) (2026-08-26)
+
+### ✨ New Features
+
+* **Gboard:** add the `Floating Web Search` patch, which opens a floating web page directly from Gboard so you can quickly search for the information you need.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Floating Web Search` Patch，可直接從 Gboard 開啟懸浮網頁，快速搜尋需要的資訊。
+
+## [3.5.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0...v3.5.0) (2026-08-26)
+
+### ✨ New Features
+
+* **Gboard:** add the `Top Toolbar Item Count` patch, which lets you customize how many items appear in the Gboard top toolbar.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Top Toolbar Item Count` Patch，可自訂 Gboard 頂端工具列項目數量。
+
+## [3.5.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0...v3.5.0-dev.1) (2026-08-25)
+
+### ✨ New Features
+
+* **Gboard:** add the `Top Toolbar Item Count` patch, which lets you customize how many items appear in the Gboard top toolbar.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Top Toolbar Item Count` Patch，可自訂 Gboard 頂端工具列項目數量。
+
+## [3.4.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.3.0...v3.4.0) (2026-08-25)
+
+### ✨ New Features
+
+* **Gboard:** add the `Rounded Keyboard Panel` patch, which lets you choose which corners of the keyboard panel are rounded and configure the top and bottom corner radii independently.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Rounded Keyboard Panel` Patch，可自訂鍵盤面板哪些角落呈現圓角，並可分別設定上方與下方半徑。
+
 ## [3.4.0-dev.5](https://github.com/Burhanverse/shotgun-patches/compare/v3.4.0-dev.4...v3.4.0-dev.5) (2026-08-25)
 
 ### 🐛 Bug Fixes

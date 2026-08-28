@@ -1,7 +1,7 @@
 {
-    "created_at": "2026-08-25T03:12:00",
-    "description": "### 🐛 Bug Fixes\n\n* **Web Clipboard:** ensure monotonic image ID tracking in ScreenshotCaptureObserver to prevent historical screenshot resends.\n\n### 🐛 修復\n\n* **Web Clipboard:** 在 ScreenshotCaptureObserver 中確保單調遞增的圖片 ID 追蹤，以避免歷史螢幕截圖被重複發送。",
-    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.4.0-dev.5/patches-3.4.0-dev.5.mpp",
+    "created_at": "2026-08-29T03:20:00",
+    "description": "### ✨ New Features\n\n* **Gboard:** merge upstream changes up to `v3.6.0-dev.1` including Floating Web Search, Top Toolbar Item Count, Rounded Keyboard Panel, and one-tap Gboard restart.\n\n### ✨ 新功能\n\n* **Gboard:** 合併上游更新至 `v3.6.0-dev.1`，包含懸浮網頁搜尋、頂端工具列項目數量設定、圓角鍵盤面板以及一鍵快速重新啟動 Gboard 功能。",
+    "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.6.0-dev.2/patches-3.6.0-dev.2.mpp",
     "signature_download_url": "",
-    "version": "3.4.0-dev.5"
+    "version": "3.6.0-dev.2"
 }

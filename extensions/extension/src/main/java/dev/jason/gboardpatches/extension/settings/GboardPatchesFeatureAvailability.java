@@ -59,6 +59,8 @@ public final class GboardPatchesFeatureAvailability {
             "dev.jason.gboardpatches.feature.split_keyboard";
     public static final String FEATURE_ACCESSIBILITY_LAYOUT =
             "dev.jason.gboardpatches.feature.accessibility_layout";
+    public static final String FEATURE_ROUNDED_KEYBOARD_PANEL =
+            "dev.jason.gboardpatches.feature.rounded_keyboard_panel";
     public static final String FEATURE_SPACEBAR_LOGO =
             "dev.jason.gboardpatches.feature.spacebar_logo";
     public static final String FEATURE_SHOTGUN_KEYBOARD =
@@ -69,6 +71,10 @@ public final class GboardPatchesFeatureAvailability {
             "dev.jason.gboardpatches.feature.flow_mode_animation";
     public static final String FEATURE_QUICK_INSERT =
             "dev.jason.gboardpatches.feature.quick_insert";
+    public static final String FEATURE_ACCESS_POINT_COUNT =
+            "dev.jason.gboardpatches.feature.access_point_count";
+    public static final String FEATURE_FLOATING_WEB_SEARCH =
+            "dev.jason.gboardpatches.feature.floating_web_search";
 
     private static final String TAG = "GboardPatches";
 
