@@ -156,7 +156,7 @@ class GboardSettingsHomepagePatchContractTest {
         const val BINDINGS_PATH =
             "patches/src/main/resources/gboard/gboard-version-bindings.json"
         const val PATCH_INVENTORY_SHA256 =
-            "06D5196AF4A29833AA6D4F818CEC7C9A241DC82A2CBDF125B8E2AB569DA65D48"
+            "A3262CC10770746A69365B67ED567B4AA0892DBDE8FC7AE154D28E6B8E2A4117"
         const val BINDINGS_SHA256 =
             "EA4D35FDC483DCA17E1461BA5C494EAA788CEE8028942E6722C7C02C48140BDC"
     }
