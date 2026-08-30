@@ -1,14 +1,42 @@
-## [3.6.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.6.0-dev.1...v3.6.0-dev.2) (2026-08-29)
+## [3.7.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.2...v3.7.0-dev.3) (2026-08-30)
 
 ### ✨ New Features
 
-* **Gboard:** merge upstream changes up to `v3.6.0-dev.1` including Floating Web Search, Top Toolbar Item Count, Rounded Keyboard Panel, and one-tap Gboard restart.
+* **Gboard:** merge upstream changes up to `v3.7.0-dev.2`, including globe-key editing shortcuts and expanded keyboard layout support for editing shortcuts.
 
 ### ✨ 新功能
 
-* **Gboard:** 合併上游更新至 `v3.6.0-dev.1`，包含懸浮網頁搜尋、頂端工具列項目數量設定、圓角鍵盤面板以及一鍵快速重新啟動 Gboard 功能。
+* **Gboard:** 合併上游更新至 `v3.7.0-dev.2`，包含地球鍵編輯快捷手勢，並擴充編輯快捷手勢以支援更多鍵盤配置。
 
-## [3.6.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.5.0...v3.6.0-dev.1) (2026-08-26)
+## [3.7.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
+
+### ✨ New Features
+
+* **Gboard:** expand the `Long-Press Editing Shortcuts` patch to support additional keyboard layouts.
+
+### ✨ 新功能
+
+* **Gboard:** 擴充 `Long-Press Editing Shortcuts` Patch，現在支援更多鍵盤配置。
+
+## [3.7.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.6.0-dev.2...v3.7.0-dev.1) (2026-08-28)
+
+### ✨ New Features
+
+* **Gboard:** expand the `Long-Press Editing Shortcuts` patch with globe-key drag shortcuts. Press and hold the globe key, then drag to the corresponding letter to trigger an editing action—for example, drag to `C` to copy.
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the `Long-Press Editing Shortcuts` patch so `Copy` and `Cut` do nothing when the target text is empty, preventing empty copy or cut operations.
+
+### ✨ 新功能
+
+* **Gboard:** 擴充 `Long-Press Editing Shortcuts` Patch，新增地球鍵拖曳快捷操作；按住地球鍵後拖曳至對應字母，即可執行編輯操作，例如拖曳至 `C` 即可複製。
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch：當要複製或剪下的文字為空字串時，不再執行 `Copy` 或 `Cut`，避免空內容的複製／剪下操作。
+
+## [3.6.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.6.0-dev.1...v3.6.0-dev.2) (2026-08-29)
 
 ### ✨ New Features
 

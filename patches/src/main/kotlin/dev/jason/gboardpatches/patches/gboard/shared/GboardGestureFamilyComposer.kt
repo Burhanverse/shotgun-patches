@@ -21,13 +21,16 @@ import java.util.WeakHashMap
 
 private const val TOP_ROW_HELPER_NAME = "jasondevDispatchWithTopRow"
 private const val TOGGLE_HELPER_NAME = "jasondevDispatchOrToggle"
+private const val LONG_PRESS_HELPER_NAME = "jasondevDispatchGlobeDrag"
 private const val SHOTGUN_HELPER_NAME = "jasondevDispatchWithShotgun"
-private val GESTURE_HELPER_NAMES = setOf(TOP_ROW_HELPER_NAME, TOGGLE_HELPER_NAME, SHOTGUN_HELPER_NAME)
+private val GESTURE_HELPER_NAMES =
+    setOf(LONG_PRESS_HELPER_NAME, TOP_ROW_HELPER_NAME, TOGGLE_HELPER_NAME, SHOTGUN_HELPER_NAME)
 private val GESTURE_HELPER_ACCESS_FLAGS = AccessFlags.PRIVATE.value or AccessFlags.FINAL.value
 private val GESTURE_TARGET_ACCESS_FLAGS = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value
 private val GESTURE_STOCK_FIELD_ACCESS_FLAGS = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value
 
 internal enum class GboardGestureFamilyFeature {
+    LONG_PRESS_QUICK_ACTIONS,
     TOP_ROW_SWIPE,
     ZHUYIN_TOGGLE,
     SHOTGUN_KEYBOARD,
@@ -44,6 +47,17 @@ private enum class GboardGestureFamilyStage(
     val call: RuntimeCallId,
     val operands: List<GestureOperand>,
 ) {
+    LONG_PRESS_QUICK_ACTIONS(
+        feature = GboardGestureFamilyFeature.LONG_PRESS_QUICK_ACTIONS,
+        order = 50,
+        call = RuntimeCallId.LONG_PRESS_QUICK_ACTIONS_RUNTIME_MAYBE_HANDLE_GLOBE_GESTURE,
+        operands = listOf(
+            GestureOperand.Parameter(0),
+            GestureOperand.Parameter(1),
+            GestureOperand.Parameter(2),
+            GestureOperand.Parameter(3),
+        ),
+    ),
     TOP_ROW_SWIPE(
         feature = GboardGestureFamilyFeature.TOP_ROW_SWIPE,
         order = 100,
@@ -403,9 +417,50 @@ private fun MutableClass.applySelectedGestureFamily(
             ),
         )
     }
+    if (GboardGestureFamilyFeature.LONG_PRESS_QUICK_ACTIONS in selected) {
+        addGestureHelper(
+            LONG_PRESS_HELPER_NAME,
+            layout,
+            renderLongPressHelperBody(selected, layout),
+        )
+    }
 
     val target = GboardVersionBindings.gestureDispatch.resolve(this)
     target.addInstructions(0, renderGestureOwnerWrapper(selected, layout))
+}
+
+private fun renderLongPressHelperBody(
+    selected: Set<GboardGestureFamilyFeature>,
+    layout: GestureRegisterLayout,
+): String {
+    val stage = GboardGestureFamilyStage.LONG_PRESS_QUICK_ACTIONS
+    val nextHelper = when {
+        GboardGestureFamilyFeature.TOP_ROW_SWIPE in selected -> TOP_ROW_HELPER_NAME
+        GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected -> TOGGLE_HELPER_NAME
+        GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected -> SHOTGUN_HELPER_NAME
+        else -> null
+    }
+    val continuation = if (nextHelper == null) {
+        renderStockGestureDispatch(layout)
+    } else {
+        """
+            invoke-direct/range {p0 .. p${layout.rangeEndParameterRegister}}, ${GboardVersionBindings.gestureDispatch.referenceNamed(nextHelper)}
+
+            return-void
+        """.trimIndent()
+    }
+    return """
+        ${emitGestureRuntimeCall(stage.call, layout.render(stage.operands))}
+
+        move-result v0
+
+        if-nez v0, :cond_return
+
+        $continuation
+
+        :cond_return
+        return-void
+    """.trimIndent()
 }
 
 private fun MutableClass.addGestureHelper(
@@ -542,6 +597,7 @@ private fun renderStockGestureDispatch(
 }
 
 private fun Set<GboardGestureFamilyFeature>.entryHelperName(): String = when {
+    GboardGestureFamilyFeature.LONG_PRESS_QUICK_ACTIONS in this -> LONG_PRESS_HELPER_NAME
     GboardGestureFamilyFeature.TOP_ROW_SWIPE in this -> TOP_ROW_HELPER_NAME
     GboardGestureFamilyFeature.ZHUYIN_TOGGLE in this -> TOGGLE_HELPER_NAME
     else -> SHOTGUN_HELPER_NAME
@@ -553,6 +609,9 @@ private fun MutableClass.verifyExactGestureFamilyState(
 ) {
     val target = resolveGestureTargetForPreflight()
     val expectedHelperNames = buildSet {
+        if (GboardGestureFamilyFeature.LONG_PRESS_QUICK_ACTIONS in selected) {
+            add(LONG_PRESS_HELPER_NAME)
+        }
         if (GboardGestureFamilyFeature.TOP_ROW_SWIPE in selected) add(TOP_ROW_HELPER_NAME)
         if (GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected) add(TOGGLE_HELPER_NAME)
         if (GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected) add(SHOTGUN_HELPER_NAME)
