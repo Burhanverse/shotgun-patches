@@ -1,3 +1,9 @@
+## [3.7.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.3...v3.7.0-dev.4) (2026-08-31)
+
+### 🐛 Bug Fixes
+
+* **Web Clipboard:** update tile activation logic to fallback to service running state and improve service detection.
+
 ## [3.7.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.2...v3.7.0-dev.3) (2026-08-30)
 
 ### ✨ New Features
