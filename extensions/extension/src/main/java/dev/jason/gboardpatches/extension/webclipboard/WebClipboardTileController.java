@@ -62,7 +62,6 @@ public final class WebClipboardTileController {
             } else {
                 ClipboardSyncService.requestStop(appContext);
             }
-            requestTileRefresh(appContext);
         } catch (Throwable throwable) {
             Log.w(TAG, "Failed to apply Web Clipboard enabled state", throwable);
         }
@@ -157,7 +156,7 @@ public final class WebClipboardTileController {
     }
 
     public static boolean isTileActive(SharedPreferences preferences, boolean serviceRunning) {
-        return isEnabled(preferences) && isRuntimeActive(preferences);
+        return isEnabled(preferences) && (isRuntimeActive(preferences) || serviceRunning);
     }
 
     public static boolean shouldRestoreService(SharedPreferences preferences,
@@ -191,6 +190,9 @@ public final class WebClipboardTileController {
     }
 
     public static boolean isServiceRunning(Context context) {
+        if (ClipboardSyncService.isServiceRunning()) {
+            return true;
+        }
         if (context == null) {
             return false;
         }

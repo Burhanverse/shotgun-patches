@@ -71,6 +71,26 @@ public final class WebClipboardTileControllerTest {
     }
 
     @Test
+    public void tileStateUsesRunningServiceFallbackWhenRuntimeActivePending() {
+        InMemorySharedPreferences preferences = new InMemorySharedPreferences();
+        WebClipboardTileController.setEnabled(preferences, true);
+        WebClipboardTileController.setRuntimeActive(preferences, false);
+
+        Assert.assertTrue(WebClipboardTileController.isTileActive(preferences, true));
+        Assert.assertFalse(WebClipboardTileController.isTileActive(preferences, false));
+    }
+
+    @Test
+    public void tileStateRemainsInactiveWhenDisabledEvenIfServiceIsRunning() {
+        InMemorySharedPreferences preferences = new InMemorySharedPreferences();
+        WebClipboardTileController.setEnabled(preferences, false);
+        WebClipboardTileController.setRuntimeActive(preferences, false);
+
+        Assert.assertFalse(WebClipboardTileController.isTileActive(preferences, true));
+        Assert.assertFalse(WebClipboardTileController.isTileActive(preferences, false));
+    }
+
+    @Test
     public void defaultPortIs8080() {
         InMemorySharedPreferences preferences = new InMemorySharedPreferences();
 

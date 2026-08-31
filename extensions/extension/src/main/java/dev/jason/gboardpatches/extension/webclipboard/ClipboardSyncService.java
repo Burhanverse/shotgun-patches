@@ -154,6 +154,10 @@ public final class ClipboardSyncService extends Service {
         return portal != null && portal.kickClient(clientId);
     }
 
+    public static boolean isServiceRunning() {
+        return activeService != null;
+    }
+
     public static boolean publishPhoneClipboardIfActive(String text) {
         ClipboardSyncService service = activeService;
         if (service == null || !hasClipboardText(text)) {
