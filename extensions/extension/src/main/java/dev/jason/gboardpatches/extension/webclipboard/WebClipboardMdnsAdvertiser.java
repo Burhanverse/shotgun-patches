@@ -25,7 +25,10 @@ public final class WebClipboardMdnsAdvertiser {
         this.nsdManager = this.context != null
                 ? (NsdManager) this.context.getSystemService(Context.NSD_SERVICE)
                 : null;
-        this.instanceName = resolveInstanceName();
+        this.instanceName = this.context != null
+                ? WebClipboardPreferences.getMdnsInstanceId(
+                        WebClipboardPreferences.preferences(this.context))
+                : resolveInstanceName();
         this.registered = false;
     }
 

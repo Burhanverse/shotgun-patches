@@ -21,6 +21,14 @@ public class WebClipboardMdnsAdvertiserTest {
     }
 
     @Test
+    public void instanceNameFormatIsStablePrefix() {
+        // The instance name must start with the stable prefix, whether
+        // generated fresh (null context) or read from persisted preferences.
+        String instanceName = WebClipboardMdnsAdvertiser.resolveInstanceName();
+        assertTrue(instanceName.startsWith("WebClip-"));
+    }
+
+    @Test
     public void txtRecordKeysArePresent() {
         String[] preferenceKeys = new String[]{"v", "code", "token"};
         assertEquals(3, preferenceKeys.length);

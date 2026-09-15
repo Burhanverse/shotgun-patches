@@ -27,7 +27,10 @@ public final class LanFtpMdnsAdvertiser {
         this.nsdManager = this.context != null
                 ? (NsdManager) this.context.getSystemService(Context.NSD_SERVICE)
                 : null;
-        this.instanceName = resolveInstanceName();
+        this.instanceName = this.context != null
+                ? LanFtpPreferences.getMdnsInstanceId(
+                        LanFtpPreferences.preferences(this.context))
+                : resolveInstanceName();
         this.registered = false;
     }
 
