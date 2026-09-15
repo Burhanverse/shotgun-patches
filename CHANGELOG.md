@@ -1,20 +1,117 @@
-## [3.7.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.3...v3.7.0-dev.4) (2026-08-31)
+## [3.10.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.3...v3.10.0-dev.4) (2026-09-15)
+
+### ✨ New Features
+
+* **Gboard:** add the `Backup & Restore` patch for exporting and restoring all patch settings, and for backing up, comparing, and restoring Gboard's PB/XML flag stores.
+* **Gboard:** add the `Simple Calculator` patch. Enter an expression directly to display both the expression and its result in Gboard's suggestion strip.
+* **Gboard:** add the `FTP Server` patch, providing a LAN FTP server for browsing and transferring files with resume support.
+* **Gboard:** preserved the custom `Shotgun Keyboard` patch with audio effects and settings.
 
 ### 🐛 Bug Fixes
 
 * **Web Clipboard:** update tile activation logic to fallback to service running state and improve service detection.
 
-## [3.7.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.2...v3.7.0-dev.3) (2026-08-30)
+### ✨ 新功能
+
+* **Gboard:** 新增 `Backup & Restore` Patch，可匯出與還原所有 Patch 設定，並支援備份、比較及還原 Gboard 的 PB/XML flag store。
+* **Gboard:** 新增 `Simple Calculator` Patch；直接輸入算式，即可在 Gboard 推薦列顯示算式與計算結果。
+* **Gboard:** 新增 `FTP Server` Patch，提供區域網路 FTP 伺服器，支援檔案瀏覽、傳輸與續傳。
+* **Gboard:** 保留自訂 `Shotgun Keyboard` Patch，包含音效與設定功能。
+
+### 🐛 修復
+
+* **Web Clipboard:** 更新 tile 啟動邏輯，改為以服務運行狀態為後備，並改善服務偵測機制。
+
+## [3.10.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v3.9.0...v3.10.0-dev.3) (2026-09-01)
 
 ### ✨ New Features
 
-* **Gboard:** merge upstream changes up to `v3.7.0-dev.2`, including globe-key editing shortcuts and expanded keyboard layout support for editing shortcuts.
+* **Gboard:** add the `Backup & Restore` patch for exporting and restoring all patch settings, and for backing up, comparing, and restoring Gboard's PB/XML flag stores.
 
 ### ✨ 新功能
 
-* **Gboard:** 合併上游更新至 `v3.7.0-dev.2`，包含地球鍵編輯快捷手勢，並擴充編輯快捷手勢以支援更多鍵盤配置。
+* **Gboard:** 新增 `Backup & Restore` Patch，可匯出與還原所有 Patch 設定，並支援備份、比較及還原 Gboard 的 PB/XML flag store。
 
-## [3.7.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
+## [3.9.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.8.0...v3.9.0) (2026-09-01)
+
+### ✨ New Features
+
+* **Gboard:** add the `Simple Calculator` patch. Enter an expression directly to display both the expression and its result in Gboard's suggestion strip.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Simple Calculator` Patch；直接輸入算式，即可在 Gboard 推薦列顯示算式與計算結果。
+
+## [3.9.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.8.0...v3.9.0-dev.1) (2026-09-01)
+
+### ✨ New Features
+
+* **Gboard:** add the `Simple Calculator` patch. Enter an expression directly to display both the expression and its result in Gboard's suggestion strip.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Simple Calculator` Patch；直接輸入算式，即可在 Gboard 推薦列顯示算式與計算結果。
+
+## [3.8.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0...v3.8.0) (2026-08-31)
+
+### ✨ New Features
+
+* **Gboard:** add the `FTP Server` patch, providing a LAN FTP server for browsing and transferring files with resume support. Why would a keyboard app need an FTP server? You're right—it doesn't, but I do 😂
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix an issue in the `Long-Press Editing Shortcuts` patch that could occasionally enter unintended text when switching languages.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `FTP Server` Patch，提供區域網路 FTP 伺服器，支援檔案瀏覽、傳輸與續傳。為什麼鍵盤 App 會需要 FTP 伺服器？沒錯，鍵盤不需要，但我需要 😂
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch 在某些情況下切換語言時會意外輸入文字的問題。
+
+## [3.8.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0...v3.8.0-dev.3) (2026-08-31)
+
+### ✨ New Features
+
+* **Gboard:** add the `FTP Server` patch, providing a LAN FTP server for browsing and transferring files with resume support. Why would a keyboard app need an FTP server? You're right—it doesn't, but I do 😂
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix an issue in the `Long-Press Editing Shortcuts` patch that could occasionally enter unintended text when switching languages.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `FTP Server` Patch，提供區域網路 FTP 伺服器，支援檔案瀏覽、傳輸與續傳。為什麼鍵盤 App 會需要 FTP 伺服器？沒錯，鍵盤不需要，但我需要 😂
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch 在某些情況下切換語言時會意外輸入文字的問題。
+
+## [3.7.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.6.0...v3.7.0) (2026-08-30)
+
+### ✨ New Features
+
+* **Gboard:** expand the `Long-Press Editing Shortcuts` patch to support additional keyboard layouts.
+
+* **Gboard:** expand the `Long-Press Editing Shortcuts` patch with globe-key drag shortcuts. Press and hold the globe key, then drag to the corresponding letter to trigger an editing action—for example, drag to `C` to copy.
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the `Long-Press Editing Shortcuts` patch so `Copy` and `Cut` do nothing when the target text is empty, preventing empty copy or cut operations.
+
+### ✨ 新功能
+
+* **Gboard:** 擴充 `Long-Press Editing Shortcuts` Patch，現在支援更多鍵盤配置。
+
+* **Gboard:** 擴充 `Long-Press Editing Shortcuts` Patch，新增地球鍵拖曳快捷操作；按住地球鍵後拖曳至對應字母，即可執行編輯操作，例如拖曳至 `C` 即可複製。
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch：當要複製或剪下的文字為空字串時，不再執行 `Copy` 或 `Cut`，避免空內容的複製／剪下操作。
+
+## [3.7.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
+>>>>>>> upstream/dev
 
 ### ✨ New Features
 
