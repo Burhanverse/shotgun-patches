@@ -78,6 +78,7 @@ public final class ClipboardSyncService extends Service {
     private String lastAppliedImageHash = "";
     private final WebClipboardEchoSuppressor webClipboardEchoSuppressor =
             new WebClipboardEchoSuppressor(DUPLICATE_SUPPRESSION_WINDOW_MS);
+    private WebClipboardMdnsAdvertiser mdnsAdvertiser;
     private final ExecutorService clipboardPublishExecutor = Executors.newSingleThreadExecutor();
 
     public static void startOrUpdate(Context context) {
@@ -181,6 +182,10 @@ public final class ClipboardSyncService extends Service {
             WebClipboardTileController.markRuntimeActive(this, false);
             registerClipboardListener();
             refreshWebPortal();
+            mdnsAdvertiser = WebClipboardMdnsAdvertiser.create(this);
+            if (mdnsAdvertiser != null) {
+                mdnsAdvertiser.register();
+            }
         } catch (Throwable throwable) {
             Log.w(TAG, "Web Clipboard service onCreate failed", throwable);
             stopSelf();
@@ -238,6 +243,10 @@ public final class ClipboardSyncService extends Service {
             unregisterClipboardListener();
             clipboardPublishExecutor.shutdownNow();
             stopWebPortal();
+            if (mdnsAdvertiser != null) {
+                mdnsAdvertiser.unregister();
+                mdnsAdvertiser = null;
+            }
             WebClipboardTileController.requestTileRefresh(this);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 stopForeground(STOP_FOREGROUND_REMOVE);
@@ -292,8 +301,15 @@ public final class ClipboardSyncService extends Service {
             if (!startWebPortal(desiredPort, pairingRequired, pairingCode, loopbackIngressToken)) {
                 return;
             }
+            if (mdnsAdvertiser != null) {
+                mdnsAdvertiser.unregister();
+                mdnsAdvertiser.register();
+            }
         } else {
             WebClipboardTileController.markRuntimeActive(this, true);
+            if (mdnsAdvertiser != null && !mdnsAdvertiser.isRegistered()) {
+                mdnsAdvertiser.register();
+            }
         }
         updateNotification("Open " + firstUrl(desiredPort));
         WebClipboardTileController.requestTileRefresh(this);

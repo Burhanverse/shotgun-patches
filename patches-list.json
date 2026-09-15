@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0-dev.4",
+  "version": "3.10.0-dev.5",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -40,6 +40,18 @@
     {
       "name": "Advanced Voice Typing",
       "description": "啟用進階語音輸入（包含自動標點功能），並另外為不支援進階語音輸入的繁體中文語音啟用自動標點\nEnable Advanced Voice Typing with automatic punctuation, and separately enable automatic punctuation for Traditional Chinese voice typing, which does not support Advanced Voice Typing.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Backup & Restore",
+      "description": "匯出或還原全部 Patches 設定，並備份、比較及還原 Gboard PB/XML flag store\nExport or restore all Patches settings, and back up, compare, or restore the Gboard PB/XML flag store.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {
@@ -196,6 +208,18 @@
     {
       "name": "English QWERTY Up-Flick Uppercase",
       "description": "英文 QWERTY 鍵盤上滑大小寫\nFlick up on the English QWERTY keyboard to toggle uppercase and lowercase.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "FTP Server",
+      "description": "新增區域網路 FTP 伺服器，支援檔案瀏覽、傳輸與下載續傳\nAdd a LAN FTP server with file browsing, transfers, and download resume.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {
@@ -380,6 +404,18 @@
     {
       "name": "Shotgun Keyboard",
       "description": "擊鍵時播放散彈槍開火音效，空白鍵/換行鍵播放上膛音效，支援耳機與外接裝置自動靜音\nPlay shotgun blast sound on keystrokes, pump sound on Space / Enter, and auto-mute with headphones/external audio.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Simple Calculator",
+      "description": "直接輸入算式，在 Gboard 推薦列顯示可捲動算式與答案。\nType an expression and show a scrollable equation plus its answer in Gboard's suggestion row.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {

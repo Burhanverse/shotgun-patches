@@ -28,6 +28,8 @@ class GboardWebClipboardRuntimePreservationTest {
             NON_CAPTURE_PATCHES_SHA256,
             filesDigest(
                 listOf(
+                    "patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/shared/" +
+                        "GboardManifestXmlUtils.kt",
                     "patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/features/" +
                         "webclipboard/GboardWebClipboardAssetsPatch.kt",
                     "patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/features/" +
@@ -92,13 +94,13 @@ class GboardWebClipboardRuntimePreservationTest {
 
     private companion object {
         const val RUNTIME_JAVA_SHA256 =
-            "C9B3C8A38A0F21BACF0ABCB9BCAA1AEB38274DA0D5E60F11428B929C33D96D78"
+            "62307BD4084EA5305EC6B0B04986E8521CF35660EC0B0E42937F563AD4B87D14"
         const val PORTAL_ASSETS_SHA256 =
             "DE38DBE50AD0F82EE9D2357B0EADA6680F270845A36CAB6B9A719576DD40E3AC"
         const val RESOURCE_SHA256 =
             "DE0AEBDC3D5D36AC06CEA66334E5528CAF8319122680F59761FAC4423E3C49F2"
         const val NON_CAPTURE_PATCHES_SHA256 =
-            "B1ED6A3375C989F5C08A951FEEB1A4949133F86F4826C602552D4C3D21E719BF"
+            "7EC047AF855BF53A112B6A505ACDCE94DDEB39D05C0058CE1AC5F4D613BEDD3A"
         // STRONG #4 intentionally narrows settings features from Host to FeatureHost.
         const val SETTINGS_RUNTIME_SHA256 =
             "4406B8F10478D995223CC5F92EAE4195EC04BC90FFA051BBEC867C44B63167D0"
