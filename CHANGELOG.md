@@ -1,3 +1,13 @@
+## [3.10.0-dev.10](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.5...v3.10.0-dev.10) (2026-09-16)
+
+### ♻️ Code Refactoring
+
+* **Web Clipboard / LAN FTP:** remove mDNS advertisers and clean up unused preferences.
+
+### ♻️ 程式碼重構
+
+* **Web Clipboard / LAN FTP:** 移除 mDNS 廣播器並清理未使用的偏好設定。
+
 ## [3.10.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.3...v3.10.0-dev.4) (2026-09-15)
 
 ### ✨ New Features

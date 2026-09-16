@@ -30,7 +30,7 @@ public final class LanFtpPreferences {
     private static final String REMOVED_PREF_KEY_METADATA_AUTH_KEY =
             "pref_lan_ftp_metadata_auth_key";
     public static final String PREF_KEY_ALLOW_ANONYMOUS = "pref_lan_ftp_allow_anonymous";
-    public static final String PREF_KEY_MDNS_INSTANCE_ID = "pref_lan_ftp_mdns_instance_id";
+
     private static final String PREF_KEY_DEDICATED_STORAGE_READY =
             "pref_lan_ftp_dedicated_storage_ready";
     private static final Set<String> FTP_PREFERENCE_KEYS = Collections.unmodifiableSet(
@@ -208,13 +208,6 @@ public final class LanFtpPreferences {
                 changed = true;
             } else if (!(values.get(PREF_KEY_PASSWORD_REVISION) instanceof Number)) {
                 editor.putLong(PREF_KEY_PASSWORD_REVISION, 1L);
-                changed = true;
-            }
-            Object rawInstanceId = values.get(PREF_KEY_MDNS_INSTANCE_ID);
-            String instanceId = rawInstanceId instanceof String ? (String) rawInstanceId : null;
-            if (instanceId == null || instanceId.isEmpty()) {
-                instanceId = "WebClipFTP-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-                editor.putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId);
                 changed = true;
             }
             if (changed) {
@@ -425,25 +418,6 @@ public final class LanFtpPreferences {
         }
         String trimmed = value.trim();
         return SHARED_STORAGE_ROOT_URI.equals(trimmed) || trimmed.startsWith("content://");
-    }
-
-    public static String getMdnsInstanceId(SharedPreferences preferences) {
-        if (preferences == null) {
-            return null;
-        }
-        Object rawValue = preferences.getAll().get(PREF_KEY_MDNS_INSTANCE_ID);
-        String instanceId = rawValue instanceof String ? (String) rawValue : null;
-        if (instanceId == null || instanceId.isEmpty()) {
-            instanceId = "WebClipFTP-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-        }
-        return instanceId;
-    }
-
-    public static void setMdnsInstanceId(SharedPreferences preferences, String instanceId) {
-        if (preferences == null) {
-            return;
-        }
-        preferences.edit().putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId).commit();
     }
 
     private static String sanitizePassword(String value) {

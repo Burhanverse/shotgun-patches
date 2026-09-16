@@ -35,6 +35,7 @@ import dev.jason.gboardpatches.extension.lanftp.runtime.fs.LanFtpStagingDocument
 import dev.jason.gboardpatches.extension.lanftp.runtime.fs.LocalLanFtpDocumentStore;
 import dev.jason.gboardpatches.extension.lanftp.runtime.fs.SafLanFtpDocumentStore;
 
+
 public final class LanFtpService extends Service implements LanFtpActivityObserver {
     enum StartupFailureReason {
         LOCAL_NETWORK_PERMISSION("Local network permission is required to start FTP"),
@@ -128,7 +129,6 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
     });
 
     private volatile boolean configuredReadOnly = true;
-    private LanFtpMdnsAdvertiser mdnsAdvertiser;
 
     static boolean requestStart(Context context, LanFtpServerConfigSnapshot snapshot) {
         Context appContext = applicationContext(context);
@@ -196,10 +196,6 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
             ACTIVE_SERVICE.set(this);
             runtimeLocks = new LanFtpRuntimeLockController(this);
             notifications = new LanFtpNotificationController(this);
-            mdnsAdvertiser = LanFtpMdnsAdvertiser.create(this);
-            if (mdnsAdvertiser != null) {
-                mdnsAdvertiser.register();
-            }
             notifications.startForeground();
             publishRuntimeStatus(LanFtpRuntimeStatus.starting(), false);
             lastActivityElapsedMs = SystemClock.elapsedRealtime();
@@ -253,10 +249,6 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
             mainHandler.removeCallbacksAndMessages(null);
         } catch (Throwable throwable) {
             logContainedFailure("Destroy callback cancellation failed", throwable);
-        }
-        if (mdnsAdvertiser != null) {
-            mdnsAdvertiser.unregister();
-            mdnsAdvertiser = null;
         }
         scheduleRuntimeShutdown(this::completeDestroyAfterRuntimeShutdown);
         try {
@@ -446,10 +438,6 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
                 transferCount = 0;
                 lastActivityElapsedMs = SystemClock.elapsedRealtime();
                 failed = false;
-            }
-            if (mdnsAdvertiser != null) {
-                mdnsAdvertiser.unregister();
-                mdnsAdvertiser.register();
             }
             replacement.start();
             registerNetworkCallback(network);

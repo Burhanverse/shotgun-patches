@@ -16,8 +16,7 @@ public final class WebClipboardPreferences {
     public static final String PREF_KEY_PAIRING_CODE = "pref_web_clipboard_pairing_code";
     public static final String PREF_KEY_LOOPBACK_INGRESS_TOKEN =
             "pref_web_clipboard_loopback_ingress_token";
-    public static final String PREF_KEY_MDNS_INSTANCE_ID =
-            "pref_web_clipboard_mdns_instance_id";
+
 
     public static final boolean DEFAULT_ENABLED = false;
     public static final int DEFAULT_PORT = 8080;
@@ -88,14 +87,6 @@ public final class WebClipboardPreferences {
                 || !loopbackIngressToken.equals(rawLoopbackToken)) {
             editor = ensureEditor(editor, preferences);
             editor.putString(PREF_KEY_LOOPBACK_INGRESS_TOKEN, loopbackIngressToken);
-        }
-
-        Object rawInstanceId = preferences.getAll().get(PREF_KEY_MDNS_INSTANCE_ID);
-        String instanceId = rawInstanceId instanceof String ? (String) rawInstanceId : null;
-        if (instanceId == null || instanceId.isEmpty()) {
-            instanceId = WebClipboardMdnsAdvertiser.resolveInstanceName();
-            editor = ensureEditor(editor, preferences);
-            editor.putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId);
         }
 
         if (editor != null) {
@@ -238,25 +229,6 @@ public final class WebClipboardPreferences {
                 ? token
                 : nextLoopbackIngressToken();
         preferences.edit().putString(PREF_KEY_LOOPBACK_INGRESS_TOKEN, sanitized).commit();
-    }
-
-    public static String getMdnsInstanceId(SharedPreferences preferences) {
-        if (preferences == null) {
-            return null;
-        }
-        Object rawValue = preferences.getAll().get(PREF_KEY_MDNS_INSTANCE_ID);
-        String instanceId = rawValue instanceof String ? (String) rawValue : null;
-        if (instanceId == null || instanceId.isEmpty()) {
-            instanceId = WebClipboardMdnsAdvertiser.resolveInstanceName();
-        }
-        return instanceId;
-    }
-
-    public static void setMdnsInstanceId(SharedPreferences preferences, String instanceId) {
-        if (preferences == null) {
-            return;
-        }
-        preferences.edit().putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId).commit();
     }
 
     public static int sanitizePort(int port) {

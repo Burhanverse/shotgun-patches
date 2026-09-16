@@ -1,7 +1,7 @@
 {
-    "created_at":  "2026-09-15T00:00:00",
-    "description":  "### ✨ New Features\n\n* **Gboard:** add the `Backup \u0026 Restore` patch for exporting and restoring all patch settings, and for backing up, comparing, and restoring Gboard\u0027s PB/XML flag stores.\n* **Gboard:** add the `Simple Calculator` patch.\n* **Gboard:** add the `FTP Server` patch (LAN FTP server with file browsing, transfers, and download resume).\n\n### 🐛 Bug Fixes\n\n* **Web Clipboard:** update tile activation logic to fallback to service running state and improve service detection.\n* **Shotgun Keyboard:** preserved custom modifications including shotgun keyboard audio patches and web clipboard enhancements.\n\n### ✨ 新功能\n\n* **Gboard:** 新增 `Backup \u0026 Restore` Patch，可匯出與還原所有 Patch 設定，並支援備份、比較及還原 Gboard 的 PB/XML flag store。\n* **Gboard:** 新增 `Simple Calculator` Patch。\n* **Gboard:** 新增 `FTP Server` Patch，新增區域網路 FTP 伺服器，支援檔案瀏覽、傳輸與下載續傳。",
-    "download_url":  "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.10.0-dev.6/patches-3.10.0-dev.6.mpp",
+    "created_at":  "2026-09-16T03:00:00",
+    "description":  "### ✨ New Features / Changes (v3.10.0-dev.10)\n\n* **Broadcast Discovery:** set broadcast discovery port to `1717` and enumerate network interfaces directly via `NetworkInterface` instead of `ConnectivityManager` to reliably discover and broadcast across all local subnet addresses.\n* **Web Clipboard:** added `filterBroadcastAddress` for clean IPv4 broadcast address resolution and improved fallback to global broadcast address `255.255.255.255`.\n* **Shotgun Keyboard:** preserved all custom shotgun keyboard audio effects, settings, and web clipboard synchronization features.\n\n### ✨ 新功能 / 變更 (v3.10.0-dev.10)\n\n* **廣播探索：** 將廣播探索埠設為 `1717`，並透過 `NetworkInterface` 直接列舉網路介面以可靠發送至所有本機子網路廣播位址，取代 `ConnectivityManager` 查詢。\n* **Web Clipboard：** 新增 `filterBroadcastAddress` 進行純淨的 IPv4 廣播位址解析，並改善向全域廣播位址 `255.255.255.255` 的備援傳送。\n* **Shotgun Keyboard：** 完整保留散彈槍鍵盤音效、設定及網頁剪貼簿同步等自訂功能。",
+    "download_url":  "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.10.0-dev.10/patches-3.10.0-dev.10.mpp",
     "signature_download_url":  "",
-    "version":  "3.10.0-dev.6"
+    "version":  "3.10.0-dev.10"
 }
