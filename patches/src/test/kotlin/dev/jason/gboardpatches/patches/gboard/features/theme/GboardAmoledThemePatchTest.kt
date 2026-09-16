@@ -65,6 +65,12 @@ class GboardAmoledThemePatchTest {
         assertTrue(source.contains("Lqyj;->P:I"))
         assertTrue(source.contains("Lqyj;->G:I"))
         assertTrue(source.contains("const/high16 v0, -0x1000000"))
+        assertTrue(source.contains("jasondevApplyAmoledTheme"))
+        assertTrue(source.contains("installAmoledThemeHelper"))
+        assertTrue(source.contains("if-nez v0, :cond_return"))
+        assertTrue(source.contains("if-eqz v0, :cond_return"))
+        assertTrue(source.contains(".catch Ljava/lang/Throwable;"))
+        assertTrue(source.contains("invoke-direct {p0}, \$helperReference"))
     }
 
     private fun root(): Path {
