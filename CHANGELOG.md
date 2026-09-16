@@ -1,3 +1,13 @@
+## [3.11.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.11...v3.11.0-dev.1) (2026-09-16)
+
+### ✨ New Features
+
+* **Gboard:** add AMOLED pure black theme patch with AMOLED overrides and preference settings.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 AMOLED 純黑主題 Patch，提供 AMOLED 覆蓋與偏好設定。
+
 ## [3.10.0-dev.11](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.10...v3.10.0-dev.11) (2026-09-16)
 
 ### ♻️ Code Refactoring
