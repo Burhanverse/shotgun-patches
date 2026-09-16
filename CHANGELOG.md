@@ -1,3 +1,13 @@
+## [3.10.0-dev.10](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.9...v3.10.0-dev.10) (2026-09-16)
+
+### ✨ New Features
+
+* **Web Clipboard:** update broadcast discovery to port `1717` and direct network interface enumeration for reliable multi-interface subnet broadcast dispatch.
+
+### ✨ 新功能
+
+* **Web Clipboard:** 將廣播探索更新為埠號 `1717`，並改用直接網路介面列舉以達成跨多網介子網路的可靠廣播發送。
+
 ## [3.10.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.3...v3.10.0-dev.4) (2026-09-15)
 
 ### ✨ New Features
