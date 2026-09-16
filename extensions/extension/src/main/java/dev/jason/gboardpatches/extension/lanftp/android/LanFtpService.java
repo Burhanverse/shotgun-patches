@@ -34,6 +34,7 @@ import dev.jason.gboardpatches.extension.lanftp.runtime.fs.LanFtpDocumentStore;
 import dev.jason.gboardpatches.extension.lanftp.runtime.fs.LanFtpStagingDocumentStore;
 import dev.jason.gboardpatches.extension.lanftp.runtime.fs.LocalLanFtpDocumentStore;
 import dev.jason.gboardpatches.extension.lanftp.runtime.fs.SafLanFtpDocumentStore;
+import dev.jason.gboardpatches.extension.webclipboard.WebClipboardBroadcastAnnouncer;
 
 public final class LanFtpService extends Service implements LanFtpActivityObserver {
     enum StartupFailureReason {
@@ -128,7 +129,6 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
     });
 
     private volatile boolean configuredReadOnly = true;
-    private LanFtpMdnsAdvertiser mdnsAdvertiser;
 
     static boolean requestStart(Context context, LanFtpServerConfigSnapshot snapshot) {
         Context appContext = applicationContext(context);
@@ -196,10 +196,7 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
             ACTIVE_SERVICE.set(this);
             runtimeLocks = new LanFtpRuntimeLockController(this);
             notifications = new LanFtpNotificationController(this);
-            mdnsAdvertiser = LanFtpMdnsAdvertiser.create(this);
-            if (mdnsAdvertiser != null) {
-                mdnsAdvertiser.register();
-            }
+            WebClipboardBroadcastAnnouncer.announcer().start(this);
             notifications.startForeground();
             publishRuntimeStatus(LanFtpRuntimeStatus.starting(), false);
             lastActivityElapsedMs = SystemClock.elapsedRealtime();
@@ -254,10 +251,7 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
         } catch (Throwable throwable) {
             logContainedFailure("Destroy callback cancellation failed", throwable);
         }
-        if (mdnsAdvertiser != null) {
-            mdnsAdvertiser.unregister();
-            mdnsAdvertiser = null;
-        }
+        WebClipboardBroadcastAnnouncer.announcer().stop();
         scheduleRuntimeShutdown(this::completeDestroyAfterRuntimeShutdown);
         try {
             lifecycleExecutor.shutdown();
@@ -447,10 +441,7 @@ public final class LanFtpService extends Service implements LanFtpActivityObserv
                 lastActivityElapsedMs = SystemClock.elapsedRealtime();
                 failed = false;
             }
-            if (mdnsAdvertiser != null) {
-                mdnsAdvertiser.unregister();
-                mdnsAdvertiser.register();
-            }
+            WebClipboardBroadcastAnnouncer.announcer().announceNow();
             replacement.start();
             registerNetworkCallback(network);
             boolean obsolete;

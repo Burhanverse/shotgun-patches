@@ -93,7 +93,7 @@ public final class WebClipboardPreferences {
         Object rawInstanceId = preferences.getAll().get(PREF_KEY_MDNS_INSTANCE_ID);
         String instanceId = rawInstanceId instanceof String ? (String) rawInstanceId : null;
         if (instanceId == null || instanceId.isEmpty()) {
-            instanceId = WebClipboardMdnsAdvertiser.resolveInstanceName();
+            instanceId = nextDeviceId();
             editor = ensureEditor(editor, preferences);
             editor.putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId);
         }
@@ -247,7 +247,7 @@ public final class WebClipboardPreferences {
         Object rawValue = preferences.getAll().get(PREF_KEY_MDNS_INSTANCE_ID);
         String instanceId = rawValue instanceof String ? (String) rawValue : null;
         if (instanceId == null || instanceId.isEmpty()) {
-            instanceId = WebClipboardMdnsAdvertiser.resolveInstanceName();
+            instanceId = nextDeviceId();
         }
         return instanceId;
     }
@@ -257,6 +257,11 @@ public final class WebClipboardPreferences {
             return;
         }
         preferences.edit().putString(PREF_KEY_MDNS_INSTANCE_ID, instanceId).commit();
+    }
+
+    private static String nextDeviceId() {
+        java.util.UUID uuid = java.util.UUID.randomUUID();
+        return "WebClip-" + uuid.toString().replace("-", "").substring(0, 8);
     }
 
     public static int sanitizePort(int port) {
