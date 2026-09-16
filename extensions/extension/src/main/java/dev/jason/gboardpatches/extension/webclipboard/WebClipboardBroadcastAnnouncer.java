@@ -2,9 +2,8 @@ package dev.jason.gboardpatches.extension.webclipboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.LinkAddress;
-import android.net.LinkProperties;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -13,6 +12,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,7 +28,7 @@ public final class WebClipboardBroadcastAnnouncer {
     private static final byte[] FALLBACK_BROADCAST_BYTES =
             {(byte) 255, (byte) 255, (byte) 255, (byte) 255};
 
-    public static final int BROADCAST_PORT = 1717;
+    public static final int BROADCAST_PORT = 17693;
 
     private static final WebClipboardBroadcastAnnouncer SHARED =
             new WebClipboardBroadcastAnnouncer();
@@ -111,13 +112,34 @@ public final class WebClipboardBroadcastAnnouncer {
             AnnouncementConfig config = readConfig(context);
             String payload = buildPayloadJson(config);
             byte[] data = payload.getBytes("UTF-8");
-            try (DatagramSocket socket = new DatagramSocket()) {
-                socket.setBroadcast(true);
-                DatagramPacket packet = new DatagramPacket(
-                        data, data.length, resolveBroadcastAddress(context), BROADCAST_PORT);
-                socket.send(packet);
-                Log.i(TAG, "broadcast announced to " + packet.getAddress().getHostAddress()
-                        + ":" + BROADCAST_PORT);
+            List<InetAddress> targets = collectBroadcastAddresses();
+            boolean anySent = false;
+            for (InetAddress target : targets) {
+                try (DatagramSocket socket = new DatagramSocket()) {
+                    socket.setBroadcast(true);
+                    DatagramPacket packet = new DatagramPacket(
+                            data, data.length, target, BROADCAST_PORT);
+                    socket.send(packet);
+                    Log.i(TAG, "broadcast announced to " + target.getHostAddress()
+                            + ":" + BROADCAST_PORT);
+                    anySent = true;
+                } catch (Throwable ignored) {
+                    // Best effort per target.
+                }
+            }
+            if (!anySent) {
+                InetAddress fallback = globalBroadcastAddress();
+                if (fallback != null) {
+                    try (DatagramSocket socket = new DatagramSocket()) {
+                        socket.setBroadcast(true);
+                        DatagramPacket packet = new DatagramPacket(
+                                data, data.length, fallback, BROADCAST_PORT);
+                        socket.send(packet);
+                        Log.i(TAG, "broadcast announced to global broadcast "
+                                + fallback.getHostAddress());
+                    } catch (Throwable ignored) {
+                    }
+                }
             }
         } catch (Throwable throwable) {
             Log.w(TAG, "broadcast skipped due to exception");
@@ -168,42 +190,39 @@ public final class WebClipboardBroadcastAnnouncer {
         return payload.toString();
     }
 
-    private static InetAddress resolveBroadcastAddress(Context context) {
+    public static InetAddress filterBroadcastAddress(InetAddress address, InetAddress broadcast) {
+        return (address instanceof Inet4Address && broadcast != null) ? broadcast : null;
+    }
+
+    private static List<InetAddress> collectBroadcastAddresses() {
+        List<InetAddress> result = new ArrayList<>();
         try {
-            ConnectivityManager manager = context.getSystemService(ConnectivityManager.class);
-            if (manager != null) {
-                LinkProperties properties = manager.getLinkProperties(manager.getActiveNetwork());
-                if (properties != null) {
-                    List<LinkAddress> addresses = properties.getLinkAddresses();
-                    for (LinkAddress address : addresses) {
-                        InetAddress ip = address.getAddress();
-                        int prefix = address.getPrefixLength();
-                        if (ip instanceof Inet4Address
-                                && prefix >= 0
-                                && prefix < 32
-                                && !ip.isLoopbackAddress()
-                                && !ip.isLinkLocalAddress()) {
-                            return ipv4Broadcast((Inet4Address) ip, prefix);
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            if (interfaces != null) {
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface iface = interfaces.nextElement();
+                    try {
+                        if (!iface.isUp() || iface.isLoopback() || iface.isPointToPoint()) {
+                            continue;
                         }
+                        List<InterfaceAddress> ifaceAddrs = iface.getInterfaceAddresses();
+                        if (ifaceAddrs == null) {
+                            continue;
+                        }
+                        for (InterfaceAddress ifaceAddr : ifaceAddrs) {
+                            InetAddress broadcast = filterBroadcastAddress(
+                                    ifaceAddr.getAddress(), ifaceAddr.getBroadcast());
+                            if (broadcast != null) {
+                                result.add(broadcast);
+                            }
+                        }
+                    } catch (Throwable ignored) {
                     }
                 }
             }
         } catch (Throwable ignored) {
-            // Fall back to the global broadcast address.
         }
-        return globalBroadcastAddress();
-    }
-
-    private static InetAddress ipv4Broadcast(Inet4Address address, int prefix) {
-        byte[] broadcast = address.getAddress().clone();
-        for (int bit = prefix; bit < 32; bit++) {
-            broadcast[bit / 8] |= (byte) (0x80 >>> (bit % 8));
-        }
-        try {
-            return InetAddress.getByAddress(broadcast);
-        } catch (Throwable ignored) {
-            return globalBroadcastAddress();
-        }
+        return result;
     }
 
     private static InetAddress globalBroadcastAddress() {

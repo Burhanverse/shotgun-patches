@@ -1,6 +1,11 @@
 package dev.jason.gboardpatches.extension.webclipboard;
 
+import java.net.InetAddress;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -44,5 +49,25 @@ public class WebClipboardBroadcastAnnouncerTest {
     public void broadcastPortDoesNotCollideWithHttpOrFtpDefaults() {
         assertTrue(WebClipboardBroadcastAnnouncer.BROADCAST_PORT != 8080);
         assertTrue(WebClipboardBroadcastAnnouncer.BROADCAST_PORT != 2121);
+    }
+
+    @Test
+    public void filterBroadcastAddressReturnsBroadcastForValidIpv4() throws Exception {
+        InetAddress ipv4 = InetAddress.getByName("192.168.1.42");
+        InetAddress broadcast = InetAddress.getByName("192.168.1.255");
+        assertEquals(broadcast, WebClipboardBroadcastAnnouncer.filterBroadcastAddress(ipv4, broadcast));
+    }
+
+    @Test
+    public void filterBroadcastAddressReturnsNullForNullBroadcast() throws Exception {
+        InetAddress ipv4 = InetAddress.getByName("10.0.0.1");
+        assertNull(WebClipboardBroadcastAnnouncer.filterBroadcastAddress(ipv4, null));
+    }
+
+    @Test
+    public void filterBroadcastAddressReturnsNullForIPv6() throws Exception {
+        InetAddress ipv6 = InetAddress.getByName("fe80::1");
+        InetAddress broadcast = InetAddress.getByName("ff02::1");
+        assertNull(WebClipboardBroadcastAnnouncer.filterBroadcastAddress(ipv6, broadcast));
     }
 }
