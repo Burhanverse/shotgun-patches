@@ -1,3 +1,13 @@
+## [3.10.0-dev.11](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.10...v3.10.0-dev.11) (2026-09-16)
+
+### ♻️ Code Refactoring
+
+* **Web Clipboard / LAN FTP:** consolidate mDNS removal and clean up preferences into squashed patch release.
+
+### ♻️ 程式碼重構
+
+* **Web Clipboard / LAN FTP:** 整合移除 mDNS 與清理偏好設定至壓縮整理後的 Patch 版本。
+
 ## [3.10.0-dev.10](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.5...v3.10.0-dev.10) (2026-09-16)
 
 ### ♻️ Code Refactoring

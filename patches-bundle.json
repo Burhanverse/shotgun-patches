@@ -1,7 +1,7 @@
 {
-    "created_at":  "2026-09-16T03:00:00",
-    "description":  "### ✨ New Features / Changes (v3.10.0-dev.10)\n\n* **Broadcast Discovery:** set broadcast discovery port to `1717` and enumerate network interfaces directly via `NetworkInterface` instead of `ConnectivityManager` to reliably discover and broadcast across all local subnet addresses.\n* **Web Clipboard:** added `filterBroadcastAddress` for clean IPv4 broadcast address resolution and improved fallback to global broadcast address `255.255.255.255`.\n* **Shotgun Keyboard:** preserved all custom shotgun keyboard audio effects, settings, and web clipboard synchronization features.\n\n### ✨ 新功能 / 變更 (v3.10.0-dev.10)\n\n* **廣播探索：** 將廣播探索埠設為 `1717`，並透過 `NetworkInterface` 直接列舉網路介面以可靠發送至所有本機子網路廣播位址，取代 `ConnectivityManager` 查詢。\n* **Web Clipboard：** 新增 `filterBroadcastAddress` 進行純淨的 IPv4 廣播位址解析，並改善向全域廣播位址 `255.255.255.255` 的備援傳送。\n* **Shotgun Keyboard：** 完整保留散彈槍鍵盤音效、設定及網頁剪貼簿同步等自訂功能。",
-    "download_url":  "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.10.0-dev.10/patches-3.10.0-dev.10.mpp",
+    "created_at":  "2026-09-16T05:00:00",
+    "description":  "### ♻️ Code Refactoring (v3.10.0-dev.11)\n\n* **Web Clipboard / LAN FTP:** consolidate mDNS removal and clean up unused preferences into squashed patch release.\n* **Shotgun Keyboard:** preserved all custom shotgun keyboard audio effects, settings, and web clipboard synchronization features.\n\n### ♻️ 程式碼重構 (v3.10.0-dev.11)\n\n* **Web Clipboard / LAN FTP:** 整合移除 mDNS 與清理偏好設定至壓縮整理後的 Patch 版本。\n* **Shotgun Keyboard:** 完整保留散彈槍鍵盤音效、設定及網頁剪貼簿同步等自訂功能。",
+    "download_url":  "https://github.com/Burhanverse/shotgun-patches/releases/download/v3.10.0-dev.11/patches-3.10.0-dev.11.mpp",
     "signature_download_url":  "",
-    "version":  "3.10.0-dev.10"
+    "version":  "3.10.0-dev.11"
 }

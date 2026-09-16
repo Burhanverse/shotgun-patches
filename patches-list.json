@@ -1,5 +1,5 @@
 {
-  "version": "3.10.0-dev.10",
+  "version": "3.10.0-dev.11",
   "patches": [
     {
       "name": "AI Writing Tools",
