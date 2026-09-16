@@ -13,7 +13,7 @@ import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallEmitt
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
 import dev.jason.gboardpatches.patches.shared.Constants.COMPATIBILITY_GBOARD
 
-private const val COLOR_GM3_SURFACE_CONTAINER_LOW_FIELD = "Lqyj;->R:I"
+private const val COLOR_GM3_SCRIM_FIELD = "Lqyj;->V:I"
 
 internal val gboardAmoledThemeBytecodePatch = bytecodePatch(
     description = "在 GM3 color token 計算管線注入 AMOLED 純黑覆寫邏輯。",
@@ -35,7 +35,7 @@ internal val gboardAmoledThemeBytecodePatch = bytecodePatch(
 }
 
 internal fun MutableMethod.injectAmoledThemeOverride() {
-    val runtimeAbi = RuntimeAbiCatalog.abi(RuntimeCallId.AMOLED_THEME_RUNTIME_APPLY_OVERRIDE)
+    val runtimeAbi = RuntimeAbiCatalog.abi(RuntimeCallId.AMOLED_THEME_RUNTIME_IS_ACTIVE)
     val instructions = implementation?.instructions
         ?: error("No instructions in $definingClass->$name")
 
@@ -44,36 +44,30 @@ internal fun MutableMethod.injectAmoledThemeOverride() {
     }
 
     val targetIndex = instructions.indexOfFirst {
-        it.isFieldReference(COLOR_GM3_SURFACE_CONTAINER_LOW_FIELD)
+        it.isFieldReference(COLOR_GM3_SCRIM_FIELD)
     }
     check(targetIndex >= 0) {
-        "Could not find $COLOR_GM3_SURFACE_CONTAINER_LOW_FIELD write in $definingClass->$name"
+        "Could not find $COLOR_GM3_SCRIM_FIELD write in $definingClass->$name"
     }
 
     addInstructions(
         targetIndex + 1,
         """
-            iget v0, p0, Lqyj;->Q:I
-            iget v1, p0, Lqyj;->I:I
-            iget v2, p0, Lqyj;->R:I
-            iget v3, p0, Lqyj;->K:I
-            ${RuntimeCallEmitter.invoke(
-                RuntimeCallId.AMOLED_THEME_RUNTIME_APPLY_OVERRIDE,
-                "p1, v0, v1, v2, v3",
-            )}
-            move-result-object v0
-            const/4 v1, 0x0
-            aget v1, v0, v1
-            iput v1, p0, Lqyj;->Q:I
-            const/4 v1, 0x1
-            aget v1, v0, v1
-            iput v1, p0, Lqyj;->I:I
-            const/4 v1, 0x2
-            aget v1, v0, v1
-            iput v1, p0, Lqyj;->R:I
-            const/4 v1, 0x3
-            aget v1, v0, v1
-            iput v1, p0, Lqyj;->K:I
+            iget-boolean v0, p0, Lqyj;->a:Z
+            if-eqz v0, :cond_amoled_done
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_IS_ACTIVE, "")}
+            move-result v0
+            if-nez v0, :cond_amoled_done
+            const/high16 v0, -0x1000000
+            iput v0, p0, Lqyj;->Q:I
+            iput v0, p0, Lqyj;->I:I
+            iput v0, p0, Lqyj;->R:I
+            iput v0, p0, Lqyj;->S:I
+            iput v0, p0, Lqyj;->T:I
+            iput v0, p0, Lqyj;->U:I
+            iput v0, p0, Lqyj;->P:I
+            iput v0, p0, Lqyj;->G:I
+            :cond_amoled_done
         """.trimIndent(),
     )
 }

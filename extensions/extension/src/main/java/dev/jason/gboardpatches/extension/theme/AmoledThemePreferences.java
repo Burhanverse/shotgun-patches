@@ -13,6 +13,15 @@ public final class AmoledThemePreferences {
     private AmoledThemePreferences() {
     }
 
+    public static boolean isAmoledEnabled() {
+        try {
+            SharedPreferences preferences = dev.jason.gboardpatches.extension.flagsettings.GboardFlagRuntimeContext.preferencesOrNull();
+            return isAmoledEnabled(preferences);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
     public static boolean isAmoledEnabled(Context context) {
         if (context == null) {
             return false;

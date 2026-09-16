@@ -23,6 +23,7 @@ public final class AmoledThemeOverrideTest {
 
     @Before
     public void setUp() {
+        AmoledThemeOverride.setTestOverrideEnabled(null);
         application = RuntimeEnvironment.getApplication();
         GboardPatchesSettings.preferences(application).edit().clear().commit();
     }
@@ -30,6 +31,18 @@ public final class AmoledThemeOverrideTest {
     @Test
     public void preferencesDefaultToDisabled() {
         assertFalse(AmoledThemePreferences.isAmoledEnabled(application));
+        assertFalse(AmoledThemeOverride.isAmoledThemeActive());
+    }
+
+    @Test
+    public void isAmoledThemeActiveFollowsTestOverride() {
+        AmoledThemeOverride.setTestOverrideEnabled(true);
+        assertTrue(AmoledThemeOverride.isAmoledThemeActive());
+
+        AmoledThemeOverride.setTestOverrideEnabled(false);
+        assertFalse(AmoledThemeOverride.isAmoledThemeActive());
+
+        AmoledThemeOverride.setTestOverrideEnabled(null);
     }
 
     @Test

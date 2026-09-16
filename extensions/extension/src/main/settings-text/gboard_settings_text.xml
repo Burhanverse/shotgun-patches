@@ -2207,8 +2207,8 @@
         <translation locale="zh-Hant">AMOLED 純黑模式</translation>
     </string>
     <string name="gboard_patches_amoled_theme_summary">
-        <translation locale="en">Use true pure black (#000000) for surfaces in dark mode while preserving accent colors.</translation>
-        <translation locale="zh-Hant">在深色模式下將表面與背景轉為純黑 (#000000)，同時保留輔色與強調色彩。</translation>
+        <translation locale="en">Use true pure black (#000000) for surfaces in dark mode while preserving accent colors. Force-stop and restart Gboard for changes to take effect.</translation>
+        <translation locale="zh-Hant">在深色模式下將表面與背景轉為純黑 (#000000)，同時保留輔色與強調色彩。變更後請強制停止並重新啟動 Gboard 以便生效。</translation>
     </string>
     <string name="gboard_patches_amoled_theme_toggle_title">
         <translation locale="en">Enable AMOLED pure black</translation>

@@ -35,7 +35,7 @@ class GboardAmoledThemePatchTest {
             contribution.getAsJsonArray("required_bindings").map { it.asString },
         )
         assertEquals(
-            listOf(RuntimeCallId.AMOLED_THEME_RUNTIME_APPLY_OVERRIDE.name),
+            listOf(RuntimeCallId.AMOLED_THEME_RUNTIME_IS_ACTIVE.name),
             contribution.getAsJsonArray("runtime_calls").map { it.asString },
         )
     }
@@ -53,11 +53,18 @@ class GboardAmoledThemePatchTest {
     @Test
     fun `bytecode patch source wires runtime abi call and updates target fields`() {
         val source = Files.readString(root().resolve(BYTECODE), StandardCharsets.UTF_8)
-        assertTrue(source.contains("RuntimeCallId.AMOLED_THEME_RUNTIME_APPLY_OVERRIDE"))
-        assertTrue(source.contains("Lqyj;->R:I"))
+        assertTrue(source.contains("RuntimeCallId.AMOLED_THEME_RUNTIME_IS_ACTIVE"))
+        assertTrue(source.contains("Lqyj;->V:I"))
+        assertTrue(source.contains("Lqyj;->a:Z"))
         assertTrue(source.contains("Lqyj;->Q:I"))
         assertTrue(source.contains("Lqyj;->I:I"))
-        assertTrue(source.contains("Lqyj;->K:I"))
+        assertTrue(source.contains("Lqyj;->R:I"))
+        assertTrue(source.contains("Lqyj;->S:I"))
+        assertTrue(source.contains("Lqyj;->T:I"))
+        assertTrue(source.contains("Lqyj;->U:I"))
+        assertTrue(source.contains("Lqyj;->P:I"))
+        assertTrue(source.contains("Lqyj;->G:I"))
+        assertTrue(source.contains("const/high16 v0, -0x1000000"))
     }
 
     private fun root(): Path {

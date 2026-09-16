@@ -1,14 +1,39 @@
 package dev.jason.gboardpatches.extension.theme;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.util.Log;
+
+import dev.jason.gboardpatches.extension.flagsettings.GboardFlagRuntimeContext;
 
 public final class AmoledThemeOverride {
     private static final String TAG = "GboardPatches";
     private static final int AMOLED_BLACK = 0xFF000000;
 
+    private static volatile Boolean testOverrideEnabled;
+
     private AmoledThemeOverride() {
+    }
+
+    public static boolean isAmoledThemeActive() {
+        if (testOverrideEnabled != null) {
+            return testOverrideEnabled;
+        }
+        try {
+            SharedPreferences preferences = GboardFlagRuntimeContext.preferencesOrNull();
+            return AmoledThemePreferences.isAmoledEnabled(preferences);
+        } catch (Throwable throwable) {
+            try {
+                Log.w(TAG, "Failed to check AMOLED theme active state", throwable);
+            } catch (Throwable ignored) {
+            }
+            return false;
+        }
+    }
+
+    public static void setTestOverrideEnabled(Boolean enabled) {
+        testOverrideEnabled = enabled;
     }
 
     public static boolean isDarkModeActive(Context context) {
