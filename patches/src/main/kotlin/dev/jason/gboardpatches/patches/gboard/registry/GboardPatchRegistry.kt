@@ -67,6 +67,8 @@ import dev.jason.gboardpatches.patches.gboard.features.packagerename.isValidGboa
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.roundedkeyboard.gboardRoundedKeyboardFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.theme.gboardAmoledThemeBytecodePatch
+import dev.jason.gboardpatches.patches.gboard.features.theme.gboardAmoledThemeFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.settingshomepage.gboardSettingsHomepageBytecodePatch
 import dev.jason.gboardpatches.patches.gboard.features.settingshomepage.gboardSettingsHomepageFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.signaturebypass.gboardSignatureBypassBytecodePatch
@@ -360,6 +362,23 @@ val gboardRoundedKeyboardPanelPatch = gboardPublicResourcePatch(
     dependsOn(
         gboardPatchesSettingsPatch,
         gboardRoundedKeyboardFeatureMarkerPatch,
+    )
+}
+
+@Suppress("unused")
+val gboardAmoledThemePatch = gboardPublicResourcePatch(
+    featureId = "amoled_theme",
+    name = "AMOLED Pure Black Theme",
+    description = "在深色模式下將背景與表面顏色覆寫為純黑 (#000000)，並保留強調色彩。\n" +
+        "Override surfaces and backgrounds with pure black (#000000) in dark mode while keeping accent colors.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardAmoledThemeFeatureMarkerPatch,
+        gboardAmoledThemeBytecodePatch,
     )
 }
 
@@ -832,6 +851,7 @@ object GboardPublishedPatchCatalog {
         gboardSplitKeyboardPatch,
         gboardAccessibilityLayoutPatch,
         gboardRoundedKeyboardPanelPatch,
+        gboardAmoledThemePatch,
         gboardAccessPointCountPatch,
         gboardCloseProactiveSuggestionsPatch,
         gboardFlowModeAnimationPatch,

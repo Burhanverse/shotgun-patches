@@ -2202,6 +2202,30 @@
         <translation locale="en">Restore the top and bottom corner radii to 32 dp?</translation>
         <translation locale="zh-Hant">要將上方與下方圓角程度恢復為 32dp 嗎？</translation>
     </string>
+    <string name="gboard_patches_amoled_theme_title">
+        <translation locale="en">AMOLED Pure Black</translation>
+        <translation locale="zh-Hant">AMOLED 純黑模式</translation>
+    </string>
+    <string name="gboard_patches_amoled_theme_summary">
+        <translation locale="en">Use true pure black (#000000) for surfaces in dark mode while preserving accent colors.</translation>
+        <translation locale="zh-Hant">在深色模式下將表面與背景轉為純黑 (#000000)，同時保留輔色與強調色彩。</translation>
+    </string>
+    <string name="gboard_patches_amoled_theme_toggle_title">
+        <translation locale="en">Enable AMOLED pure black</translation>
+        <translation locale="zh-Hant">啟用 AMOLED 純黑</translation>
+    </string>
+    <string name="gboard_patches_amoled_theme_error_title">
+        <translation locale="en">AMOLED theme settings unavailable</translation>
+        <translation locale="zh-Hant">AMOLED 主題設定無法使用</translation>
+    </string>
+    <string name="gboard_patches_amoled_theme_error_summary">
+        <translation locale="en">The AMOLED theme settings screen failed to load. Reopen Gboard settings and try again.</translation>
+        <translation locale="zh-Hant">AMOLED 主題設定畫面載入失敗。請重新開啟 Gboard 設定再試一次。</translation>
+    </string>
+    <string name="gboard_patches_amoled_theme_section">
+        <translation locale="en">Appearance</translation>
+        <translation locale="zh-Hant">外觀</translation>
+    </string>
     <string name="gboard_patches_cursor_trackpad_preview_mode">
         <translation locale="en">Trackpad mode</translation>
         <translation locale="zh-Hant">觸控板模式</translation>

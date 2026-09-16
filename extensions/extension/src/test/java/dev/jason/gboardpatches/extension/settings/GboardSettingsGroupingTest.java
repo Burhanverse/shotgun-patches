@@ -124,6 +124,7 @@ public final class GboardSettingsGroupingTest {
                 "new GboardSplitKeyboardSettingsFeature(context)",
                 "new GboardAccessibilityLayoutSettingsFeature(context)",
                 "new GboardRoundedKeyboardSettingsFeature(context)",
+                "new GboardAmoledThemeSettingsFeature(context)",
                 "new GboardAccessPointCountSettingsFeature(context)");
         Assert.assertFalse(registrySource.contains("GboardKeyboardSettingsGroupFeature"));
     }
@@ -147,6 +148,9 @@ public final class GboardSettingsGroupingTest {
         Assert.assertTrue(availabilitySource.contains("FEATURE_ACCESS_POINT_COUNT"));
         Assert.assertTrue(availabilitySource.contains(
                 "dev.jason.gboardpatches.feature.access_point_count"));
+        Assert.assertTrue(availabilitySource.contains("FEATURE_AMOLED_THEME"));
+        Assert.assertTrue(availabilitySource.contains(
+                "dev.jason.gboardpatches.feature.amoled_theme"));
     }
 
     @Test

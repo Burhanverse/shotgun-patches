@@ -19,6 +19,7 @@ import dev.jason.gboardpatches.extension.settings.GboardSettingsText;
 import dev.jason.gboardpatches.extension.spacebarlogo.GboardSpacebarLogoSettingsFeature;
 import dev.jason.gboardpatches.extension.symbolfooter.GboardSymbolFooterOrderSettingsFeature;
 import dev.jason.gboardpatches.extension.splitkeyboard.GboardSplitKeyboardSettingsFeature;
+import dev.jason.gboardpatches.extension.theme.GboardAmoledThemeSettingsFeature;
 import dev.jason.gboardpatches.extension.zhuyinbottomrow.GboardZhuyinBottomRowWeightSettingsFeature;
 
 public final class GboardKeyboardLayoutSettingsGroupFeature
@@ -51,6 +52,7 @@ public final class GboardKeyboardLayoutSettingsGroupFeature
                         new GboardSplitKeyboardSettingsFeature(context),
                         new GboardAccessibilityLayoutSettingsFeature(context),
                         new GboardRoundedKeyboardSettingsFeature(context),
+                        new GboardAmoledThemeSettingsFeature(context),
                         new GboardAccessPointCountSettingsFeature(context)));
     }
 
