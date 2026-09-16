@@ -1,3 +1,13 @@
+## [3.11.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.11.0-dev.2...v3.11.0-dev.3) (2026-09-16)
+
+### 🐛 Bug Fixes
+
+* **AMOLED Theme:** extract AMOLED theme override bytecode logic into a helper method.
+
+### 🐛 錯誤修復
+
+* **AMOLED Theme:** 將 AMOLED 主題覆寫位元組碼邏輯提煉為輔助方法。
+
 ## [3.11.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.11.0-dev.1...v3.11.0-dev.2) (2026-09-16)
 
 ### 🐛 Bug Fixes
