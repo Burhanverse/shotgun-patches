@@ -28,7 +28,7 @@ public final class WebClipboardBroadcastAnnouncer {
     private static final byte[] FALLBACK_BROADCAST_BYTES =
             {(byte) 255, (byte) 255, (byte) 255, (byte) 255};
 
-    public static final int BROADCAST_PORT = 17693;
+    public static final int BROADCAST_PORT = 1717;
 
     private static final WebClipboardBroadcastAnnouncer SHARED =
             new WebClipboardBroadcastAnnouncer();
