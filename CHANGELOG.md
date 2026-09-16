@@ -1,3 +1,13 @@
+## [3.11.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.11.0-dev.1...v3.11.0-dev.2) (2026-09-16)
+
+### 🐛 Bug Fixes
+
+* **AMOLED Theme:** replace AMOLED theme override runtime call with active status check and direct color assignments.
+
+### 🐛 錯誤修復
+
+* **AMOLED Theme:** 將 AMOLED 主題覆寫執行期呼叫替換為啟用狀態檢查與直接顏色賦值。
+
 ## [3.11.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.10.0-dev.11...v3.11.0-dev.1) (2026-09-16)
 
 ### ✨ New Features
