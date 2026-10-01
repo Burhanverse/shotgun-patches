@@ -10,6 +10,8 @@ import dev.jason.gboardpatches.extension.accessibilitylayout.GboardAccessibility
 import dev.jason.gboardpatches.extension.accesspointcount.GboardAccessPointCountSettingsFeature;
 import dev.jason.gboardpatches.extension.accesspointsmenu.GboardAccessPointsMenuSettingsFeature;
 import dev.jason.gboardpatches.extension.closeproactivesuggestions.GboardCloseProactiveSuggestionsSettingsFeature;
+import dev.jason.gboardpatches.extension.customtheme.GboardCustomThemeSettingsFeature;
+import dev.jason.gboardpatches.extension.frostedglass.GboardFrostedGlassSettingsFeature;
 import dev.jason.gboardpatches.extension.emojisize.GboardEmojiSizeSettingsFeature;
 import dev.jason.gboardpatches.extension.flowmode.GboardFlowModeSettingsFeature;
 import dev.jason.gboardpatches.extension.roundedkeyboard.GboardRoundedKeyboardSettingsFeature;
@@ -53,7 +55,9 @@ public final class GboardKeyboardLayoutSettingsGroupFeature
                         new GboardAccessibilityLayoutSettingsFeature(context),
                         new GboardRoundedKeyboardSettingsFeature(context),
                         new GboardAmoledThemeSettingsFeature(context),
-                        new GboardAccessPointCountSettingsFeature(context)));
+                        new GboardAccessPointCountSettingsFeature(context),
+                        new GboardCustomThemeSettingsFeature(context),
+                        new GboardFrostedGlassSettingsFeature(context)));
     }
 
     @Override

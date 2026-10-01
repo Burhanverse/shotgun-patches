@@ -1,5 +1,5 @@
 {
-  "version": "3.11.0-dev.3",
+  "version": "3.12.0-dev.5",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -134,6 +134,18 @@
       "options": []
     },
     {
+      "name": "Custom Theme",
+      "description": "支援匯入自訂 ZIP 主題，並支援從 Rboard 官方儲存庫匯入精美主題。\nImport custom ZIP themes and beautiful themes from the official Rboard repository.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
       "name": "Developer options",
       "description": "啟用 開發人員選項 與 Flag 編輯器，你可以自己修改Flag的值\nEnable Developer options and the Flag Editor, allowing you to modify flag values.",
       "use": true,
@@ -244,6 +256,18 @@
     {
       "name": "Floating Web Search",
       "description": "直接從 Gboard 開啟懸浮網頁，快速搜尋需要的資訊。\nOpen a floating web page directly from Gboard to quickly search for the information you need.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Frosted Glass",
+      "description": "為鍵盤加入即時背景模糊與自訂主題透明度。\nAdd live background blur and custom-theme opacity to the keyboard.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {
@@ -440,6 +464,18 @@
     {
       "name": "Swipeable Custom Top Row",
       "description": "滑動鍵盤第一排，在原生列與可自訂文字/JavaScript 列之間切換\nSwipe the keyboard top row to switch between the stock row and a customizable text/JavaScript row.",
+      "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.0.3.954559732-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Toolbar Editing Buttons",
+      "description": "將全選、複製、剪下與貼上加入選單。\nAdd Select All, Copy, Cut and Paste to the menu.",
       "use": true,
       "dependencies": [],
       "compatiblePackages": {

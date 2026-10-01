@@ -51,7 +51,7 @@ class GboardPortProductCatalogContractTest {
     @Test
     fun catalogIsDeterministicAndDeclaresSelectedOnlyZeroSelectionComposition() {
         assertEquals("gboard-port-product-catalog.v1", catalog["format"].asString)
-        assertEquals("1.12.0", catalog["catalog_version"].asString)
+        assertEquals("1.15.0", catalog["catalog_version"].asString)
         val composition = catalog.getAsJsonObject("composition")
         assertEquals(
             setOf("selected_only_call_chain", "runtime_feature_mask"),
@@ -176,7 +176,7 @@ class GboardPortProductCatalogContractTest {
                 }
         }.toSet()
 
-        assertEquals(33, authoritativeKeys.size)
+        assertEquals(41, authoritativeKeys.size)
         assertEquals(authoritativeKeys, requiredKeys)
         assertEquals(
             authoritativeKinds,
@@ -682,8 +682,10 @@ class GboardPortProductCatalogContractTest {
             "clipboard_custom_character_limit" to "version-sensitive",
             "clipboard_enhancements" to "version-sensitive",
             "close_proactive_suggestions" to "version-sensitive",
+            "custom_theme" to "version-sensitive",
             "custom_symbols" to "version-sensitive",
             "developer_options" to "version-sensitive",
+            "editing_access_points" to "version-sensitive",
             "emojis_stickers_gifs_tab_order" to "version-sensitive",
             "enable_accessibility_layout" to "version-sensitive",
             "enable_cursor_trackpad_mode" to "version-sensitive",
@@ -693,6 +695,7 @@ class GboardPortProductCatalogContractTest {
             "english_qwerty_up_flick_uppercase" to "version-sensitive",
             "flow_mode_animation" to "version-sensitive",
             "floating_web_search" to "version-sensitive",
+            "frosted_glass" to "version-sensitive",
             "g_logo_on_spacebar" to "version-sensitive",
             "grammar_checker" to "version-sensitive",
             "incognito_mode_toggle" to "version-sensitive",
