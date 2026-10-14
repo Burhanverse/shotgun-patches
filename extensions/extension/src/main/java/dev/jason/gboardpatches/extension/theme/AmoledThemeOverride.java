@@ -32,6 +32,30 @@ public final class AmoledThemeOverride {
         }
     }
 
+    /**
+     * Key-fill colour for the AMOLED surface tokens. Tint 0 is pure black (the original
+     * behaviour); higher values blend the stock Monet colour back in.
+     */
+    public static int keyColor(int original) {
+        try {
+            SharedPreferences preferences = GboardFlagRuntimeContext.preferencesOrNull();
+            return blendKeyColor(original, AmoledThemePreferences.readKeyTint(preferences));
+        } catch (Throwable throwable) {
+            return AMOLED_BLACK;
+        }
+    }
+
+    static int blendKeyColor(int original, int tintPercent) {
+        int tint = Math.max(0, Math.min(100, tintPercent));
+        if (tint == 0) {
+            return AMOLED_BLACK;
+        }
+        int red = (((original >> 16) & 0xFF) * tint) / 100;
+        int green = (((original >> 8) & 0xFF) * tint) / 100;
+        int blue = ((original & 0xFF) * tint) / 100;
+        return 0xFF000000 | (red << 16) | (green << 8) | blue;
+    }
+
     public static void setTestOverrideEnabled(Boolean enabled) {
         testOverrideEnabled = enabled;
     }

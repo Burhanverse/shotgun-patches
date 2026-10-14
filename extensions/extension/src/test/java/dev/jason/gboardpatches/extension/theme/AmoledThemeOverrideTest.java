@@ -116,6 +116,16 @@ public final class AmoledThemeOverrideTest {
         assertArrayEquals(new int[] {1, 2, 3, 4}, result);
     }
 
+    @Test
+    public void blendKeyColorScalesTowardsBlack() {
+        int monet = 0xFF406080;
+        assertEquals(0xFF000000, AmoledThemeOverride.blendKeyColor(monet, 0));
+        assertEquals(monet, AmoledThemeOverride.blendKeyColor(monet, 100));
+        assertEquals(0xFF203040, AmoledThemeOverride.blendKeyColor(monet, 50));
+        assertEquals(monet, AmoledThemeOverride.blendKeyColor(monet, 250));
+        assertEquals(0xFF000000, AmoledThemeOverride.blendKeyColor(monet, -5));
+    }
+
     private Context createContextWithNightMode(int nightMode) {
         Configuration config = new Configuration(application.getResources().getConfiguration());
         config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | nightMode;

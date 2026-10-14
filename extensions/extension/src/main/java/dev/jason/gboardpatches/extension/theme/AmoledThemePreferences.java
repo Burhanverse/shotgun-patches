@@ -9,6 +9,9 @@ import dev.jason.gboardpatches.extension.settings.GboardPatchesSettings;
 public final class AmoledThemePreferences {
     public static final String PREF_KEY_AMOLED_ENABLED = "pref_amoled_pure_black_enabled";
     public static final boolean DEFAULT_AMOLED_ENABLED = false;
+    public static final String PREF_KEY_AMOLED_KEY_TINT = "pref_amoled_key_tint";
+    /** 0 keeps keys pure black (legacy behaviour); 100 keeps the stock Monet surface. */
+    public static final int DEFAULT_AMOLED_KEY_TINT = 0;
 
     private AmoledThemePreferences() {
     }
@@ -71,6 +74,33 @@ public final class AmoledThemePreferences {
                     preferences,
                     PREF_KEY_AMOLED_ENABLED,
                     enabled);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    public static int readKeyTint(SharedPreferences preferences) {
+        if (preferences == null) {
+            return DEFAULT_AMOLED_KEY_TINT;
+        }
+        try {
+            Object raw = preferences.getAll().get(PREF_KEY_AMOLED_KEY_TINT);
+            int value = raw instanceof Number number
+                    ? number.intValue() : Integer.parseInt(String.valueOf(raw));
+            return Math.max(0, Math.min(100, value));
+        } catch (Throwable ignored) {
+            return DEFAULT_AMOLED_KEY_TINT;
+        }
+    }
+
+    public static boolean writeKeyTint(SharedPreferences preferences, int tint) {
+        if (preferences == null) {
+            return false;
+        }
+        try {
+            return preferences.edit()
+                    .putInt(PREF_KEY_AMOLED_KEY_TINT, Math.max(0, Math.min(100, tint)))
+                    .commit();
         } catch (Throwable ignored) {
             return false;
         }

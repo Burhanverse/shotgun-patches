@@ -63,21 +63,45 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             const/high16 v0, -0x1000000
 
-            iput v0, p0, Lqyj;->Q:I
-
             iput v0, p0, Lqyj;->I:I
 
-            iput v0, p0, Lqyj;->R:I
-
             iput v0, p0, Lqyj;->S:I
-
-            iput v0, p0, Lqyj;->T:I
-
-            iput v0, p0, Lqyj;->U:I
 
             iput v0, p0, Lqyj;->P:I
 
             iput v0, p0, Lqyj;->G:I
+
+            iget v1, p0, Lqyj;->Q:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->Q:I
+
+            iget v1, p0, Lqyj;->T:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->T:I
+
+            iget v1, p0, Lqyj;->U:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->U:I
+
+            iget v1, p0, Lqyj;->R:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->R:I
 
             :cond_return
             return-void
