@@ -117,13 +117,29 @@ public final class AmoledThemeOverrideTest {
     }
 
     @Test
-    public void blendKeyColorScalesTowardsBlack() {
+    public void scaleTowardsBlackKeepsStockAtFullTint() {
         int monet = 0xFF406080;
-        assertEquals(0xFF000000, AmoledThemeOverride.blendKeyColor(monet, 0));
-        assertEquals(monet, AmoledThemeOverride.blendKeyColor(monet, 100));
-        assertEquals(0xFF203040, AmoledThemeOverride.blendKeyColor(monet, 50));
-        assertEquals(monet, AmoledThemeOverride.blendKeyColor(monet, 250));
-        assertEquals(0xFF000000, AmoledThemeOverride.blendKeyColor(monet, -5));
+        assertEquals(0xFF000000, AmoledThemeOverride.scaleTowardsBlack(monet, 0));
+        assertEquals(monet, AmoledThemeOverride.scaleTowardsBlack(monet, 100));
+        assertEquals(0xFF203040, AmoledThemeOverride.scaleTowardsBlack(monet, 50));
+    }
+
+    @Test
+    public void scaleKeyBrightensAboveStockAndDarkensBelow() {
+        int stock = 0xFF406080;
+        assertEquals(stock, AmoledThemeOverride.scaleKey(stock, 100));
+        assertEquals(0xFF203040, AmoledThemeOverride.scaleKey(stock, 50));
+        assertEquals(0xFFFFFFFF, AmoledThemeOverride.scaleKey(stock, 200));
+        assertEquals(0xFF9FAFBF, AmoledThemeOverride.scaleKey(stock, 150));
+    }
+
+    @Test
+    public void mixBlendsAccentIntoText() {
+        int stock = 0xFFE0E0E0;
+        int accent = 0xFF2040C0;
+        assertEquals(stock, AmoledThemeOverride.mix(stock, accent, 0));
+        assertEquals(accent, AmoledThemeOverride.mix(stock, accent, 100));
+        assertEquals(0xFF8090D0, AmoledThemeOverride.mix(stock, accent, 50));
     }
 
     private Context createContextWithNightMode(int nightMode) {

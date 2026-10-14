@@ -25,9 +25,14 @@ public final class GboardAmoledThemeSettingsFeature
     private final String errorTitle;
     private final String errorSummary;
     private final String sectionTitle;
-    private final String tintTitle;
-    private final String tintSummary;
-    private final String tintHint;
+    private final String backgroundTitle;
+    private final String backgroundSummary;
+    private final String keyTitle;
+    private final String keySummary;
+    private final String functionTitle;
+    private final String functionSummary;
+    private final String textTitle;
+    private final String textSummary;
 
     public GboardAmoledThemeSettingsFeature(Context context) {
         entryTitle = text(context, R.string.gboard_patches_amoled_theme_title);
@@ -37,9 +42,14 @@ public final class GboardAmoledThemeSettingsFeature
         errorTitle = text(context, R.string.gboard_patches_amoled_theme_error_title);
         errorSummary = text(context, R.string.gboard_patches_amoled_theme_error_summary);
         sectionTitle = text(context, R.string.gboard_patches_amoled_theme_section);
-        tintTitle = text(context, R.string.gboard_patches_amoled_key_tint_title);
-        tintSummary = text(context, R.string.gboard_patches_amoled_key_tint_summary);
-        tintHint = text(context, R.string.gboard_patches_amoled_key_tint_hint);
+        backgroundTitle = text(context, R.string.gboard_patches_amoled_background_tint_title);
+        backgroundSummary = text(context, R.string.gboard_patches_amoled_background_tint_summary);
+        keyTitle = text(context, R.string.gboard_patches_amoled_key_fill_tint_title);
+        keySummary = text(context, R.string.gboard_patches_amoled_key_fill_tint_summary);
+        functionTitle = text(context, R.string.gboard_patches_amoled_function_key_tint_title);
+        functionSummary = text(context, R.string.gboard_patches_amoled_function_key_tint_summary);
+        textTitle = text(context, R.string.gboard_patches_amoled_text_tint_title);
+        textSummary = text(context, R.string.gboard_patches_amoled_text_tint_summary);
     }
 
     @Override
@@ -69,7 +79,6 @@ public final class GboardAmoledThemeSettingsFeature
             SharedPreferences preferences = GboardPatchesSettings.preferences(context);
             AmoledThemePreferences.ensureDefault(preferences);
             boolean enabled = AmoledThemePreferences.isAmoledEnabled(preferences);
-            int tint = AmoledThemePreferences.readKeyTint(preferences);
             List<GboardPatchesSettingsContract.Row> rows = new ArrayList<>();
             rows.add(new GboardPatchesSettingsContract.ToggleRow(
                     toggleTitle, entrySummary, true, enabled, value -> {
@@ -78,18 +87,20 @@ public final class GboardAmoledThemeSettingsFeature
                     }));
             if (GboardPatchesFeatureAvailability.hasFeature(
                     context, GboardPatchesFeatureAvailability.FEATURE_AMOLED_MONET)) {
-            rows.add(new GboardPatchesSettingsContract.SelectorRow(
-                    tintTitle, tintSummary, tint + "%", enabled,
-                    () -> GboardPatchesSettingsContract.showTextInputDialog(host,
-                            tintTitle, tintHint, Integer.toString(tint), value -> {
-                                try {
-                                    AmoledThemePreferences.writeKeyTint(
-                                            preferences, Integer.parseInt(value.trim()));
-                                    GboardPatchesSettingsContract.refresh(host);
-                                } catch (NumberFormatException invalid) {
-                                    GboardPatchesSettingsContract.showMessage(host, tintHint);
-                                }
-                            })));
+                addTintRow(rows, host, preferences, enabled, backgroundTitle, backgroundSummary,
+                        AmoledThemePreferences.PREF_KEY_AMOLED_BACKGROUND_TINT,
+                        AmoledThemePreferences.DEFAULT_AMOLED_BACKGROUND_TINT, 100);
+                addTintRow(rows, host, preferences, enabled, keyTitle, keySummary,
+                        AmoledThemePreferences.PREF_KEY_AMOLED_KEY_FILL_TINT,
+                        AmoledThemePreferences.DEFAULT_AMOLED_KEY_FILL_TINT,
+                        AmoledThemePreferences.MAX_AMOLED_KEY_FILL_TINT);
+                addTintRow(rows, host, preferences, enabled, functionTitle, functionSummary,
+                        AmoledThemePreferences.PREF_KEY_AMOLED_FUNCTION_KEY_TINT,
+                        AmoledThemePreferences.DEFAULT_AMOLED_FUNCTION_KEY_TINT,
+                        AmoledThemePreferences.MAX_AMOLED_KEY_FILL_TINT);
+                addTintRow(rows, host, preferences, enabled, textTitle, textSummary,
+                        AmoledThemePreferences.PREF_KEY_AMOLED_TEXT_TINT,
+                        AmoledThemePreferences.DEFAULT_AMOLED_TEXT_TINT, 100);
             }
             return new GboardPatchesSettingsContract.Screen(
                     entryTitle,
@@ -107,6 +118,25 @@ public final class GboardAmoledThemeSettingsFeature
             }
             return errorScreen();
         }
+    }
+
+    private void addTintRow(
+            List<GboardPatchesSettingsContract.Row> rows,
+            GboardPatchesSettingsContract.FeatureHost host,
+            SharedPreferences preferences,
+            boolean enabled,
+            String title,
+            String summary,
+            String key,
+            int fallback,
+            int max) {
+        int tint = AmoledThemePreferences.readTint(preferences, key, fallback, max);
+        rows.add(new GboardPatchesSettingsContract.SliderRow(
+                title, summary, enabled, tint, 0, max, 5, "%",
+                value -> {
+                    AmoledThemePreferences.writeTint(preferences, key, value, max);
+                    GboardPatchesSettingsContract.refresh(host);
+                }));
     }
 
     private GboardPatchesSettingsContract.Screen errorScreen() {

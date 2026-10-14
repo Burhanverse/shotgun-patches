@@ -19,6 +19,7 @@ public final class GboardSpacebarLogoSettings {
     public static final boolean DEFAULT_ENABLED = false;
     public static final String DEFAULT_COLOR_HEX = "#4285F4";
     public static final String COLOR_VALUE_AUTO = "AUTO";
+    public static final String COLOR_VALUE_MONET = "MONET";
     public static final String COLOR_SELECTION_CUSTOM = "CUSTOM";
     public static final String GOOGLE_BLUE = "#4285F4";
     public static final String GOOGLE_RED = "#EA4335";
@@ -177,12 +178,34 @@ public final class GboardSpacebarLogoSettings {
                 PREF_KEY_ICON, GboardSpacebarLogoContract.normalizeIcon(icon)).commit();
     }
 
+    public static boolean isMonetColor(String value) {
+        return COLOR_VALUE_MONET.equals(normalizeColorValue(value));
+    }
+
+    /** System accent colour (Material You) for the Monet option; Android 12+ only. */
+    static int monetColor(Context context) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                boolean night = (context.getResources().getConfiguration().uiMode
+                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                        == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+                return context.getColor(night
+                        ? android.R.color.system_accent1_200
+                        : android.R.color.system_accent1_600);
+            }
+        } catch (Throwable ignored) {
+            // Fall through to the default colour.
+        }
+        return Color.parseColor(DEFAULT_COLOR_HEX);
+    }
+
     public static boolean isAutomaticColor(String value) {
         return COLOR_VALUE_AUTO.equals(normalizeColorValue(value));
     }
 
     public static String normalizeColorValue(String value) {
         String normalized = value == null ? "" : value.trim();
+        if (COLOR_VALUE_MONET.equalsIgnoreCase(normalized)) return COLOR_VALUE_MONET;
         return COLOR_VALUE_AUTO.equalsIgnoreCase(normalized)
                 ? COLOR_VALUE_AUTO : normalizeColorHex(normalized);
     }
@@ -205,8 +228,8 @@ public final class GboardSpacebarLogoSettings {
             SharedPreferences preferences = GboardPatchesSettings.preferences(context);
             ensureDefaults(preferences);
             String color = readColorHex(preferences);
-            int parsedColor = Color.parseColor(
-                    isAutomaticColor(color) ? DEFAULT_COLOR_HEX : color);
+            int parsedColor = isMonetColor(color) ? monetColor(context)
+                    : Color.parseColor(isAutomaticColor(color) ? DEFAULT_COLOR_HEX : color);
             return new GboardSpacebarLogoRuntime.SettingsSnapshot(
                     readEnabled(preferences), !isAutomaticColor(color), parsedColor,
                     readIcon(preferences));
@@ -244,12 +267,14 @@ public final class GboardSpacebarLogoSettings {
         if (value == null) return null;
         if (COLOR_SELECTION_CUSTOM.equalsIgnoreCase(value.trim())) return COLOR_SELECTION_CUSTOM;
         if (COLOR_VALUE_AUTO.equalsIgnoreCase(value.trim())) return COLOR_VALUE_AUTO;
+        if (COLOR_VALUE_MONET.equalsIgnoreCase(value.trim())) return COLOR_VALUE_MONET;
         String color = tryNormalizeColorHex(value);
         return isPresetColor(color) ? color : null;
     }
 
     private static String selectionForColorValue(String value) {
         if (isAutomaticColor(value)) return COLOR_VALUE_AUTO;
+        if (isMonetColor(value)) return COLOR_VALUE_MONET;
         String normalized = normalizeColorHex(value);
         return isPresetColor(normalized) ? normalized : COLOR_SELECTION_CUSTOM;
     }

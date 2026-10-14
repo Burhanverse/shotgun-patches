@@ -61,27 +61,51 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             if-eqz v0, :cond_return
 
-            const/high16 v0, -0x1000000
-
-            iput v0, p0, Lqyj;->I:I
-
-            iput v0, p0, Lqyj;->S:I
-
-            iput v0, p0, Lqyj;->P:I
-
-            iput v0, p0, Lqyj;->G:I
-
             iget v1, p0, Lqyj;->Q:I
 
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
 
             move-result v1
 
             iput v1, p0, Lqyj;->Q:I
 
+            iget v1, p0, Lqyj;->I:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->I:I
+
+            iget v1, p0, Lqyj;->R:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->R:I
+
+            iget v1, p0, Lqyj;->S:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->S:I
+
             iget v1, p0, Lqyj;->T:I
 
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
 
             move-result v1
 
@@ -89,19 +113,83 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             iget v1, p0, Lqyj;->U:I
 
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
 
             move-result v1
 
             iput v1, p0, Lqyj;->U:I
 
-            iget v1, p0, Lqyj;->R:I
+            iget v1, p0, Lqyj;->P:I
 
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_KEY_COLOR, "v1")}
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
 
             move-result v1
 
-            iput v1, p0, Lqyj;->R:I
+            iput v1, p0, Lqyj;->P:I
+
+            iget v1, p0, Lqyj;->G:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->G:I
+
+            iget v1, p0, Lqyj;->O:I
+
+            const/4 v0, 0x1
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->O:I
+
+            iget v1, p0, Lqyj;->J:I
+
+            iget v0, p0, Lqyj;->b:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->J:I
+
+            iget v1, p0, Lqyj;->L:I
+
+            iget v0, p0, Lqyj;->b:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->L:I
+
+            iget v1, p0, Lqyj;->m:I
+
+            const/4 v0, 0x2
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->m:I
+
+            iget v1, p0, Lqyj;->n:I
+
+            iget v0, p0, Lqyj;->b:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lqyj;->n:I
 
             :cond_return
             return-void

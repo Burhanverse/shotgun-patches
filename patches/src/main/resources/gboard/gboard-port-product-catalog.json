@@ -249,7 +249,7 @@
         "amoled_theme"
       ],
       "contributions": [
-        { "contribution_id": "amoled_monet.key_tint", "anchor_family_id": "dedicated_bytecode", "phase": "dedicated", "order": 1821, "required_bindings": ["amoled_theme_color_token_constructor"], "runtime_calls": ["AMOLED_THEME_RUNTIME_KEY_COLOR"] }
+        { "contribution_id": "amoled_monet.key_tint", "anchor_family_id": "dedicated_bytecode", "phase": "dedicated", "order": 1821, "required_bindings": ["amoled_theme_color_token_constructor"], "runtime_calls": ["AMOLED_THEME_RUNTIME_ADJUST_COLOR", "AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR"] }
       ]
     },
     {
