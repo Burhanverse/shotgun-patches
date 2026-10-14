@@ -431,8 +431,7 @@ val gboardAmoledThemePatch = gboardPublicResourcePatch(
 val gboardAmoledMonetPatch = gboardPublicResourcePatch(
     featureId = "amoled_monet",
     name = "AMOLED Monet Keys",
-    description = "在 AMOLED 純黑背景上保留 Monet 色調的按鍵，可在設定中調整色調強度。
-" +
+    description = "在 AMOLED 純黑背景上保留 Monet 色調的按鍵，可在設定中調整色調強度。\n" +
         "Keep Monet-tinted keys on the AMOLED black background, with an adjustable tint strength in settings.",
     default = false,
 ) {

@@ -2295,8 +2295,8 @@
         <translation locale="zh-Hant">按鍵色調強度</translation>
     </string>
     <string name="gboard_patches_amoled_key_tint_summary">
-        <translation locale="en">How much of the Monet colour the keys keep on the black background. 0% is pure black keys; 100% is the stock Monet key colour.</translation>
-        <translation locale="zh-Hant">按鍵在黑色背景上保留多少 Monet 色彩。0% 為純黑按鍵；100% 為原始 Monet 按鍵色彩。</translation>
+        <translation locale="en">How much of the Monet colour the keys keep on the black background. 0 is pure black keys; 100 is the stock Monet key colour.</translation>
+        <translation locale="zh-Hant">按鍵在黑色背景上保留多少 Monet 色彩。0 為純黑按鍵；100 為原始 Monet 按鍵色彩。</translation>
     </string>
     <string name="gboard_patches_amoled_key_tint_hint">
         <translation locale="en">Enter a value from 0 to 100.</translation>
