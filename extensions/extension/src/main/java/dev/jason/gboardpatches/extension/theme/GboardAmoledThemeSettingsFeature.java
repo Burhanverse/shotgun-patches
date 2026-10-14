@@ -76,6 +76,8 @@ public final class GboardAmoledThemeSettingsFeature
                         AmoledThemePreferences.setAmoledEnabled(preferences, value);
                         GboardPatchesSettingsContract.refresh(host);
                     }));
+            if (GboardPatchesFeatureAvailability.hasFeature(
+                    context, GboardPatchesFeatureAvailability.FEATURE_AMOLED_MONET)) {
             rows.add(new GboardPatchesSettingsContract.SelectorRow(
                     tintTitle, tintSummary, tint + "%", enabled,
                     () -> GboardPatchesSettingsContract.showTextInputDialog(host,
@@ -88,6 +90,7 @@ public final class GboardAmoledThemeSettingsFeature
                                     GboardPatchesSettingsContract.showMessage(host, tintHint);
                                 }
                             })));
+            }
             return new GboardPatchesSettingsContract.Screen(
                     entryTitle,
                     headerBadge,

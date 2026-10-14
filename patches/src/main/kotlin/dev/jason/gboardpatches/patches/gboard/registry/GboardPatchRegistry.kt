@@ -73,6 +73,7 @@ import dev.jason.gboardpatches.patches.gboard.features.packagerename.isValidGboa
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.roundedkeyboard.gboardRoundedKeyboardFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.theme.gboardAmoledMonetFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.theme.gboardAmoledThemeBytecodePatch
 import dev.jason.gboardpatches.patches.gboard.features.theme.gboardAmoledThemeFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.frostedglass.gboardFrostedGlassFeatureMarkerPatch
@@ -423,6 +424,23 @@ val gboardAmoledThemePatch = gboardPublicResourcePatch(
         gboardPatchesSettingsPatch,
         gboardAmoledThemeFeatureMarkerPatch,
         gboardAmoledThemeBytecodePatch,
+    )
+}
+
+@Suppress("unused")
+val gboardAmoledMonetPatch = gboardPublicResourcePatch(
+    featureId = "amoled_monet",
+    name = "AMOLED Monet Keys",
+    description = "在 AMOLED 純黑背景上保留 Monet 色調的按鍵，可在設定中調整色調強度。
+" +
+        "Keep Monet-tinted keys on the AMOLED black background, with an adjustable tint strength in settings.",
+    default = false,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardAmoledThemePatch,
+        gboardAmoledMonetFeatureMarkerPatch,
     )
 }
 
@@ -933,6 +951,7 @@ object GboardPublishedPatchCatalog {
         gboardAccessibilityLayoutPatch,
         gboardRoundedKeyboardPanelPatch,
         gboardAmoledThemePatch,
+        gboardAmoledMonetPatch,
         gboardFrostedGlassPatch,
         gboardAccessPointCountPatch,
         gboardCloseProactiveSuggestionsPatch,
