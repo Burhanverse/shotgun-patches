@@ -710,6 +710,7 @@ class GboardPortProductCatalogContractTest {
             "settings_homepage_override" to "version-sensitive",
             "shotgun_keyboard" to "version-sensitive",
             "simple_calculator" to "version-sensitive",
+            "swipe_down_to_dismiss_keyboard" to "version-sensitive",
             "swipeable_custom_top_row" to "version-sensitive",
             "use_bluetooth_microphone" to "version-sensitive",
             "web_clipboard" to "version-sensitive",
