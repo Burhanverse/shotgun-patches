@@ -238,7 +238,7 @@ public final class WebClipboardTileController {
         }
     }
 
-    public static void reconcileAfterPackageReplace(Context context) {
+    public static void reconcileRuntime(Context context) {
         if (context == null) {
             return;
         }
@@ -253,7 +253,7 @@ public final class WebClipboardTileController {
             }
             requestTileRefresh(appContext);
         } catch (Throwable throwable) {
-            Log.w(TAG, "Failed to reconcile Web Clipboard after package replace", throwable);
+            Log.w(TAG, "Failed to reconcile Web Clipboard runtime", throwable);
         }
     }
 

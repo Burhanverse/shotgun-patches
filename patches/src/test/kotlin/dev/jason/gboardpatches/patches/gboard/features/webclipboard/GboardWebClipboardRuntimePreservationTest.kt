@@ -93,15 +93,16 @@ class GboardWebClipboardRuntimePreservationTest {
     }
 
     private companion object {
-        // Web Clipboard FGS type intentionally moved dataSync -> connectedDevice (6h dataSync limit).
+        // Web Clipboard FGS type intentionally moved dataSync -> connectedDevice (6h dataSync limit);
+        // runtime restarts on BOOT_COMPLETED.
         const val RUNTIME_JAVA_SHA256 =
-            "A2C6A34A20F6F0256B6B6E04E44F5929A211F8B64FE978D3869E924A3C16283A"
+            "96BF2759023D849C787C044283C1B1128BB1F7FB43455EB1BB4BED9E0DD1D63A"
         const val PORTAL_ASSETS_SHA256 =
             "DE38DBE50AD0F82EE9D2357B0EADA6680F270845A36CAB6B9A719576DD40E3AC"
         const val RESOURCE_SHA256 =
             "DE0AEBDC3D5D36AC06CEA66334E5528CAF8319122680F59761FAC4423E3C49F2"
         const val NON_CAPTURE_PATCHES_SHA256 =
-            "C0D935D7F6B7C87D65104FCC26D9F6E525A06A3C2620BA2D0DE9CA57F7564313"
+            "4ABB9CFF69E577ACADCE3D157BABC6A40C0CD85D792B5355A266C5FEA16B9C51"
         // STRONG #4 intentionally narrows settings features from Host to FeatureHost.
         const val SETTINGS_RUNTIME_SHA256 =
             "4406B8F10478D995223CC5F92EAE4195EC04BC90FFA051BBEC867C44B63167D0"
