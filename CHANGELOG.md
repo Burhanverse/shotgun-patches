@@ -1,3 +1,13 @@
+## [3.13.0-dev.8](https://github.com/maxcodl/shotgun-patches/compare/v3.13.0-dev.7...v3.13.0-dev.8) (2026-10-18)
+
+### 🐛 Bug Fixes
+
+* **Gboard (Web Clipboard):** the phone-side service now starts again after the phone reboots. Before, it stayed off after a reboot while the toggle still showed on.
+
+### 🐛 修復
+
+* **Gboard (Web Clipboard):** 手機重新開機後，手機端服務會自動重新啟動。先前重新開機後服務不會啟動，但開關仍顯示為開啟。
+
 ## [3.13.0-dev.7](https://github.com/maxcodl/shotgun-patches/compare/v3.13.0-dev.6...v3.13.0-dev.7) (2026-10-14)
 
 ### ✨ New Features
