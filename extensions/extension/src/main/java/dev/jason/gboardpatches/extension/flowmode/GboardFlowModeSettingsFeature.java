@@ -114,7 +114,9 @@ public final class GboardFlowModeSettingsFeature
                                 true,
                                 enabled,
                                 toggleAction,
-                                buildPreview())))),
+                                buildPreview())
+                                .setRestartRequired(
+                                        GboardFlowModeSettings.PREF_KEY_ENABLED)))),
                 GboardPatchesSettingsContract.RefreshPolicy.none(),
                 GboardPatchesSettingsContract.PanelStyle.FLAT);
     }

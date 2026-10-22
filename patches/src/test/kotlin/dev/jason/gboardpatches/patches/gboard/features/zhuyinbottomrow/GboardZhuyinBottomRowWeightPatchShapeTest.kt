@@ -11,10 +11,10 @@ import org.junit.Test
 
 class GboardZhuyinBottomRowWeightPatchShapeTest {
     @Test
-    fun `softkey patch uses exact 1803 shared bind descriptor`() {
+    fun `softkey patch uses exact 1853 shared bind descriptor`() {
         assertEquals(
             "Lcom/google/android/libraries/inputmethod/widgets/SoftKeyView;->" +
-                "r(Lcom/google/android/libraries/inputmethod/metadata/SoftKeyDef;J)Z",
+                "s(Lcom/google/android/libraries/inputmethod/metadata/SoftKeyDef;J)Z",
             GboardVersionBindings.softKeyBind.reference,
         )
     }
@@ -29,7 +29,7 @@ class GboardZhuyinBottomRowWeightPatchShapeTest {
     }
 
     @Test
-    fun `softkey patch contributes only the after phase to the family composer`() {
+    fun `softkey patch contributes before restore and after apply phases to the family composer`() {
         val source = String(
             Files.readAllBytes(
                 Path.of(
@@ -41,6 +41,7 @@ class GboardZhuyinBottomRowWeightPatchShapeTest {
         )
 
         assertTrue(source.contains("GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW"))
+        assertTrue(source.contains("beforeDelegate()"))
         assertTrue(source.contains("afterDelegate()"))
         assertFalse(source.contains("addInstructions"))
     }

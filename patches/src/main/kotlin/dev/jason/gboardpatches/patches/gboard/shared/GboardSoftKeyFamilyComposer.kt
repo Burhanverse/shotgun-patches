@@ -88,8 +88,11 @@ internal enum class GboardSoftKeyFamilyFeature(
         ),
     ),
     ZHUYIN_BOTTOM_ROW(
-        beforeOrder = null,
+        beforeOrder = 50,
         afterOrder = 300,
+        beforeRuntimeCalls = listOf(
+            RuntimeCallId.ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND,
+        ),
         afterRuntimeCalls = listOf(
             RuntimeCallId.ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_AFTER_SOFT_KEY_BOUND,
         ),
@@ -245,7 +248,7 @@ private fun MutableMethod.requireSoftKeyTargetShape() {
 }
 
 private fun MutableMethod.requireSupportedSoftKeyStock() {
-    check(GboardVersionBindings.targetVersion == "18.0.3") {
+    check(GboardVersionBindings.targetVersion in setOf("18.0.3", "18.5.3")) {
         "Unsupported Gboard SoftKey stock contract for ${GboardVersionBindings.targetVersion}"
     }
     requireExact1803SoftKeyStockShape()
@@ -256,6 +259,12 @@ private fun MutableMethod.requireExact1803SoftKeyStockShape() {
         ?: error("No instructions in formal 18.0.3 SoftKey bind target")
     check(accessFlags == (AccessFlags.PUBLIC.value or AccessFlags.FINAL.value)) {
         "18.0.3 SoftKey bind access drift in $definingClass->$name"
+    }
+    if (GboardVersionBindings.targetVersion == "18.5.3") {
+        check(implementation!!.registerCount == 8 && returnInstructionIndices().size == 2 &&
+            implementation!!.tryBlocks.isNotEmpty()) {
+            "18.5.3 SoftKey bind register/return/exception boundary drift"
+        }
     }
     val traceMarkers = instructions.count { instruction ->
         (instruction as? ReferenceInstruction)?.reference?.toString()
@@ -345,7 +354,7 @@ internal fun GboardSoftKeyFamilyFeature.beforeDelegate(): String = when (this) {
         move-result-object p1
     """.trimIndent().replace("->\n            ", "->")
     GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW ->
-        error("$this has no before-stock contribution")
+        emitSoftKeyRuntimeCall(beforeRuntimeCalls.single(), "p0")
 }
 
 internal fun GboardSoftKeyFamilyFeature.afterDelegate(): String = when (this) {
@@ -436,6 +445,7 @@ private fun GboardSoftKeyFamilyFeature.beforeInstructionCount(): Int = when {
     beforeOrder == null -> 0
     this == GboardSoftKeyFamilyFeature.ENGLISH_QWERTY -> 2
     this == GboardSoftKeyFamilyFeature.SPACEBAR_LOGO -> 1
+    this == GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW -> 1
     else -> 3
 }
 

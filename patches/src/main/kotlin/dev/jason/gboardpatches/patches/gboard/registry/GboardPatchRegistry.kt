@@ -88,11 +88,6 @@ import dev.jason.gboardpatches.patches.gboard.features.swipedismiss.gboardSwipeD
 import dev.jason.gboardpatches.patches.gboard.features.swipedismiss.gboardSwipeDismissFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.toprowswipe.gboardTopRowSwipeFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingToolsFeatureMarkerPatch
-import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803AutoFixAcceptancePatch
-import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803AutoFixRoutePatch
-import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803GenAiInitPatch
-import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803GenAiRefreshPatch
-import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingTools1803SmartEditInitPatch
 import dev.jason.gboardpatches.patches.gboard.features.writingtools.gboardAiWritingToolsFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesExtensionCarrierPatch
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesSettingsPatch
@@ -748,11 +743,6 @@ val gboardAiWritingToolsPatch = gboardPublicResourcePatch(
         gboardPatchesSettingsPatch,
         gboardAiWritingToolsFeatureMarkerPatch,
         gboardAiWritingToolsFlagValuePatch,
-        gboardAiWritingTools1803AutoFixRoutePatch,
-        gboardAiWritingTools1803AutoFixAcceptancePatch,
-        gboardAiWritingTools1803GenAiInitPatch,
-        gboardAiWritingTools1803GenAiRefreshPatch,
-        gboardAiWritingTools1803SmartEditInitPatch,
     )
 }
 
@@ -853,12 +843,7 @@ val gboardPackageRenamePatch = gboardPublicResourcePatch(
     )
 
     finalize {
-        document("AndroidManifest.xml").use { manifestDocument ->
-            applyGboardApplicationDisplayName(
-                manifestDocument = manifestDocument,
-                displayName = checkNotNull(appDisplayName.value),
-            )
-        }
+        applyGboardApplicationDisplayName(displayName = checkNotNull(appDisplayName.value))
     }
 }
 

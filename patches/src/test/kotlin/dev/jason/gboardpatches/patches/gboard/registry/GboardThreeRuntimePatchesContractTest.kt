@@ -4,7 +4,7 @@ import dev.jason.gboardpatches.patches.gboard.features.closeproactivesuggestions
 import dev.jason.gboardpatches.patches.gboard.features.closeproactivesuggestions.gboardCloseProactiveSuggestionsFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeFlagValuePatch
-import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeKeyEventPatch
+import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowMode1853Patch
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.quickinsert.gboardQuickInsertFlagValuePatch
 import org.junit.Assert.assertEquals
@@ -52,7 +52,7 @@ class GboardThreeRuntimePatchesContractTest {
             dependency === gboardFlowModeFlagValuePatch
         })
         assertTrue(gboardFlowModeAnimationPatch.dependencies.any { dependency ->
-            dependency === gboardFlowModeKeyEventPatch
+            dependency === gboardFlowMode1853Patch
         })
 
         assertTrue(gboardQuickInsertPatch.dependencies.any { dependency ->

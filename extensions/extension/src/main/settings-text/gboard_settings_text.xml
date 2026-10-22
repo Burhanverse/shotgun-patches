@@ -138,7 +138,7 @@
     </string>
     <string name="gboard_patches_section_preferences">
         <translation locale="en">Preferences</translation>
-        <translation locale="zh-Hant">偏好</translation>
+        <translation locale="zh-Hant">偏好設定</translation>
     </string>
     <string name="gboard_patches_section_features">
         <translation locale="en">Features</translation>
@@ -3249,5 +3249,51 @@
     <string name="gboard_edit_ap_error">
         <translation locale="en">Editing buttons settings unavailable. Reopen settings and try again.</translation>
         <translation locale="zh-Hant">編輯按鈕設定無法載入，請重新開啟設定再試一次。</translation>
+    </string>
+    <string name="gboard_patches_section_settings">
+        <translation locale="en">Settings</translation>
+        <translation locale="zh-Hant">設定</translation>
+    </string>
+    <plurals name="gboard_patches_restart_action_pending">
+        <item quantity="one">
+            <translation locale="en">Restart Gboard (%1$d change waiting to apply)</translation>
+            <translation locale="zh-Hant">重新啟動 Gboard（有 %1$d 項變更待套用）</translation>
+        </item>
+        <item quantity="other">
+            <translation locale="en">Restart Gboard (%1$d changes waiting to apply)</translation>
+            <translation locale="zh-Hant">重新啟動 Gboard（有 %1$d 項變更待套用）</translation>
+        </item>
+    </plurals>
+    <string name="gboard_patches_preview_row_description">
+        <translation locale="en">Preview “%1$s”</translation>
+        <translation locale="zh-Hant">預覽「%1$s」</translation>
+    </string>
+    <string name="gboard_patches_preview_done">
+        <translation locale="en">Done</translation>
+        <translation locale="zh-Hant">完成</translation>
+    </string>
+    <string name="gboard_patches_preview_viewer_close">
+        <translation locale="en">Close viewer</translation>
+        <translation locale="zh-Hant">關閉</translation>
+    </string>
+    <string name="gboard_patches_preview_viewer_previous">
+        <translation locale="en">Previous</translation>
+        <translation locale="zh-Hant">上一張</translation>
+    </string>
+    <string name="gboard_patches_preview_viewer_next">
+        <translation locale="en">Next</translation>
+        <translation locale="zh-Hant">下一張</translation>
+    </string>
+    <string name="gboard_patches_preview_open_fullscreen">
+        <translation locale="en">View full screen</translation>
+        <translation locale="zh-Hant">全螢幕檢視</translation>
+    </string>
+    <string name="gboard_patches_advanced_voice_modes_title">
+        <translation locale="en">Voice typing modes</translation>
+        <translation locale="zh-Hant">語音輸入模式說明</translation>
+    </string>
+    <string name="gboard_patches_advanced_voice_modes_summary">
+        <translation locale="en">Voice typing consists of three modes: Standard, Standard - Advanced features (colorful microphone), and Rambler. Among these, Standard - Advanced features requires the Dictation payload to function. As of this release (2026/10/22), an official bundle APKM containing the Dictation payload has not yet been released.</translation>
+        <translation locale="zh-Hant">語音輸入分為三種：標準、標準-進階功能（彩色麥克風）以及 Rambler。其中「標準-進階功能」需要有 Dictation payload 才能運作；截至發布當下（2026/10/22），官方尚未推出包含 Dictation payload 的 bundle APKM。</translation>
     </string>
 </settings-text>

@@ -16,6 +16,7 @@ import dev.jason.gboardpatches.extension.emojisize.GboardEmojiSizeSettingsFeatur
 import dev.jason.gboardpatches.extension.flowmode.GboardFlowModeSettingsFeature;
 import dev.jason.gboardpatches.extension.roundedkeyboard.GboardRoundedKeyboardSettingsFeature;
 import dev.jason.gboardpatches.extension.settings.GboardFeatureGroup;
+import dev.jason.gboardpatches.extension.settings.GboardPatchesIcons;
 import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsContract;
 import dev.jason.gboardpatches.extension.settings.GboardSettingsText;
 import dev.jason.gboardpatches.extension.spacebarlogo.GboardSpacebarLogoSettingsFeature;
@@ -66,6 +67,16 @@ public final class GboardKeyboardLayoutSettingsGroupFeature
     @Override
     public String getEntrySummary() {
         return delegate.getEntrySummary();
+    }
+
+    @Override
+    public int getEntryIcon() {
+        return GboardPatchesIcons.KEYBOARD_FILLED;
+    }
+
+    @Override
+    public String getEntryTone() {
+        return "green";
     }
 
     @Override

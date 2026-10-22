@@ -1,3 +1,43 @@
+## [4.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0...v4.0.0-dev.1) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** eliminate brief white or dark background flashes when opening or switching keyboards with custom opacity enabled.
+* **Gboard:** fix black borders around keyboard corners when adjusting custom opacity.
+
+### 🚀 Updated App Support
+
+* **Gboard:** update the supported Gboard version to `18.5.3.993608717-release-arm64-v8a`.
+
+### 🐛 修復
+
+* **Gboard:** 修復啟用自訂透明度後，開啟或切換鍵盤時背景短暫閃白或閃黑的問題。
+* **Gboard:** 修復調整自訂透明度時，鍵盤邊角出現黑邊的問題。
+
+### 🚀 支援版本更新
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.5.3.993608717-release-arm64-v8a`。
+
+## [3.13.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.0...v3.13.0) (2026-10-15)
+
+### ✨ New Features
+
+* **Gboard:** add the `Swipe Down to Dismiss Keyboard` patch, allowing you to dismiss the keyboard by swiping down from the suggestion strip or toolbar.
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix an issue where the `Frosted Glass` patch could cause the keyboard to crash when entering the password upon device startup (Direct Boot).
+* **Gboard:** fix the `Swipe Down to Dismiss Keyboard` patch to prevent accidental dismissal during toolbar icon sorting and candidate drag-to-delete.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Swipe Down to Dismiss Keyboard` Patch，支援從建議列或工具列向下滑動以關閉鍵盤。
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Frosted Glass` Patch 在裝置開機輸入密碼時（Direct Boot）可能導致鍵盤崩潰的問題。
+* **Gboard:** 修復 `Swipe Down to Dismiss Keyboard` Patch，避免在排序工具列圖示及拖曳候選字刪除時誤觸關閉鍵盤。
+
 ## [3.13.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0-dev.1...v3.13.0-dev.2) (2026-10-14)
 
 ### 🐛 Bug Fixes

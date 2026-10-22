@@ -51,7 +51,7 @@ class GboardPortProductCatalogContractTest {
     @Test
     fun catalogIsDeterministicAndDeclaresSelectedOnlyZeroSelectionComposition() {
         assertEquals("gboard-port-product-catalog.v1", catalog["format"].asString)
-        assertEquals("1.15.0", catalog["catalog_version"].asString)
+        assertEquals("1.16.0", catalog["catalog_version"].asString)
         val composition = catalog.getAsJsonObject("composition")
         assertEquals(
             setOf("selected_only_call_chain", "runtime_feature_mask"),
@@ -148,14 +148,14 @@ class GboardPortProductCatalogContractTest {
     }
 
     @Test
-    fun admittedBindingUnionExactlyMatchesTheAuthoritative1803Profile() {
+    fun admittedBindingUnionExactlyMatchesTheAuthoritative1853Profile() {
         val bindingProfile = JsonParser.parseString(
             Files.readString(
                 repositoryRoot().resolve(BINDINGS_PATH),
                 StandardCharsets.UTF_8,
             ),
         ).asJsonObject
-        assertEquals("18.0.3", bindingProfile["target_version"].asString)
+        assertEquals("18.5.3", bindingProfile["target_version"].asString)
         val authoritativeKeys = bindingProfile.getAsJsonObject("bindings").keySet()
         val authoritativeKinds = bindingProfile.getAsJsonObject("bindings").entrySet()
             .associate { (key, binding) -> key to binding.asJsonObject["kind"].asString }
@@ -176,7 +176,7 @@ class GboardPortProductCatalogContractTest {
                 }
         }.toSet()
 
-        assertEquals(40, authoritativeKeys.size)
+        assertEquals(270, authoritativeKeys.size)
         assertEquals(authoritativeKeys, requiredKeys)
         assertEquals(
             authoritativeKinds,
@@ -188,12 +188,15 @@ class GboardPortProductCatalogContractTest {
     fun zhuyinBottomRowDeclaresBothSoftKeyBindingsResolvedByTheComposer() {
         val bottomRow = features().single { feature ->
             feature["feature_id"].asString == "zhuyin_bottom_row_key_sizes"
-        }.getAsJsonArray("contributions").single().asJsonObject
-
-        assertEquals(
-            listOf("soft_key_bind", "soft_key_metadata_type"),
-            bottomRow.getAsJsonArray("required_bindings").map { it.asString },
-        )
+        }.getAsJsonArray("contributions").map { it.asJsonObject }
+        val before = bottomRow.single { it["phase"].asString == "before_stock" }
+        val after = bottomRow.single { it["phase"].asString == "after_stock" }
+        assertEquals(50, before["order"].asInt)
+        assertEquals(listOf("soft_key_bind"), before.getAsJsonArray("required_bindings").map { it.asString })
+        assertEquals(listOf("ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND"),
+            before.getAsJsonArray("runtime_calls").map { it.asString })
+        assertEquals(listOf("soft_key_bind", "soft_key_metadata_type"),
+            after.getAsJsonArray("required_bindings").map { it.asString })
     }
 
     @Test
@@ -273,7 +276,8 @@ class GboardPortProductCatalogContractTest {
         }
         assertEquals("dedicated_bytecode", popup["anchor_family_id"].asString)
         assertEquals(
-            listOf("zhuyin_toggle_popup_action"),
+            listOf("zhuyin_toggle_popup_action", "zhuyin_toggle_popup_target", "zhuyin_toggle_preference_factory",
+                "zhuyin_toggle_preference_write", "zhuyin_toggle_reset"),
             popup.getAsJsonArray("required_bindings").map { it.asString },
         )
         assertEquals(
@@ -406,7 +410,7 @@ class GboardPortProductCatalogContractTest {
 
         assertEquals(8, SOFT_KEY_FEATURE_CONTRACTS.size)
         assertEquals(
-            11,
+            12,
             features().sumOf { feature ->
                 feature.getAsJsonArray("contributions").count { contribution ->
                     contribution.asJsonObject["anchor_family_id"].asString == "soft_key_bind"
