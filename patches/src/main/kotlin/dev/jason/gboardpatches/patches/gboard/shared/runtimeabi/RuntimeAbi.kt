@@ -29,7 +29,6 @@ internal enum class RuntimeCallId(internal val encodedAbi: String) {
     FLOW_SKIP_OOV("Ldev/jason/gboardpatches/extension/flowmode/GboardFlowModeCallbacks;->skipOov()Z"),
     CURSOR_TRACKPAD_RUNTIME_APPLY_BOOLEAN_PREFERENCE("Ldev/jason/gboardpatches/extension/cursortrackpad/GboardCursorTrackpadRuntime;->applyBooleanPreference(Ljava/lang/String;Z)Z"),
     CURSOR_TRACKPAD_RUNTIME_APPLY_RESOURCE_BOOLEAN_PREFERENCE("Ldev/jason/gboardpatches/extension/cursortrackpad/GboardCursorTrackpadRuntime;->applyResourceBooleanPreference(IZ)Z"),
-    ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND("Ldev/jason/gboardpatches/extension/zhuyinbottomrow/GboardZhuyinBottomRowWeightRuntime;->beforeSoftKeyBound(Ljava/lang/Object;)V"),
     ACCESS_POINTS_MENU_RUNTIME_SELECT_BODY("Ldev/jason/gboardpatches/extension/accesspointsmenu/GboardAccessPointsMenuRuntime;->selectBody(I)I"),
     ACCESS_POINTS_MENU_RUNTIME_SELECT_KEYBOARD_LAYOUT("Ldev/jason/gboardpatches/extension/accesspointsmenu/GboardAccessPointsMenuRuntime;->selectKeyboardLayout(I)I"),
     ACCESS_POINTS_MENU_RUNTIME_WANTS_LEGACY("Ldev/jason/gboardpatches/extension/accesspointsmenu/GboardAccessPointsMenuRuntime;->wantsLegacy()Z"),

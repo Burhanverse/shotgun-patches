@@ -185,16 +185,15 @@ class GboardPortProductCatalogContractTest {
     }
 
     @Test
-    fun zhuyinBottomRowDeclaresBothSoftKeyBindingsResolvedByTheComposer() {
+    fun zhuyinBottomRowDeclaresOnlyAfterBindResolvedByTheComposer() {
         val bottomRow = features().single { feature ->
             feature["feature_id"].asString == "zhuyin_bottom_row_key_sizes"
         }.getAsJsonArray("contributions").map { it.asJsonObject }
-        val before = bottomRow.single { it["phase"].asString == "before_stock" }
+        assertEquals(1, bottomRow.size)
         val after = bottomRow.single { it["phase"].asString == "after_stock" }
-        assertEquals(50, before["order"].asInt)
-        assertEquals(listOf("soft_key_bind"), before.getAsJsonArray("required_bindings").map { it.asString })
-        assertEquals(listOf("ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND"),
-            before.getAsJsonArray("runtime_calls").map { it.asString })
+        assertEquals(300, after["order"].asInt)
+        assertEquals(listOf("ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_AFTER_SOFT_KEY_BOUND"),
+            after.getAsJsonArray("runtime_calls").map { it.asString })
         assertEquals(listOf("soft_key_bind", "soft_key_metadata_type"),
             after.getAsJsonArray("required_bindings").map { it.asString })
     }
@@ -410,7 +409,7 @@ class GboardPortProductCatalogContractTest {
 
         assertEquals(8, SOFT_KEY_FEATURE_CONTRACTS.size)
         assertEquals(
-            12,
+            11,
             features().sumOf { feature ->
                 feature.getAsJsonArray("contributions").count { contribution ->
                     contribution.asJsonObject["anchor_family_id"].asString == "soft_key_bind"

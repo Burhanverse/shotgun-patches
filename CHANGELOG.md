@@ -1,3 +1,13 @@
+## [4.0.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the `Zhuyin Bottom Row Key Sizes` patch so bottom-row keys retain their configured sizes while typing on the Zhuyin keyboard.
+
+### 🐛 修復
+
+* **Gboard:** 修復「注音底排按鍵大小」Patch 在注音輸入時無法維持自訂按鍵大小的問題。
+
 ## [4.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0...v4.0.0-dev.1) (2026-10-22)
 
 ### 🐛 Bug Fixes

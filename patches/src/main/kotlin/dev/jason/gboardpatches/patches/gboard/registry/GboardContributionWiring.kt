@@ -34,7 +34,6 @@ import dev.jason.gboardpatches.patches.gboard.features.toprowswipe.gboardTopRowS
 import dev.jason.gboardpatches.patches.gboard.features.toprowswipe.gboardTopRowSwipeSoftKeyPatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyinslide.gboardZhuyinSlidePointerAnchorPatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyinslide.gboardZhuyinSlideSoftKeyPatch
-import dev.jason.gboardpatches.patches.gboard.features.zhuyinbottomrow.gboardZhuyinBottomRowWeightSoftKeyPatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyintraditionalsimplifiedtoggle.gboardZhuyinTraditionalSimplifiedToggleGesturePatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyintraditionalsimplifiedtoggle.gboardZhuyinTraditionalSimplifiedTogglePopupPatch
 import dev.jason.gboardpatches.patches.gboard.features.zhuyintraditionalsimplifiedtoggle.gboardZhuyinTraditionalSimplifiedToggleSoftKeyPatch
@@ -59,11 +58,6 @@ internal object GboardContributionWiring {
         "enable_cursor_trackpad_mode" to listOf(
             unit("enable_cursor_trackpad_mode.flag") { arrayOf(gboardCursorTrackpadFlagValuePatch) },
             unit("enable_cursor_trackpad_mode.preferences") { arrayOf(gboardCursorTrackpadPreferencePatch) },
-        ),
-        "zhuyin_bottom_row_key_sizes" to listOf(
-            unit("zhuyin_bottom_row_key_sizes.before_bind", "zhuyin_bottom_row_key_sizes.soft_key") {
-                arrayOf(gboardZhuyinBottomRowWeightSoftKeyPatch)
-            },
         ),
         "advanced_voice_typing" to listOf(
             unit("advanced_voice_typing.flag") {

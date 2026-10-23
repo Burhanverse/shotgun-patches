@@ -19,6 +19,8 @@ import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import dev.jason.gboardpatches.extension.zhuyinslide.GboardZhuyinSlideTargetFixture;
+
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 33, manifest = Config.NONE)
@@ -110,11 +112,11 @@ public final class GboardZhuyinBottomRowWeightReuseTest {
     }
 
     @Test
-    public void stockRebindCanPublishANewBaselineEqualToThePreviousModuleWeight()
+    public void releasedScopeCanPublishANewBaselineEqualToThePreviousModuleWeight()
             throws Throwable {
         Fixture f = new Fixture();
         f.bind(true);
-        GboardZhuyinBottomRowWeightRuntime.beforeSoftKeyBound(f.keys[0]);
+        GboardZhuyinBottomRowWeightRuntime.restoreOwnedWeights(f.keys[0]);
         f.assertWeights(STOCK);
         f.params(5).weight = CUSTOM[5];
         f.params(5).height = 81;
@@ -149,13 +151,111 @@ public final class GboardZhuyinBottomRowWeightReuseTest {
         first.assertWeights(STOCK);
     }
 
+    @Test
+    public void composingControlBindsKeepAllWeightsAndLayoutParams() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        Object[] params = new Object[f.views.length];
+        for (int i = 0; i < params.length; i++) params[i] = f.views[i].getLayoutParams();
+        for (String label : new String[] {"ˉ", "", "注音"}) {
+            f.metadata.put(f.keys[3], new Metadata(label, false));
+            for (int key : new int[] {3, 5, 6}) {
+                f.afterBind(f.keys[key]);
+                f.assertWeights(CUSTOM);
+                for (int i = 0; i < params.length; i++) {
+                    Assert.assertSame(params[i], f.views[i].getLayoutParams());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void firstBindDuringCompositionUsesSiblingZhuyinBody() throws Throwable {
+        Fixture f = new Fixture();
+        f.setSettings(true);
+        f.metadata.put(f.keys[3], new Metadata("ˉ", false));
+        f.afterBind(f.keys[6]);
+        f.assertWeights(CUSTOM);
+    }
+
+    @Test
+    public void unknownControlMetadataDoesNotRevokeOwnedFooter() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        f.metadata.remove(f.bodyKeys[0]);
+        f.metadata.remove(f.bodyKeys[1]);
+        for (View key : f.keys) f.metadata.put(key, new Metadata("", false));
+        f.afterBind(f.keys[6]);
+        f.assertWeights(CUSTOM);
+        f.bind(false);
+        f.assertWeights(STOCK);
+    }
+
+    @Test
+    public void unknownUnownedComposingFooterIsNotClaimed() throws Throwable {
+        Fixture f = new Fixture();
+        f.metadata.remove(f.bodyKeys[0]);
+        f.metadata.remove(f.bodyKeys[1]);
+        f.metadata.put(f.keys[3], new Metadata("ˉ", false));
+        f.setSettings(true);
+        f.afterBind(f.keys[6]);
+        f.assertWeights(STOCK);
+    }
+
+    @Test
+    public void foreignBodyReleasesWeightsEvenBeforeFooterLabelsChange() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        f.metadata.put(f.bodyKeys[0], new Metadata("a", false));
+        f.metadata.put(f.bodyKeys[1], new Metadata("b", false));
+        f.afterBind(f.bodyKeys[1]);
+        f.assertWeights(STOCK);
+    }
+
+    @Test
+    public void partialBodyRebindKeepsWeightsWhileZhuyinKeysRemain() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        f.metadata.put(f.bodyKeys[0], new Metadata("a", false));
+        f.metadata.put(f.keys[3], new Metadata("ˉ", false));
+        f.afterBind(f.bodyKeys[0]);
+        f.assertWeights(CUSTOM);
+    }
+
+    @Test
+    public void changedFooterHierarchyReleasesOwnedWeights() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        ((LinearLayout) f.keys[4].getParent()).removeView(f.keys[4]);
+        f.afterBind(f.bodyKeys[0]);
+        float[] expected = STOCK.clone();
+        // A moved view no longer belongs to the recorded parent.
+        expected[6] = CUSTOM[6];
+        f.assertWeights(expected);
+    }
+
+    @Test
+    public void stockWeightUpdateDuringCompositionBecomesNewBaseline() throws Throwable {
+        Fixture f = new Fixture();
+        f.bind(true);
+        f.params(5).weight = 365;
+        f.metadata.put(f.keys[3], new Metadata("ˉ", false));
+        f.afterBind(f.keys[3]);
+        f.assertWeights(CUSTOM);
+        f.bind(false);
+        float[] expected = STOCK.clone();
+        expected[5] = 365;
+        f.assertWeights(expected);
+    }
+
     private static final class Fixture {
         final Context context;
         final View[] keys = new View[7];
+        final View[] bodyKeys = new View[2];
         final View[] views;
         final Map<View, Metadata> metadata = new IdentityHashMap<>();
 
-        Fixture() {
+        Fixture() throws Exception {
             Context app = RuntimeEnvironment.getApplication();
             Resources base = app.getResources();
             Resources resources = new Resources(base.getAssets(), base.getDisplayMetrics(),
@@ -169,15 +269,22 @@ public final class GboardZhuyinBottomRowWeightReuseTest {
                 @Override public Resources getResources() { return resources; }
             };
             SoftKeyboardView keyboard = new SoftKeyboardView(context);
+            LinearLayout body = new LinearLayout(context);
+            keyboard.addView(body);
+            for (int i = 0; i < bodyKeys.length; i++) {
+                bodyKeys[i] = (View) GboardZhuyinSlideTargetFixture.newSoftKeyView(context);
+                body.addView(bodyKeys[i]);
+                metadata.put(bodyKeys[i], new Metadata(i == 0 ? "ㄅ" : "ㄉ", true));
+            }
             LinearLayout footer = new LinearLayout(context);
             LinearLayout middle = new LinearLayout(context);
             LinearLayout space = new LinearLayout(context);
             keyboard.addView(footer);
             for (int i = 0; i < keys.length; i++) {
-                keys[i] = new View(context);
-                keys[i].setId(i + 1);
+                keys[i] = (View) GboardZhuyinSlideTargetFixture.newSoftKeyView(context);
+                GboardZhuyinSlideTargetFixture.setResourceEntryName(keys[i], i + 1, NAMES[i]);
                 metadata.put(keys[i], new Metadata(i == 1 ? "，" : i == 3 ? "注音"
-                        : i == 4 ? "ㄦ" : "", true));
+                        : i == 4 ? "ㄦ" : "", false));
             }
             footer.addView(keys[0]); footer.addView(keys[1]); footer.addView(middle);
             footer.addView(keys[5]); footer.addView(keys[6]);
@@ -191,28 +298,28 @@ public final class GboardZhuyinBottomRowWeightReuseTest {
         }
 
         void bind(boolean enabled) throws Throwable {
-            Field cached = GboardZhuyinBottomRowWeightRuntime.class.getDeclaredField("cachedSettingsSnapshot");
+            setSettings(enabled);
+            afterBind(keys[0]);
+        }
+
+        void setSettings(boolean enabled) throws Throwable {
+            Field cached = GboardZhuyinBottomRowWeightRuntime.class
+                    .getDeclaredField("cachedSettingsSnapshot");
             cached.setAccessible(true);
-            GboardZhuyinBottomRowWeightRuntime.SettingsSnapshot settings =
-                    new GboardZhuyinBottomRowWeightRuntime.SettingsSnapshot(
-                    SystemClock.elapsedRealtime(), enabled, 110, 120, 130, 140, 180, 160, 170);
-            cached.set(null, settings);
-            if (!enabled || !metadata.get(keys[0]).zhuyin) {
-                GboardZhuyinBottomRowWeightRuntime.beforeSoftKeyBound(keys[0]);
-                return;
-            }
-            java.lang.reflect.Method resolve = GboardZhuyinBottomRowWeightRuntime.class
-                    .getDeclaredMethod("findFooterCandidate", View.class);
-            resolve.setAccessible(true);
-            Object footer = resolve.invoke(null, keys[0]);
-            java.lang.reflect.Method apply = GboardZhuyinBottomRowWeightRuntime.class
-                    .getDeclaredMethod("applyWeights", footer.getClass(), settings.getClass());
-            apply.setAccessible(true);
-            apply.invoke(null, footer, settings);
+            cached.set(null, new GboardZhuyinBottomRowWeightRuntime.SettingsSnapshot(
+                    SystemClock.elapsedRealtime(), enabled, 110, 120, 130, 140, 180, 160,
+                    170));
+        }
+
+        void afterBind(View key) throws Throwable {
+            for (View view : keys) publishMetadata(view);
+            for (View view : bodyKeys) publishMetadata(view);
+            GboardZhuyinBottomRowWeightRuntime.afterSoftKeyBound(key);
         }
 
         void makeNonZhuyin() {
             for (View key : keys) metadata.put(key, new Metadata("english", false));
+            for (View key : bodyKeys) metadata.put(key, new Metadata("a", false));
         }
 
         LinearLayout.LayoutParams params(int index) {
@@ -225,6 +332,13 @@ public final class GboardZhuyinBottomRowWeightReuseTest {
             }
         }
 
+        void publishMetadata(View view) throws Exception {
+            Metadata value = metadata.get(view);
+            Object actual = value == null ? null : GboardZhuyinSlideTargetFixture.metadata(
+                    view.getId(), value.label, value.label, new String[] {value.label},
+                    value.zhuyin ? "up" : null, null);
+            view.getClass().getField("e").set(view, actual);
+        }
     }
 
     private static final class SoftKeyboardView extends LinearLayout {

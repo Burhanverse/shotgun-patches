@@ -88,11 +88,8 @@ internal enum class GboardSoftKeyFamilyFeature(
         ),
     ),
     ZHUYIN_BOTTOM_ROW(
-        beforeOrder = 50,
+        beforeOrder = null,
         afterOrder = 300,
-        beforeRuntimeCalls = listOf(
-            RuntimeCallId.ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND,
-        ),
         afterRuntimeCalls = listOf(
             RuntimeCallId.ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_AFTER_SOFT_KEY_BOUND,
         ),

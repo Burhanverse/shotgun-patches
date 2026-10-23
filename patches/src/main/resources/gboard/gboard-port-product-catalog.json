@@ -2122,18 +2122,6 @@
           "runtime_calls": [
             "ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_AFTER_SOFT_KEY_BOUND"
           ]
-        },
-        {
-          "contribution_id": "zhuyin_bottom_row_key_sizes.before_bind",
-          "anchor_family_id": "soft_key_bind",
-          "phase": "before_stock",
-          "order": 50,
-          "required_bindings": [
-            "soft_key_bind"
-          ],
-          "runtime_calls": [
-            "ZHUYIN_BOTTOM_ROW_WEIGHT_RUNTIME_BEFORE_SOFT_KEY_BOUND"
-          ]
         }
       ]
     },

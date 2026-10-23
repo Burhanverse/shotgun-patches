@@ -1,6 +1,7 @@
 package dev.jason.gboardpatches.patches.gboard.features.zhuyinbottomrow
 
 import dev.jason.gboardpatches.patches.gboard.shared.generated.GboardVersionBindings
+import dev.jason.gboardpatches.patches.gboard.shared.GboardSoftKeyFamilyFeature
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -29,7 +30,7 @@ class GboardZhuyinBottomRowWeightPatchShapeTest {
     }
 
     @Test
-    fun `softkey patch contributes before restore and after apply phases to the family composer`() {
+    fun `softkey patch contributes only after apply to the family composer`() {
         val source = String(
             Files.readAllBytes(
                 Path.of(
@@ -41,7 +42,9 @@ class GboardZhuyinBottomRowWeightPatchShapeTest {
         )
 
         assertTrue(source.contains("GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW"))
-        assertTrue(source.contains("beforeDelegate()"))
+        assertFalse(source.contains("beforeDelegate()"))
+        assertEquals(null, GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW.beforeOrder)
+        assertTrue(GboardSoftKeyFamilyFeature.ZHUYIN_BOTTOM_ROW.beforeRuntimeCalls.isEmpty())
         assertTrue(source.contains("afterDelegate()"))
         assertFalse(source.contains("addInstructions"))
     }
