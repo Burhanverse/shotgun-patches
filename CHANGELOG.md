@@ -1,3 +1,13 @@
+## [4.0.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix runtime settings access before the first unlock after boot to prevent errors when swiping down to dismiss the keyboard.
+
+### 🐛 修復
+
+* **Gboard:** 修復開機後首次解鎖前，向下滑動關閉鍵盤功能存取設定時可能發生的錯誤。
+
 ## [4.0.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2026-10-23)
 
 ### 🐛 Bug Fixes
