@@ -132,8 +132,6 @@ public final class GboardRestartPendingChangesTest {
         assertDeclaresVia("closeproactivesuggestions/"
                         + "GboardCloseProactiveSuggestionsSettingsFeature.java",
                 "GboardCloseProactiveSuggestionsSettings.PREF_KEY_ENABLED");
-        assertDeclares("flowmode/GboardFlowModeSettingsFeature.java",
-                "GboardFlowModeSettings.PREF_KEY_ENABLED");
         assertDeclares("roundedkeyboard/GboardRoundedKeyboardSettingsFeature.java",
                 "GboardRoundedKeyboardSettings.PREF_KEY_ENABLED",
                 "GboardRoundedKeyboardSettings.PREF_KEY_MODE",

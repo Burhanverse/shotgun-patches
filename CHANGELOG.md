@@ -1,3 +1,15 @@
+## [4.0.0-dev.4](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2026-10-24)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the occasionally blank shortcut toolbar when opening the keyboard with Rambler enabled.
+* **Gboard:** remove the `Hyperspeed Typing Animation` patch because Gboard 18.5.3 no longer includes its core implementation.
+
+### 🐛 修復
+
+* **Gboard:** 修復啟用 Rambler 時，開啟鍵盤後快捷工具列偶爾空白的問題。
+* **Gboard:** 移除 `Hyperspeed Typing Animation` Patch，因 Gboard 18.5.3 已移除所需的核心實作。
+
 ## [4.0.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2026-10-23)
 
 ### 🐛 Bug Fixes

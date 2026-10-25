@@ -18,8 +18,6 @@ import dev.jason.gboardpatches.patches.gboard.features.advancedvoice.gboardAdvan
 import dev.jason.gboardpatches.patches.gboard.features.advancedvoice.gboardAdvancedVoiceFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.englishqwerty.gboardEnglishQwertyPointerPatch
 import dev.jason.gboardpatches.patches.gboard.features.englishqwerty.gboardEnglishQwertySoftKeyPatch
-import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeFlagValuePatch
-import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowMode1853Patch
 import dev.jason.gboardpatches.patches.gboard.features.longpressquickactions.gboardLongPressQuickActionsInputEventPatch
 import dev.jason.gboardpatches.patches.gboard.features.longpressquickactions.gboardLongPressQuickActionsGesturePatch
 import dev.jason.gboardpatches.patches.gboard.features.longpressquickactions.gboardLongPressQuickActionsPointerOwnerPatch
@@ -98,14 +96,6 @@ internal object GboardContributionWiring {
             },
             unit("english_qwerty_up_flick_uppercase.pointer") {
                 arrayOf(gboardEnglishQwertyPointerPatch)
-            },
-        ),
-        "flow_mode_animation" to listOf(
-            unit("flow_mode_animation.flag") {
-                arrayOf(gboardFlowModeFlagValuePatch)
-            },
-            unit("flow_mode_animation.adapter") {
-                arrayOf(gboardFlowMode1853Patch)
             },
         ),
         "g_logo_on_spacebar" to listOf(

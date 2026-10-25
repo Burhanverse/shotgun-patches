@@ -53,7 +53,7 @@ public final class GboardLongPressQuickActionsPolicy {
     }
 
     public static GboardEditingShortcutPolicy.Shortcut shortcutForChord(
-            int keyId, String pressText, int selectedCode, int flowModeTypingPulseCode,
+            int keyId, String pressText, int selectedCode, int typingPulseCode,
             int plainTextCode) {
         QuickAction action = resolve(keyId, pressText);
         if (action == null) {
@@ -61,7 +61,7 @@ public final class GboardLongPressQuickActionsPolicy {
         }
         GboardEditingShortcutPolicy.Shortcut latinCarrier =
                 GboardEditingShortcutPolicy.resolveLatinChord(
-                        pressText, selectedCode, flowModeTypingPulseCode);
+                        pressText, selectedCode, typingPulseCode);
         return selectedCode == action.actionCode
                 || selectedCode == plainTextCode
                 || latinCarrier == action.shortcut
@@ -70,13 +70,13 @@ public final class GboardLongPressQuickActionsPolicy {
 
     public static GboardEditingShortcutPolicy.Shortcut shortcutForPointerTarget(
             int keyId, String pressText, int pressCarrierCode,
-            int flowModeTypingPulseCode) {
+            int typingPulseCode) {
         QuickAction action = resolve(keyId, pressText);
         if (action == null) {
             return null;
         }
         return GboardEditingShortcutPolicy.resolveLatinChord(
-                pressText, pressCarrierCode, flowModeTypingPulseCode) == action.shortcut
+                pressText, pressCarrierCode, typingPulseCode) == action.shortcut
                 ? action.shortcut : null;
     }
 

@@ -9,7 +9,7 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
     private static final int MARKER_UP = -0x2731;
     private static final int SWITCH_TO_NEXT_LANGUAGE = -0x271b;
     private static final int CHORD_EVENT_SUBTYPE = 3;
-    private static final int FLOW_MODE_TYPING_PULSE_KEY_CODE = -10043;
+    private static final int TYPING_PULSE_KEY_CODE = -10043;
     private static final int PLAIN_TEXT_KEY_CODE = -10009;
 
     private final GboardLongPressQuickActionsReflectionHandles handles;
@@ -71,7 +71,7 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
                 keyId,
                 handles.extractPressText(metadata),
                 handles.extractPressCarrierCode(metadata),
-                FLOW_MODE_TYPING_PULSE_KEY_CODE);
+                TYPING_PULSE_KEY_CODE);
     }
 
     @Override
@@ -133,14 +133,14 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
         GboardEditingShortcutPolicy.Shortcut shortcut;
         if (GboardLongPressQuickActionsPolicy.isZhuyinKeyId(keyId)) {
             shortcut = GboardLongPressQuickActionsPolicy.shortcutForPointerTarget(
-                    keyId, pressText, pressCarrier, FLOW_MODE_TYPING_PULSE_KEY_CODE);
+                    keyId, pressText, pressCarrier, TYPING_PULSE_KEY_CODE);
         } else {
             physicalSlot = shortcutSlot(viewEntryName);
             shortcut = GboardGlobeDragPhysicalSlotPolicy.resolve(
                     physicalSlot,
                     pressText,
                     pressCarrier,
-                    FLOW_MODE_TYPING_PULSE_KEY_CODE);
+                    TYPING_PULSE_KEY_CODE);
         }
         return new TargetSignal(
                 metadata,
@@ -169,7 +169,7 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
                     keyId,
                     pressText,
                     selectedCode,
-                    FLOW_MODE_TYPING_PULSE_KEY_CODE,
+                    TYPING_PULSE_KEY_CODE,
                     PLAIN_TEXT_KEY_CODE)
                 : null;
         GboardGlobeDragPhysicalSlotPolicy.ShortcutSlot boundSlot = zhuyinKey
@@ -179,13 +179,13 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
                     keyId,
                     pressText,
                     pressCarrier,
-                    FLOW_MODE_TYPING_PULSE_KEY_CODE);
+                    TYPING_PULSE_KEY_CODE);
         GboardEditingShortcutPolicy.Shortcut boundSlotShortcut =
                 GboardGlobeDragPhysicalSlotPolicy.resolve(
                     boundSlot,
                     pressText,
                     pressCarrier,
-                    FLOW_MODE_TYPING_PULSE_KEY_CODE);
+                    TYPING_PULSE_KEY_CODE);
         GboardEditingShortcutPolicy.Shortcut shortcut = resolveTerminalShortcut(
                 zhuyinKey, zhuyinShortcut, boundSlotShortcut);
         return new TargetSignal(

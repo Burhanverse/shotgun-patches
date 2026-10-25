@@ -46,6 +46,9 @@ internal val gboardRambler1803OfficialSelectorPatch = bytecodePatch(
                     "${method.definingClass}->$helper${targets[i].descriptor}", static, words,
                     method.returnType, i))
         }
+        GboardMethodTarget("Lkaf;", "h", listOf("Ljava/lang/CharSequence;"), "V").resolve(this)
+        GboardMethodTarget("Lflz;", "J", emptyList(), "V").resolve(this)
+            .clearRamblerResetHeaderWithoutShowing()
     }
 }
 
