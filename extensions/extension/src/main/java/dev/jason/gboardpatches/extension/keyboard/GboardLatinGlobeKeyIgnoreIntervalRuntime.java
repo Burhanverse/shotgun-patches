@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GboardLatinGlobeKeyIgnoreIntervalRuntime {
     private static final String TAG = "GboardPatches";
-    private static final String LOG_PREFIX = "[gboard-latin-globe-18.5.3] ";
+    private static final String LOG_PREFIX = "[gboard-latin-globe-18.5.4] ";
     private static final String TARGET_CLASS_NAME = "yrt";
     private static final String TARGET_FIELD_NAME = "h";
     private static final int MAX_FAILURE_LOGS = 3;

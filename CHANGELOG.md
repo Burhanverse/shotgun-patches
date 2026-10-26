@@ -1,3 +1,13 @@
+## [4.0.0-dev.5](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2026-10-25)
+
+### 🚀 Updated App Support
+
+* **Gboard:** update the supported Gboard version to `18.5.4.993608717-release-arm64-v8a`.
+
+### 🚀 支援版本更新
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。
+
 ## [4.0.0-dev.4](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2026-10-24)
 
 ### 🐛 Bug Fixes

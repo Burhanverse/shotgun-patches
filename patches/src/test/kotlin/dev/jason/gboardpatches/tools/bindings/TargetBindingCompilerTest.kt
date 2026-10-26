@@ -14,7 +14,7 @@ import org.junit.Test
 class TargetBindingCompilerTest {
     @Test
     fun `dollar members and nested descriptors remain literal Kotlin strings`() {
-        val profile = """{"format":"gboard-version-bindings.v1","target_version":"18.5.3","profile_version":"2.0.0","bindings":{"callback_case":{"kind":"field","class_type":"Lsample/Outer${'$'}Nested;","field_name":"${'$'}cid","field_type":"I","confidence":1},"callback_hook":{"kind":"method","class_type":"Lsample/Outer${'$'}Nested;","method_name":"${'$'}hook","parameter_types":["[Lsample/Outer${'$'}Nested;"],"return_type":"V","confidence":1}}}"""
+        val profile = """{"format":"gboard-version-bindings.v1","target_version":"18.5.4","profile_version":"2.0.0","bindings":{"callback_case":{"kind":"field","class_type":"Lsample/Outer${'$'}Nested;","field_name":"${'$'}cid","field_type":"I","confidence":1},"callback_hook":{"kind":"method","class_type":"Lsample/Outer${'$'}Nested;","method_name":"${'$'}hook","parameter_types":["[Lsample/Outer${'$'}Nested;"],"return_type":"V","confidence":1}}}"""
         val source = compileMatching(profile).kotlinSource
         val escapedDollar = "\\" + '$'
         assertTrue(source.contains("classType = \"Lsample/Outer${escapedDollar}Nested;\""))
@@ -175,7 +175,7 @@ internal object GboardVersionBindings {
     }
 
     @Test
-    fun `authoritative 1853 admitted contract exactly matches sparse requirements and build output`() {
+    fun `authoritative 1854 admitted contract exactly matches sparse requirements and build output`() {
         val profile = Files.readString(BINDINGS_PATH, StandardCharsets.UTF_8)
         val profileBindings = JsonParser.parseString(profile).asJsonObject
             .getAsJsonObject("bindings")
@@ -187,7 +187,7 @@ internal object GboardVersionBindings {
         val generated = Files.readString(GENERATED_BINDINGS_PATH, StandardCharsets.UTF_8)
 
         val projection = TargetBindingCompiler.compile(profile, requirements)
-        assertEquals("18.5.3", projection.targetVersion)
+        assertEquals("18.5.4", projection.targetVersion)
         assertEquals(203, profileBindings.size())
         assertEquals(AUTHORITATIVE_SOURCE_SHA256, projection.sourceSha256)
         assertEquals(
@@ -296,7 +296,7 @@ internal object GboardVersionBindings {
 
     private companion object {
         const val AUTHORITATIVE_SOURCE_SHA256 =
-            "d530f19040c41489752664cfd89838e469011b886ae597244810d214248dc6cf"
+            "687aa19d4956ab311ed18b8d12e6897d919bdcbdc89ddf83f6b34a204b2de090"
         val BINDINGS_PATH = Path.of("src/main/resources/gboard/gboard-version-bindings.json")
         val BINDINGS_SCHEMA_PATH =
             Path.of("src/main/resources/gboard/gboard-version-bindings.schema.json")

@@ -14,7 +14,7 @@ import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
 import dev.jason.gboardpatches.patches.shared.Constants.COMPATIBILITY_GBOARD
 
 internal val gboardAccessPointContributions1803Patch = bytecodePatch(
-    description = "集中注入 18.5.3 synthetic Access Point catalog 與 controller delegate。",
+    description = "集中注入 18.5.4 synthetic Access Point catalog 與 controller delegate。",
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
     dependsOn(gboardPatchesExtensionCarrierPatch)
@@ -35,7 +35,7 @@ internal fun MutableMethod.applyAccessPointOrderCatalogDelegate1803() {
     val existing = instructions.count { it.isMethodReference(abi.reference) }
     if (existing > 0) {
         check(existing == 1) {
-            "Malformed 18.5.3 Access Point order catalog delegate"
+            "Malformed 18.5.4 Access Point order catalog delegate"
         }
         return
     }
@@ -66,7 +66,7 @@ internal fun MutableMethod.applyAccessPointControllerDelegate1803() {
     check(returns.size == 1) { "Expected one mwv constructor return, found ${returns.size}" }
     val existing = instructions.count { it.isMethodReference(abi.reference) }
     if (existing > 0) {
-        check(existing == 1) { "Duplicate 18.5.3 Access Point controller delegate" }
+        check(existing == 1) { "Duplicate 18.5.4 Access Point controller delegate" }
         return
     }
     addInstructions(

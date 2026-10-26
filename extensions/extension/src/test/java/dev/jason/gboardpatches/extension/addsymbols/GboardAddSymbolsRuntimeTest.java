@@ -148,7 +148,7 @@ public final class GboardAddSymbolsRuntimeTest {
                 "jpv");
         for (String className : targetClasses) {
             Assert.assertTrue(
-                    "Missing Gboard 18.5.3 runtime handle: " + className,
+                    "Missing Gboard 18.5.4 runtime handle: " + className,
                     source.contains("Class.forName(\"" + className + "\", false, classLoader)"));
         }
 
@@ -159,7 +159,7 @@ public final class GboardAddSymbolsRuntimeTest {
                 "frd");
         for (String className : retired1803Classes) {
             Assert.assertFalse(
-                    "Stale Gboard 18.5.3 runtime handle remains active: " + className,
+                    "Stale Gboard 18.5.4 runtime handle remains active: " + className,
                     source.contains("Class.forName(\"" + className + "\", false, classLoader)"));
         }
 

@@ -145,7 +145,7 @@ public final class GboardSettingsHomepageRuntime {
         try {
             Log.i(
                     TAG,
-                    "[gboard-settings-homepage-18.5.3] policy state=" + state
+                    "[gboard-settings-homepage-18.5.4] policy state=" + state
                             + " changed=" + changed);
         } catch (Throwable ignored) {
             // Logging must never affect the settings Activity entry contract.
@@ -156,7 +156,7 @@ public final class GboardSettingsHomepageRuntime {
         if (FAILURE_LOG_COUNT.getAndIncrement() >= LOG_LIMIT) {
             return;
         }
-        String tagged = "[gboard-settings-homepage-18.5.3] " + message;
+        String tagged = "[gboard-settings-homepage-18.5.4] " + message;
         try {
             if (throwable != null) {
                 Log.w(TAG, tagged, throwable);

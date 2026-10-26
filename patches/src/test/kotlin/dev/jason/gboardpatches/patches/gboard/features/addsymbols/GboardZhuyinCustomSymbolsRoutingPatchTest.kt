@@ -59,7 +59,7 @@ class GboardZhuyinCustomSymbolsRoutingPatchTest {
             "check-cast p2, Lqch;",
         )
         required.forEach { descriptor ->
-            assertTrue("Missing Gboard 18.5.3 routing descriptor: $descriptor", source.contains(descriptor))
+            assertTrue("Missing Gboard 18.5.4 routing descriptor: $descriptor", source.contains(descriptor))
         }
 
         listOf("Lniu;", "Lgsr;", "Lfsk;", "Lmzu;", "Lnzd;", "Lnim;", "Lnyt;", "Lunq;")
@@ -99,7 +99,7 @@ class GboardZhuyinCustomSymbolsRoutingPatchTest {
             "name = \"D\"",
             "parameterTypes = listOf(\"Lgph;\")",
         ).forEach { descriptor ->
-            assertTrue("Missing Gboard 18.5.3 state descriptor: $descriptor", state.contains(descriptor))
+            assertTrue("Missing Gboard 18.5.4 state descriptor: $descriptor", state.contains(descriptor))
         }
         assertTrue(state.contains("private fun patchConstructor()"))
         assertTrue(state.contains("mutableMethod.instructionIndices(\"RETURN_VOID\")"))
@@ -122,7 +122,7 @@ class GboardZhuyinCustomSymbolsRoutingPatchTest {
             "returnType = \"Lkr;\"",
             "check-cast v0, Lkr;",
         ).forEach { descriptor ->
-            assertTrue("Missing Gboard 18.5.3 recycler descriptor: $descriptor", recycler.contains(descriptor))
+            assertTrue("Missing Gboard 18.5.4 recycler descriptor: $descriptor", recycler.contains(descriptor))
         }
         assertTrue(recycler.contains("mutableMethod.instructionIndices(\"RETURN_VOID\")"))
         assertFalse(recycler.contains("val superConstructorIndex"))

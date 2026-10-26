@@ -275,7 +275,7 @@ private data class GboardFlagFamilyTransformationPlan(
                 flagNameScratch = FLAG_NAME_SCRATCH_REGISTER.takeIf { needsFlagName },
             )
 
-            if (GboardVersionBindings.targetVersion == "18.5.3") {
+            if (GboardVersionBindings.targetVersion == "18.5.4") {
                 val snapshots = instructions.filter { instruction ->
                     val load = instruction as? TwoRegisterInstruction
                     val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference
@@ -283,7 +283,7 @@ private data class GboardFlagFamilyTransformationPlan(
                         load?.registerA == 0 && load.registerB == receiverRegister &&
                         field?.definingClass == "Loki;" && field.name == "f" && field.type == "Lokr;"
                 }
-                check(snapshots.size == 1) { "18.5.3 flag snapshot carrier drift" }
+                check(snapshots.size == 1) { "18.5.4 flag snapshot carrier drift" }
             }
 
             val resultMaterializationIndex = instructions.indices.singleOrNull { index ->
@@ -478,10 +478,10 @@ private fun com.android.tools.smali.dexlib2.iface.instruction.Instruction
         load.registerB == FLAG_NAME_SCRATCH_REGISTER &&
         field.definingClass == when (GboardVersionBindings.targetVersion) {
             "18.0.3" -> "Lnyf;"
-            "18.5.3" -> "Lokr;"
+            "18.5.4" -> "Lokr;"
             else -> error("Unsupported Gboard flag stock contract for ${GboardVersionBindings.targetVersion}")
         } && field.name == when (GboardVersionBindings.targetVersion) {
-            "18.5.3" -> "a"
+            "18.5.4" -> "a"
             else -> "c"
         } &&
         field.type == "Ljava/lang/Object;"

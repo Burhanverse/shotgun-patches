@@ -154,7 +154,7 @@ class GboardPortProductCatalogContractTest {
                 StandardCharsets.UTF_8,
             ),
         ).asJsonObject
-        assertEquals("18.5.3", bindingProfile["target_version"].asString)
+        assertEquals("18.5.4", bindingProfile["target_version"].asString)
         val authoritativeKeys = bindingProfile.getAsJsonObject("bindings").keySet()
         val authoritativeKinds = bindingProfile.getAsJsonObject("bindings").entrySet()
             .associate { (key, binding) -> key to binding.asJsonObject["kind"].asString }

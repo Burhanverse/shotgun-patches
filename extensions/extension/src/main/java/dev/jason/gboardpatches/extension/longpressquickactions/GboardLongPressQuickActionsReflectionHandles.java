@@ -360,7 +360,7 @@ public final class GboardLongPressQuickActionsReflectionHandles {
                 try {
                     cached = owner.getDeclaredField("A");
                     if (!Future.class.isAssignableFrom(cached.getType())) {
-                        throw new NoSuchFieldException("18.5.3 long-press future type drift");
+                        throw new NoSuchFieldException("18.5.4 long-press future type drift");
                     }
                     cached.setAccessible(true);
                     longPressFutureField = cached;
@@ -383,7 +383,7 @@ public final class GboardLongPressQuickActionsReflectionHandles {
                 try {
                     cached = owner.getDeclaredField("w");
                     if (cached.getType() != int.class) {
-                        throw new NoSuchFieldException("18.5.3 event subtype type drift");
+                        throw new NoSuchFieldException("18.5.4 event subtype type drift");
                     }
                     cached.setAccessible(true);
                     eventSubtypeField = cached;

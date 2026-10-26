@@ -72,7 +72,7 @@ class GboardSignatureBypassPatchContractTest {
     @Test
     fun `signature bypass uses reviewed1853 exact helper without flag factory`() {
         val profile = JsonParser.parseString(readSource(BINDINGS_PROFILE_PATH)).asJsonObject
-        assertEquals("18.5.3", profile.get("target_version").asString)
+        assertEquals("18.5.4", profile.get("target_version").asString)
         val bindings = profile.getAsJsonObject("bindings")
         val signature = bindings.getAsJsonObject("signature_check")
         assertEquals("method", signature.get("kind").asString)
@@ -99,7 +99,7 @@ class GboardSignatureBypassPatchContractTest {
 
     private companion object {
         const val GBOARD_PACKAGE = "com.google.android.inputmethod.latin"
-        const val TARGET_VERSION = "18.5.3.993608717-release-arm64-v8a"
+        const val TARGET_VERSION = "18.5.4.993608717-release-arm64-v8a"
         const val SIGNATURE_BYPASS_DESCRIPTION =
             "攔截 Gboard 的簽章白名單檢查並強制通過\n" +
                 "Bypass Gboard signature whitelist checks and force them to pass."

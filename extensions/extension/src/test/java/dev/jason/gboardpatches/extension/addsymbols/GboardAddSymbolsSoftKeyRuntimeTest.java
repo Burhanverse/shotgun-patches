@@ -24,14 +24,14 @@ public final class GboardAddSymbolsSoftKeyRuntimeTest {
                 "private static final String INTENTION_CLASS = \"qbb\";",
                 "private static final String KEYBOARD_TYPE_CLASS = \"qch\";");
         for (String mapping : targetMappings) {
-            Assert.assertTrue("Missing Gboard 18.5.3 soft-key mapping: " + mapping,
+            Assert.assertTrue("Missing Gboard 18.5.4 soft-key mapping: " + mapping,
                     source.contains(mapping));
         }
 
         List<String> baselineClasses = List.of(
                 "owd", "oth", "otk", "oud", "oti", "ovv", "ouc", "ovf");
         for (String className : baselineClasses) {
-            Assert.assertFalse("Stale Gboard 18.5.3 soft-key class remains: " + className,
+            Assert.assertFalse("Stale Gboard 18.5.4 soft-key class remains: " + className,
                     source.contains("\"" + className + "\""));
         }
 

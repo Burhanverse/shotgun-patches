@@ -1975,8 +1975,8 @@
         <translation locale="zh-Hant">安裝檔需求（目前已符合）</translation>
     </string>
     <string name="gboard_patches_advanced_voice_payload_present_requirement_summary">
-        <translation locale="en">No download is needed right now. For future updates or reinstalls, you must still use a bundle or split APKM and apply the patch in Morphe; a standalone APK cannot work.\nTap to view the APKMirror download page</translation>
-        <translation locale="zh-Hant">目前不需要重新下載。日後更新或重新安裝時，仍必須使用 bundle 或 split APKM，並在 Morphe 中套用 patch；standalone APK 無法生效。\n點此查看 APKMirror 下載頁</translation>
+        <translation locale="en">The current base version includes libdictation_jni.so.\nTap to view the APKMirror download page</translation>
+        <translation locale="zh-Hant">目前的基底版本已包含 libdictation_jni.so。\n點此查看 APKMirror 下載頁</translation>
     </string>
     <string name="gboard_patches_advanced_voice_payload_absent_title">
         <translation locale="en">Dictation payload (Not installed)</translation>
@@ -1991,8 +1991,8 @@
         <translation locale="zh-Hant">需要使用 bundle 或 split APKM</translation>
     </string>
     <string name="gboard_patches_advanced_voice_payload_absent_requirement_summary">
-        <translation locale="en">Get a bundle or split APKM and apply the patch in Morphe; a standalone APK cannot work.\nTap to open the APKMirror download page</translation>
-        <translation locale="zh-Hant">請重新取得 bundle 或 split APKM，並在 Morphe 中套用 patch；standalone APK 無法生效。\n點此開啟 APKMirror 下載頁</translation>
+        <translation locale="en">The current base version does not include libdictation_jni.so.\nTap to open the APKMirror download page</translation>
+        <translation locale="zh-Hant">目前的基底版本未包含 libdictation_jni.so。\n點此開啟 APKMirror 下載頁</translation>
     </string>
     <string name="gboard_patches_advanced_voice_payload_unknown_title">
         <translation locale="en">Dictation payload (Unable to verify)</translation>
@@ -2007,8 +2007,8 @@
         <translation locale="zh-Hant">請確認安裝檔來源</translation>
     </string>
     <string name="gboard_patches_advanced_voice_payload_unknown_requirement_summary">
-        <translation locale="en">It is currently unclear whether another download is needed. Verify that you used a bundle or split APKM and applied the patch in Morphe; a standalone APK cannot work.\nTap to view the APKMirror download page</translation>
-        <translation locale="zh-Hant">目前無法判斷是否需要重新下載。請確認使用 bundle 或 split APKM，並在 Morphe 中套用 patch；standalone APK 無法生效。\n點此查看 APKMirror 下載頁</translation>
+        <translation locale="en">Cannot confirm whether the current base version includes libdictation_jni.so.\nTap to view the APKMirror download page</translation>
+        <translation locale="zh-Hant">目前無法確認基底版本是否包含 libdictation_jni.so。\n點此查看 APKMirror 下載頁</translation>
     </string>
     <string name="gboard_patches_ocr_title">
         <translation locale="en">OCR / Scan Text</translation>
@@ -3265,7 +3265,7 @@
         <translation locale="zh-Hant">語音輸入模式說明</translation>
     </string>
     <string name="gboard_patches_advanced_voice_modes_summary">
-        <translation locale="en">Voice typing consists of three modes: Standard, Standard - Advanced features (colorful microphone), and Rambler. Among these, Standard - Advanced features requires the Dictation payload to function. As of this release (2026/10/22), an official bundle APKM containing the Dictation payload has not yet been released.</translation>
-        <translation locale="zh-Hant">語音輸入分為三種：標準、標準-進階功能（彩色麥克風）以及 Rambler。其中「標準-進階功能」需要有 Dictation payload 才能運作；截至發布當下（2026/10/22），官方尚未推出包含 Dictation payload 的 bundle APKM。</translation>
+        <translation locale="en">Voice typing has three modes: Standard, Standard - Advanced features (colorful microphone), and Rambler. Standard - Advanced features requires the Dictation payload.</translation>
+        <translation locale="zh-Hant">語音輸入分為三種：標準、標準-進階功能（彩色麥克風）以及 Rambler。「標準-進階功能」需要 Dictation payload。</translation>
     </string>
 </settings-text>

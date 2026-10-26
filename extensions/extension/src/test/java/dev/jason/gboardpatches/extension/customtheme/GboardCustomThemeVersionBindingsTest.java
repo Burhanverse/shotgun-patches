@@ -10,7 +10,7 @@ import java.nio.file.Path;
 public final class GboardCustomThemeVersionBindingsTest {
     @Test
     public void generatedRuntimeBindingsMatchReviewed1853Contract() {
-        Assert.assertEquals("18.5.3", GboardCustomThemeVersionBindings.TARGET_VERSION);
+        Assert.assertEquals("18.5.4", GboardCustomThemeVersionBindings.TARGET_VERSION);
         Assert.assertEquals("khr", GboardCustomThemeVersionBindings.PLUS_CLASS);
         Assert.assertEquals("f", GboardCustomThemeVersionBindings.PLUS_METHOD);
         Assert.assertEquals("khu", GboardCustomThemeVersionBindings.ADAPTER_CLASS);

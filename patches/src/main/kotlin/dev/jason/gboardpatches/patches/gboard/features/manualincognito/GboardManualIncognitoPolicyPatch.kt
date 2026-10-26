@@ -19,7 +19,7 @@ import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
 import dev.jason.gboardpatches.patches.shared.Constants.COMPATIBILITY_GBOARD
 
 internal val gboardManualIncognitoPolicyPatch = bytecodePatch(
-    description = "在 18.5.3 clipboard 與 voice incognito gate 加入 scoped value delegate。",
+    description = "在 18.5.4 clipboard 與 voice incognito gate 加入 scoped value delegate。",
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
     dependsOn(gboardPatchesExtensionCarrierPatch)

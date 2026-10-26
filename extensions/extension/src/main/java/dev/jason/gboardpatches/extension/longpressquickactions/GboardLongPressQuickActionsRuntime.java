@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class GboardLongPressQuickActionsRuntime {
     private static final String TAG = "GboardPatches";
-    private static final String LOG_PREFIX = "[gboard-long-press-quick-actions-18.5.3] ";
+    private static final String LOG_PREFIX = "[gboard-long-press-quick-actions-18.5.4] ";
 
     private static final Map<ClassLoader,
             WeakReference<GboardLongPressQuickActionsReflectionHandles>>

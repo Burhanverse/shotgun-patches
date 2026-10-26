@@ -40,7 +40,7 @@ private val gboardEnglishQwertyPointerSpec = GboardPointerOwnerFeatureSpec(
 )
 
 internal val gboardEnglishQwertyPointerPatch = gboardPointerOwnerFeaturePatch(
-    description = "在 18.5.3 qin reset 前固定 English 上滑起始 key 並抑制 retarget。",
+    description = "在 18.5.4 qin reset 前固定 English 上滑起始 key 並抑制 retarget。",
     spec = gboardEnglishQwertyPointerSpec,
 )
 

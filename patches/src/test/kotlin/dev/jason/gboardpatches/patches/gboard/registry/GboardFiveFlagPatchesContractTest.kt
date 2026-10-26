@@ -68,7 +68,7 @@ class GboardFiveFlagPatchesContractTest {
             assertTrue(patch.default)
             assertEquals(dependencies, patch.dependencies.toList())
             assertEquals(
-                "18.5.3.993608717-release-arm64-v8a",
+                "18.5.4.993608717-release-arm64-v8a",
                 patch.compatibility!!.single().targets.single().version,
             )
         }

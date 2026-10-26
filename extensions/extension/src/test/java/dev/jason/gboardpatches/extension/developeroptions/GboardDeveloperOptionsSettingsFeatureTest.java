@@ -70,7 +70,7 @@ public final class GboardDeveloperOptionsSettingsFeatureTest {
         Assert.assertFalse(activitySource.contains("17.0.10"));
         Assert.assertFalse(activitySource.contains("versionName.startsWith("));
         Assert.assertTrue(activitySource.contains(
-                "18.5.3.993608717-release-arm64-v8a"));
+                "18.5.4.993608717-release-arm64-v8a"));
         Assert.assertTrue(activitySource.contains(
                 "showUnsupportedDeveloperOptionsPackageDialog(currentPackage"));
         Assert.assertTrue(activitySource.contains(
@@ -86,11 +86,11 @@ public final class GboardDeveloperOptionsSettingsFeatureTest {
         versionCheck.setAccessible(true);
 
         Assert.assertEquals(Boolean.TRUE, versionCheck.invoke(
-                null, "18.5.3.993608717-release-arm64-v8a"));
-        Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(null, "18.5.3"));
+                null, "18.5.4.993608717-release-arm64-v8a"));
+        Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(null, "18.5.4"));
         Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(null, "18.0.3.954559732-release-arm64-v8a"));
         Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(
-                null, "18.5.3.993608717-release-arm64-v8a-debug"));
+                null, "18.5.4.993608717-release-arm64-v8a-debug"));
         Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(
                 null, "18.0.3.932364120-release-arm64-v8a"));
         Assert.assertEquals(Boolean.FALSE, versionCheck.invoke(null, new Object[] { null }));

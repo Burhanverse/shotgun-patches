@@ -102,7 +102,7 @@ class GboardDeveloperOptionsPatchContractSourceTest {
         val activity = readSource(ACTIVITY_PATH)
 
         assertTrue(activity.contains("ENTER_PREF_HEADER"))
-        assertTrue(activity.contains("18.5.3.993608717-release-arm64-v8a"))
+        assertTrue(activity.contains("18.5.4.993608717-release-arm64-v8a"))
         assertTrue(activity.contains("targetPackageVersionName(packageName)"))
         assertTrue(activity.contains("SUPPORTED_DEVELOPER_OPTIONS_TARGET_VERSION.equals("))
         assertTrue(activity.contains("intent.putExtra(ENTER_PREF_HEADER_EXTRA, headerKeyResourceId)"))

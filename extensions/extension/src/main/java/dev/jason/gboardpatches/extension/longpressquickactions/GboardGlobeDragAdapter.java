@@ -19,7 +19,7 @@ final class GboardGlobeDragAdapter implements GboardGlobeDragPort {
     GboardGlobeDragAdapter(
             GboardLongPressQuickActionsReflectionHandles handles) {
         if (handles == null) {
-            throw new IllegalArgumentException("18.5.3 globe adapter requires handles");
+            throw new IllegalArgumentException("18.5.4 globe adapter requires handles");
         }
         this.handles = handles;
     }

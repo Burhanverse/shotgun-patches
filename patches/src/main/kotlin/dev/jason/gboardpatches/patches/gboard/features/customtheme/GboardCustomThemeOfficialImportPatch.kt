@@ -39,7 +39,7 @@ internal val gboardCustomThemeOfficialImportPatch = bytecodePatch(
 
 context(context: app.morphe.patcher.patch.BytecodePatchContext)
 private fun validateCustomThemeTargetContract(): Pair<MutableMethod, MutableMethod> = with(context) {
-    check(GboardVersionBindings.targetVersion == "18.5.3") {
+    check(GboardVersionBindings.targetVersion == "18.5.4") {
         "Unsupported Custom Theme stock contract for ${GboardVersionBindings.targetVersion}"
     }
     val publicFinal = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value
@@ -92,7 +92,7 @@ internal fun MutableMethod.requireStockFingerprintUnlessPatched(
     if (implementation!!.instructions.any { it.isMethodReference(runtimeReference) }) return
     val actual = gboardStructuralFingerprint()
     check(actual == expected) {
-        "Unexpected18.5.3 Custom Theme fingerprint for $definingClass->$name: " +
+        "Unexpected18.5.4 Custom Theme fingerprint for $definingClass->$name: " +
             "$actual != $expected"
     }
 }

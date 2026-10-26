@@ -48,7 +48,7 @@ internal fun applyGboardAboutPagePatch(aboutDocument: Document) {
             "${child.tagName}[key=${child.androidAttribute("key")}," +
                 "title=${child.androidAttribute("title")}]"
         }
-        "Expected exactly one 18.5.3 version preference in $ABOUT_XML, " +
+        "Expected exactly one 18.5.4 version preference in $ABOUT_XML, " +
             "found ${versionCandidates.size}; observed=$observed"
     }
     val versionPreference = versionCandidates.single()
@@ -61,7 +61,7 @@ internal fun applyGboardAboutPagePatch(aboutDocument: Document) {
             versionPreference.androidAttribute("selectable") == "false" &&
             versionPreference.androidAttribute("maxLines") == "100",
     ) {
-        "Unexpected 18.5.3 version preference identity or metadata in $ABOUT_XML"
+        "Unexpected 18.5.4 version preference identity or metadata in $ABOUT_XML"
     }
 
     val authorPreference = ensureAboutPreference(

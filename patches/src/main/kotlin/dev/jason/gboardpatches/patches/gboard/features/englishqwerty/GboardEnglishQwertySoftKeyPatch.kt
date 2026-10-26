@@ -19,7 +19,7 @@ private val softKeyMetadataType: String
     get() = GboardVersionBindings.softKeyMetadataType.descriptor
 
 internal val gboardEnglishQwertySoftKeyPatch = gboardSoftKeyFamilyFeaturePatch(
-    description = "在 18.5.3 English QWERTY bind time 注入缺少的上滑大小寫 action。",
+    description = "在 18.5.4 English QWERTY bind time 注入缺少的上滑大小寫 action。",
     feature = GboardSoftKeyFamilyFeature.ENGLISH_QWERTY,
 )
 
