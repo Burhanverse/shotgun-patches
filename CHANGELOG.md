@@ -1,3 +1,65 @@
+## [4.0.0-dev.5](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2026-10-25)
+
+### 🚀 Updated App Support
+
+* **Gboard:** update the supported Gboard version to `18.5.4.993608717-release-arm64-v8a`.
+
+### 🚀 支援版本更新
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。
+
+## [4.0.0-dev.4](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2026-10-24)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the occasionally blank shortcut toolbar when opening the keyboard with Rambler enabled.
+* **Gboard:** remove the `Hyperspeed Typing Animation` patch because Gboard 18.5.3 no longer includes its core implementation.
+
+### 🐛 修復
+
+* **Gboard:** 修復啟用 Rambler 時，開啟鍵盤後快捷工具列偶爾空白的問題。
+* **Gboard:** 移除 `Hyperspeed Typing Animation` Patch，因 Gboard 18.5.3 已移除所需的核心實作。
+
+## [4.0.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix runtime settings access before the first unlock after boot to prevent errors when swiping down to dismiss the keyboard.
+
+### 🐛 修復
+
+* **Gboard:** 修復開機後首次解鎖前，向下滑動關閉鍵盤功能存取設定時可能發生的錯誤。
+
+## [4.0.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the `Zhuyin Bottom Row Key Sizes` patch so bottom-row keys retain their configured sizes while typing on the Zhuyin keyboard.
+
+### 🐛 修復
+
+* **Gboard:** 修復「注音底排按鍵大小」Patch 在注音輸入時無法維持自訂按鍵大小的問題。
+
+## [4.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0...v4.0.0-dev.1) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** eliminate brief white or dark background flashes when opening or switching keyboards with custom opacity enabled.
+* **Gboard:** fix black borders around keyboard corners when adjusting custom opacity.
+
+### 🚀 Updated App Support
+
+* **Gboard:** update the supported Gboard version to `18.5.3.993608717-release-arm64-v8a`.
+
+### 🐛 修復
+
+* **Gboard:** 修復啟用自訂透明度後，開啟或切換鍵盤時背景短暫閃白或閃黑的問題。
+* **Gboard:** 修復調整自訂透明度時，鍵盤邊角出現黑邊的問題。
+
+### 🚀 支援版本更新
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.5.3.993608717-release-arm64-v8a`。
+
 ## [3.13.0-dev.8](https://github.com/maxcodl/shotgun-patches/compare/v3.13.0-dev.7...v3.13.0-dev.8) (2026-10-18)
 
 ### 🐛 Bug Fixes
@@ -29,6 +91,36 @@
 ### 🐛 修復
 
 * **Gboard (Web Clipboard):** 手機端服務改為 `connectedDevice` 前景服務，不再於 6 小時 `dataSync` 限制後被 Android 停止（開關仍顯示為開啟）。
+
+## [3.13.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.0...v3.13.0) (2026-10-15)
+
+### ✨ New Features
+
+* **Gboard:** add the `Swipe Down to Dismiss Keyboard` patch, allowing you to dismiss the keyboard by swiping down from the suggestion strip or toolbar.
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix an issue where the `Frosted Glass` patch could cause the keyboard to crash when entering the password upon device startup (Direct Boot).
+* **Gboard:** fix the `Swipe Down to Dismiss Keyboard` patch to prevent accidental dismissal during toolbar icon sorting and candidate drag-to-delete.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Swipe Down to Dismiss Keyboard` Patch，支援從建議列或工具列向下滑動以關閉鍵盤。
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Frosted Glass` Patch 在裝置開機輸入密碼時（Direct Boot）可能導致鍵盤崩潰的問題。
+* **Gboard:** 修復 `Swipe Down to Dismiss Keyboard` Patch，避免在排序工具列圖示及拖曳候選字刪除時誤觸關閉鍵盤。
+
+## [3.13.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0-dev.1...v3.13.0-dev.2) (2026-10-14)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix the `Swipe Down to Dismiss Keyboard` patch to prevent accidental dismissal during toolbar icon sorting and candidate drag-to-delete.
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Swipe Down to Dismiss Keyboard` Patch，避免在排序工具列圖示及拖曳候選字刪除時誤觸關閉鍵盤。
 
 ## [3.13.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.1-dev.1...v3.13.0-dev.1) (2026-10-14)
 
@@ -251,7 +343,6 @@
 * **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch：當要複製或剪下的文字為空字串時，不再執行 `Copy` 或 `Cut`，避免空內容的複製／剪下操作。
 
 ## [3.7.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
->>>>>>> upstream/dev
 
 ### ✨ New Features
 

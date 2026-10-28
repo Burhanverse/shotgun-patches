@@ -64,4 +64,67 @@ public final class GboardSwipeDismissGestureTest {
         Assert.assertFalse(gesture.move(0, 150f, 72f, 1f, 8f));
         Assert.assertFalse(gesture.isConsumed());
     }
+
+    @Test
+    public void longPressStationaryBeforeDownDragCannotDismiss() {
+        GboardSwipeDismissGesture gesture = new GboardSwipeDismissGesture();
+        gesture.begin(true, 0, 100f, 20f, 1000L);
+
+        // Stationary during long press (duration = 320ms >= 300ms default timeout)
+        Assert.assertFalse(gesture.move(0, 101f, 21f, 1f, 8f, 1320L, 300L));
+        Assert.assertFalse(gesture.isTracking());
+
+        // Subsequent downward drag to reorder cannot dismiss
+        Assert.assertFalse(gesture.move(0, 101f, 150f, 1f, 8f, 1500L, 300L));
+        Assert.assertFalse(gesture.isConsumed());
+    }
+
+    @Test
+    public void candidateDragDeleteUpwardMotionResetsGesture() {
+        GboardSwipeDismissGesture gesture = new GboardSwipeDismissGesture();
+        gesture.begin(true, 0, 100f, 100f, 1000L);
+
+        // Moving upwards towards delete icon past touch slop
+        Assert.assertFalse(gesture.move(0, 100f, 80f, 1f, 8f, 1050L, 300L));
+        Assert.assertFalse(gesture.isTracking());
+
+        // Even if finger wavers downwards later, it cannot dismiss
+        Assert.assertFalse(gesture.move(0, 100f, 200f, 1f, 8f, 1200L, 300L));
+        Assert.assertFalse(gesture.isConsumed());
+    }
+
+    @Test
+    public void candidateDragDeleteStationaryThenWobbleDownCannotDismiss() {
+        GboardSwipeDismissGesture gesture = new GboardSwipeDismissGesture();
+        gesture.begin(true, 0, 100f, 20f, 1000L);
+
+        // User long presses candidate for 350ms before dragging
+        Assert.assertFalse(gesture.move(0, 102f, 22f, 1f, 8f, 1350L, 300L));
+        Assert.assertFalse(gesture.isTracking());
+
+        // User accidentally moves down first before dragging up to delete icon
+        Assert.assertFalse(gesture.move(0, 102f, 90f, 1f, 8f, 1400L, 300L));
+        Assert.assertFalse(gesture.isConsumed());
+    }
+
+    @Test
+    public void fastSwipeWithTimestampsDismisses() {
+        GboardSwipeDismissGesture gesture = new GboardSwipeDismissGesture();
+        gesture.begin(true, 0, 100f, 20f, 1000L);
+
+        // Quick downward swipe within 120ms past 48dp
+        Assert.assertTrue(gesture.move(0, 104f, 75f, 1f, 8f, 1120L, 300L));
+        Assert.assertTrue(gesture.isConsumed());
+    }
+
+    @Test
+    public void slowLingeringDragExceedingMaxDurationCannotDismiss() {
+        GboardSwipeDismissGesture gesture = new GboardSwipeDismissGesture();
+        gesture.begin(true, 0, 100f, 20f, 1000L);
+
+        // Moving down but taking longer than max swipe duration (501ms > 500ms)
+        Assert.assertFalse(gesture.move(0, 102f, 80f, 1f, 8f, 1501L, 300L));
+        Assert.assertFalse(gesture.isTracking());
+        Assert.assertFalse(gesture.isConsumed());
+    }
 }

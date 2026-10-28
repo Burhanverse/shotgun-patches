@@ -20,36 +20,11 @@ public final class GboardFlagRuntimeContext {
     }
 
     public static SharedPreferences preferencesOrNull(Context context) {
-        if (!isUserUnlocked(context)) {
-            return null;
-        }
-        try {
-            return GboardPatchesSettings.preferences(context);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return GboardPatchesSettings.preferencesOrNull(context);
     }
 
     public static boolean isUserUnlocked(Context context) {
-        if (context == null) {
-            return false;
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            return true;
-        }
-        try {
-            UserManager userManager = null;
-            Object service = context.getSystemService(Context.USER_SERVICE);
-            if (service instanceof UserManager manager) {
-                userManager = manager;
-            }
-            if (userManager == null) {
-                userManager = context.getSystemService(UserManager.class);
-            }
-            return userManager == null || userManager.isUserUnlocked();
-        } catch (Throwable ignored) {
-            return false;
-        }
+        return GboardPatchesSettings.isUserUnlocked(context);
     }
 
     private static Context resolveContext() {

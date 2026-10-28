@@ -136,3 +136,7 @@ local.properties
 
 # Generated build output (Gradle / VS Code Java)
 patches/bin/
+
+# Local Python caches
+__pycache__/
+*.py[cod]

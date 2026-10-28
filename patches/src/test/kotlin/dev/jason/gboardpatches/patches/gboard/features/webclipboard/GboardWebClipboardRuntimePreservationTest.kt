@@ -11,7 +11,7 @@ class GboardWebClipboardRuntimePreservationTest {
     private val repositoryRoot = repositoryRoot()
 
     @Test
-    fun acceptedRuntimePortalAssetsManifestSettingsAndTileSourcesStayByteExact() {
+    fun reviewed1853RuntimePermissionFixAndUnchangedPortalAssetsRemainPinned() {
         assertEquals(
             RUNTIME_JAVA_SHA256,
             treeDigest("extensions/extension/src/main/java/dev/jason/gboardpatches/extension/webclipboard"),
@@ -96,13 +96,13 @@ class GboardWebClipboardRuntimePreservationTest {
         // Web Clipboard FGS type intentionally moved dataSync -> connectedDevice (6h dataSync limit);
         // runtime restarts on BOOT_COMPLETED.
         const val RUNTIME_JAVA_SHA256 =
-            "96BF2759023D849C787C044283C1B1128BB1F7FB43455EB1BB4BED9E0DD1D63A"
+            "E6E649FFA2F0B03269EBA5CD3107DCA2AA0FE73F76592C1374B7536E061E7278"
         const val PORTAL_ASSETS_SHA256 =
             "DE38DBE50AD0F82EE9D2357B0EADA6680F270845A36CAB6B9A719576DD40E3AC"
         const val RESOURCE_SHA256 =
             "DE0AEBDC3D5D36AC06CEA66334E5528CAF8319122680F59761FAC4423E3C49F2"
         const val NON_CAPTURE_PATCHES_SHA256 =
-            "4ABB9CFF69E577ACADCE3D157BABC6A40C0CD85D792B5355A266C5FEA16B9C51"
+            "9368145E2AD4C10530FBAA37C57C41EF1577D8CF01558B213A7389E9BA1A52C6"
         // STRONG #4 intentionally narrows settings features from Host to FeatureHost.
         const val SETTINGS_RUNTIME_SHA256 =
             "4406B8F10478D995223CC5F92EAE4195EC04BC90FFA051BBEC867C44B63167D0"

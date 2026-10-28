@@ -12,6 +12,8 @@ import android.view.ViewConfiguration;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import dev.jason.gboardpatches.extension.settings.GboardPatchesSettings;
+
 public final class GboardSwipeDismissRuntime {
     private static final Map<View, GboardSwipeDismissGesture> GESTURES = new WeakHashMap<>();
     private static final ThreadLocal<Boolean> CANCELLING = ThreadLocal.withInitial(() -> false);
@@ -31,6 +33,11 @@ public final class GboardSwipeDismissRuntime {
         if (!isHeaderHolder(holder) || Boolean.TRUE.equals(CANCELLING.get())) {
             return false;
         }
+        // A cached enabled value or an in-flight gesture cannot bypass Direct Boot.
+        if (!GboardPatchesSettings.isUserUnlocked(holder.getContext())) {
+            reset();
+            return false;
+        }
         GboardSwipeDismissGesture gesture = GESTURES.get(holder);
         int action = event.getActionMasked();
         if (action == MotionEvent.ACTION_DOWN) {
@@ -40,7 +47,8 @@ public final class GboardSwipeDismissRuntime {
             }
             boolean admitted = holder.isShown() && isHeaderStart(holder, event)
                     && enabled(holder.getContext());
-            gesture.begin(admitted, event.getPointerId(0), event.getRawX(), event.getRawY());
+            gesture.begin(admitted, event.getPointerId(0), event.getRawX(), event.getRawY(),
+                    event.getDownTime());
             return false;
         }
         if (gesture == null) {
@@ -74,9 +82,11 @@ public final class GboardSwipeDismissRuntime {
             return false;
         }
         float density = holder.getResources().getDisplayMetrics().density;
-        float touchSlop = ViewConfiguration.get(holder.getContext()).getScaledTouchSlop();
+        ViewConfiguration vc = ViewConfiguration.get(holder.getContext());
+        float touchSlop = vc.getScaledTouchSlop();
+        long longPressTimeout = ViewConfiguration.getLongPressTimeout();
         if (!gesture.move(event.getPointerId(pointerIndex), event.getRawX(), event.getRawY(),
-                density, touchSlop)) {
+                density, touchSlop, event.getEventTime(), longPressTimeout)) {
             return false;
         }
         MotionEvent cancel = MotionEvent.obtain(event);

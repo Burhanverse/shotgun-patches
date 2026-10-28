@@ -1,5 +1,5 @@
 {
-  "version": "3.13.0-dev.8",
+  "version": "4.0.0-dev.5",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -8,7 +8,21 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "AMOLED Monet Keys",
+      "description": "在 AMOLED 純黑背景上保留 Monet 色調的按鍵，可在設定中調整色調強度。\nKeep Monet-tinted keys on the AMOLED black background, with an adjustable tint strength in settings.",
+      "use": false,
+      "dependencies": [
+        "AMOLED Pure Black Theme"
+      ],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -20,19 +34,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
-        ]
-      },
-      "options": []
-    },
-    {
-      "name": "AMOLED Monet Keys",
-      "description": "在 AMOLED 純黑背景上保留 Monet 色調的按鍵，可在設定中調整色調強度。\nKeep Monet-tinted keys on the AMOLED black background, with an adjustable tint strength in settings.",
-      "use": false,
-      "dependencies": [],
-      "compatiblePackages": {
-        "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -44,7 +46,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -56,7 +58,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -68,7 +70,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -80,7 +82,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -92,7 +94,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -104,7 +106,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -116,7 +118,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -128,7 +130,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -140,7 +142,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -152,7 +154,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -164,7 +166,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -176,7 +178,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -188,7 +190,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -200,7 +202,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -212,7 +214,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -224,7 +226,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -236,7 +238,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -248,7 +250,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -260,7 +262,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -272,7 +274,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -284,7 +286,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -296,7 +298,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -308,19 +310,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
-        ]
-      },
-      "options": []
-    },
-    {
-      "name": "Hyperspeed Typing Animation",
-      "description": "持續快速輸入時顯示動畫，並支援所有鍵盤\nShow the animation during sustained fast typing with support for all keyboards.",
-      "use": true,
-      "dependencies": [],
-      "compatiblePackages": {
-        "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -332,7 +322,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -344,7 +334,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -356,7 +346,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -368,7 +358,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -380,7 +370,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -392,7 +382,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": [
@@ -420,7 +410,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -432,7 +422,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -444,7 +434,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -456,7 +446,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -468,7 +458,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -480,7 +470,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -492,7 +482,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -504,7 +494,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -516,7 +506,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -528,7 +518,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -540,7 +530,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -552,7 +542,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -566,7 +556,7 @@
       ],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []
@@ -578,7 +568,7 @@
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
-          "18.0.3.954559732-release-arm64-v8a"
+          "18.5.4.993608717-release-arm64-v8a"
         ]
       },
       "options": []

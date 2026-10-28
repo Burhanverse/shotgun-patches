@@ -13,6 +13,19 @@ import org.junit.Test
 
 class TargetBindingCompilerTest {
     @Test
+    fun `dollar members and nested descriptors remain literal Kotlin strings`() {
+        val profile = """{"format":"gboard-version-bindings.v1","target_version":"18.5.4","profile_version":"2.0.0","bindings":{"callback_case":{"kind":"field","class_type":"Lsample/Outer${'$'}Nested;","field_name":"${'$'}cid","field_type":"I","confidence":1},"callback_hook":{"kind":"method","class_type":"Lsample/Outer${'$'}Nested;","method_name":"${'$'}hook","parameter_types":["[Lsample/Outer${'$'}Nested;"],"return_type":"V","confidence":1}}}"""
+        val source = compileMatching(profile).kotlinSource
+        val escapedDollar = "\\" + '$'
+        assertTrue(source.contains("classType = \"Lsample/Outer${escapedDollar}Nested;\""))
+        assertTrue(source.contains("name = \"${escapedDollar}cid\""))
+        assertTrue(source.contains("name = \"${escapedDollar}hook\""))
+        assertTrue(source.contains("listOf(\"[Lsample/Outer${escapedDollar}Nested;\")"))
+        assertFalse(source.contains("name = \"${'$'}cid\""))
+        assertEquals(source, compileMatching(profile).kotlinSource)
+    }
+
+    @Test
     fun `valid LS contract compiles to a deterministic LF projection`() {
         val profile =
             """{"format":"gboard-version-bindings.v1","target_version":"18.0.0","profile_version":"2.0.0","bindings":{"sample_parameter_type":{"kind":"type","source":{"binding":"sample_method","component":"parameter","index":0},"confidence":1},"sample_method":{"kind":"method","class_type":"Lsample/Owner;","method_name":"run","parameter_types":["I"],"return_type":"V","confidence":1}}}"""
@@ -162,7 +175,7 @@ internal object GboardVersionBindings {
     }
 
     @Test
-    fun `authoritative 1803 admitted contract exactly matches sparse requirements and build output`() {
+    fun `authoritative 1854 admitted contract exactly matches sparse requirements and build output`() {
         val profile = Files.readString(BINDINGS_PATH, StandardCharsets.UTF_8)
         val profileBindings = JsonParser.parseString(profile).asJsonObject
             .getAsJsonObject("bindings")
@@ -174,6 +187,8 @@ internal object GboardVersionBindings {
         val generated = Files.readString(GENERATED_BINDINGS_PATH, StandardCharsets.UTF_8)
 
         val projection = TargetBindingCompiler.compile(profile, requirements)
+        assertEquals("18.5.4", projection.targetVersion)
+        assertEquals(204, profileBindings.size())
         assertEquals(AUTHORITATIVE_SOURCE_SHA256, projection.sourceSha256)
         assertEquals(
             requirements.keys,
@@ -281,7 +296,7 @@ internal object GboardVersionBindings {
 
     private companion object {
         const val AUTHORITATIVE_SOURCE_SHA256 =
-            "df33bbf81e57a189e361a948c1da2a54c4c0263d92932e5a4ad0f5757e1b046f"
+            "7587d4f559a6712713cd05058e910f97067b7db29f1ea6c3736a9e9969bc87fb"
         val BINDINGS_PATH = Path.of("src/main/resources/gboard/gboard-version-bindings.json")
         val BINDINGS_SCHEMA_PATH =
             Path.of("src/main/resources/gboard/gboard-version-bindings.schema.json")
