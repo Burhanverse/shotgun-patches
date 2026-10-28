@@ -98,12 +98,12 @@ android {
     }
 
     defaultConfig {
-        buildConfigField("String", "PATCH_AUTHOR", "\"Max\"")
-        buildConfigField("String", "PATCH_AUTHOR_URL", "\"https://github.com/maxcodl\"")
+        buildConfigField("String", "PATCH_AUTHOR", "\"Xie\"")
+        buildConfigField("String", "PATCH_AUTHOR_URL", "\"https://github.com/Burhanverse\"")
         buildConfigField(
             "String",
             "PATCH_REPOSITORY_URL",
-            "\"https://github.com/maxcodl/shotgun-patches\""
+            "\"https://github.com/Burhanverse/shotgun-patches\""
         )
         buildConfigField("String", "PATCH_VERSION", "\"${project.version}\"")
     }

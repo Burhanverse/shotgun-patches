@@ -1,4 +1,24 @@
-## [4.0.0-dev.5](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2026-10-25)
+## [4.0.0-dev.6](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.5...v4.0.0-dev.6) (2026-10-28)
+
+### 🚀 Updated App Support & Compatibility
+
+* **Gboard:** update supported Gboard version to `18.5.4.993608717-release-arm64-v8a`.
+* **Swipe Down to Dismiss Keyboard:** add swipe down gesture to dismiss keyboard with anti-accidental dismiss guards and Direct Boot safety.
+* **AMOLED Pure Black Theme & Monet Keys:** update GM3 color token pipeline (`Lrmt;`) for Gboard 18.5.4 compatibility.
+* **Shotgun Keyboard:** update reflection discovery for 18.5.4 gesture dispatcher (`qil`), key ID (`f`), and action data (`qbc`).
+* **Web Clipboard:** verified and preserved phone-hosted Web Clipboard, pairing service, and Quick Settings Tile.
+* **Branding:** updated repository URLs and author links to Burhanverse.
+
+### 🚀 支援版本與功能更新
+
+* **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。
+* **向下滑動關閉鍵盤:** 新增向下滑動關閉鍵盤功能並包含防誤觸及 Direct Boot 保護。
+* **AMOLED 主題:** 完整適配 Gboard 18.5.4 GM3 色彩管線（`Lrmt;`）。
+* **散彈槍擊鍵音效:** 適配 18.5.4 鍵盤分派器、按鍵 ID 與按鍵動作資料結構。
+* **網頁剪貼簿 (Web Clipboard):** 完整保留手機端自架伺服器、網頁同步與快速設定開關。
+* **品牌資訊:** 更新專案儲存庫與作者連結至 Burhanverse。
+
+## [4.0.0-dev.5](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2026-10-25)
 
 ### 🚀 Updated App Support
 
@@ -8,7 +28,7 @@
 
 * **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。
 
-## [4.0.0-dev.4](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2026-10-24)
+## [4.0.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2026-10-24)
 
 ### 🐛 Bug Fixes
 
@@ -20,7 +40,7 @@
 * **Gboard:** 修復啟用 Rambler 時，開啟鍵盤後快捷工具列偶爾空白的問題。
 * **Gboard:** 移除 `Hyperspeed Typing Animation` Patch，因 Gboard 18.5.3 已移除所需的核心實作。
 
-## [4.0.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2026-10-23)
+## [4.0.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2026-10-23)
 
 ### 🐛 Bug Fixes
 
@@ -30,7 +50,7 @@
 
 * **Gboard:** 修復開機後首次解鎖前，向下滑動關閉鍵盤功能存取設定時可能發生的錯誤。
 
-## [4.0.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2026-10-23)
+## [4.0.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2026-10-23)
 
 ### 🐛 Bug Fixes
 
@@ -40,7 +60,7 @@
 
 * **Gboard:** 修復「注音底排按鍵大小」Patch 在注音輸入時無法維持自訂按鍵大小的問題。
 
-## [4.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0...v4.0.0-dev.1) (2026-10-22)
+## [4.0.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.13.0...v4.0.0-dev.1) (2026-10-22)
 
 ### 🐛 Bug Fixes
 
@@ -92,7 +112,7 @@
 
 * **Gboard (Web Clipboard):** 手機端服務改為 `connectedDevice` 前景服務，不再於 6 小時 `dataSync` 限制後被 Android 停止（開關仍顯示為開啟）。
 
-## [3.13.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.0...v3.13.0) (2026-10-15)
+## [3.13.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.12.0...v3.13.0) (2026-10-15)
 
 ### ✨ New Features
 
@@ -112,7 +132,7 @@
 * **Gboard:** 修復 `Frosted Glass` Patch 在裝置開機輸入密碼時（Direct Boot）可能導致鍵盤崩潰的問題。
 * **Gboard:** 修復 `Swipe Down to Dismiss Keyboard` Patch，避免在排序工具列圖示及拖曳候選字刪除時誤觸關閉鍵盤。
 
-## [3.13.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.13.0-dev.1...v3.13.0-dev.2) (2026-10-14)
+## [3.13.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.13.0-dev.1...v3.13.0-dev.2) (2026-10-14)
 
 ### 🐛 Bug Fixes
 
@@ -122,7 +142,7 @@
 
 * **Gboard:** 修復 `Swipe Down to Dismiss Keyboard` Patch，避免在排序工具列圖示及拖曳候選字刪除時誤觸關閉鍵盤。
 
-## [3.13.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.1-dev.1...v3.13.0-dev.1) (2026-10-14)
+## [3.13.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.12.1-dev.1...v3.13.0-dev.1) (2026-10-14)
 
 ### ✨ New Features
 
@@ -132,7 +152,7 @@
 
 * **Gboard:** 新增 `Swipe Down to Dismiss Keyboard` Patch，支援從建議列或工具列向下滑動以關閉鍵盤。
 
-## [3.12.1-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.0...v3.12.1-dev.1) (2026-10-13)
+## [3.12.1-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.12.0...v3.12.1-dev.1) (2026-10-13)
 
 ### 🐛 Bug Fixes
 
@@ -142,7 +162,7 @@
 
 * **Gboard:** 修復 `Frosted Glass` Patch 在裝置開機輸入密碼時（Direct Boot）可能導致鍵盤崩潰的問題。
 
-## [3.12.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.11.0...v3.12.0) (2026-10-04)
+## [3.12.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.11.0...v3.12.0) (2026-10-04)
 
 ### ✨ New Features
 
@@ -254,7 +274,7 @@
 
 * **Web Clipboard:** 更新 tile 啟動邏輯，改為以服務運行狀態為後備，並改善服務偵測機制。
 
-## [3.10.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v3.9.0...v3.10.0-dev.3) (2026-09-01)
+## [3.10.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.9.0...v3.10.0-dev.3) (2026-09-01)
 
 ### ✨ New Features
 
@@ -264,7 +284,7 @@
 
 * **Gboard:** 新增 `Backup & Restore` Patch，可匯出與還原所有 Patch 設定，並支援備份、比較及還原 Gboard 的 PB/XML flag store。
 
-## [3.9.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.8.0...v3.9.0) (2026-09-01)
+## [3.9.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.8.0...v3.9.0) (2026-09-01)
 
 ### ✨ New Features
 
@@ -274,7 +294,7 @@
 
 * **Gboard:** 新增 `Simple Calculator` Patch；直接輸入算式，即可在 Gboard 推薦列顯示算式與計算結果。
 
-## [3.9.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.8.0...v3.9.0-dev.1) (2026-09-01)
+## [3.9.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v3.8.0...v3.9.0-dev.1) (2026-09-01)
 
 ### ✨ New Features
 
@@ -284,7 +304,7 @@
 
 * **Gboard:** 新增 `Simple Calculator` Patch；直接輸入算式，即可在 Gboard 推薦列顯示算式與計算結果。
 
-## [3.8.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0...v3.8.0) (2026-08-31)
+## [3.8.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0...v3.8.0) (2026-08-31)
 
 ### ✨ New Features
 
@@ -302,7 +322,7 @@
 
 * **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch 在某些情況下切換語言時會意外輸入文字的問題。
 
-## [3.8.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0...v3.8.0-dev.3) (2026-08-31)
+## [3.8.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0...v3.8.0-dev.3) (2026-08-31)
 
 ### ✨ New Features
 
@@ -320,7 +340,7 @@
 
 * **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch 在某些情況下切換語言時會意外輸入文字的問題。
 
-## [3.7.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.6.0...v3.7.0) (2026-08-30)
+## [3.7.0](https://github.com/Burhanverse/shotgun-patches/compare/v3.6.0...v3.7.0) (2026-08-30)
 
 ### ✨ New Features
 
@@ -342,7 +362,7 @@
 
 * **Gboard:** 修復 `Long-Press Editing Shortcuts` Patch：當要複製或剪下的文字為空字串時，不再執行 `Copy` 或 `Cut`，避免空內容的複製／剪下操作。
 
-## [3.7.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
+## [3.7.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v3.7.0-dev.1...v3.7.0-dev.2) (2026-08-30)
 
 ### ✨ New Features
 
@@ -544,7 +564,7 @@
 
 * **Gboard:** 新增 `Shotgun Keyboard` Patch。
 
-## [3.0.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.11.0...v3.0.0) (2026-08-22)
+## [3.0.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.11.0...v3.0.0) (2026-08-22)
 
 ### ✨ New Features
 
@@ -554,7 +574,7 @@
 
 * **Gboard:** 更新支援的 Gboard 版本至 `18.0.3.954559732-release-arm64-v8a`。
 
-## [3.0.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.11.0...v3.0.0-dev.1) (2026-08-22)
+## [3.0.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.11.0...v3.0.0-dev.1) (2026-08-22)
 
 ### ✨ New Features
 
@@ -564,7 +584,7 @@
 
 * **Gboard:** 更新支援的 Gboard 版本至 `18.0.3.954559732-release-arm64-v8a`。
 
-## [2.11.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.10.0...v2.11.0) (2026-08-15)
+## [2.11.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.10.0...v2.11.0) (2026-08-15)
 
 ### ✨ New Features
 
@@ -574,7 +594,7 @@
 
 * **Gboard:** 什麼都沒有添加。
 
-## [2.11.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.10.0...v2.11.0-dev.1) (2026-08-14)
+## [2.11.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.10.0...v2.11.0-dev.1) (2026-08-14)
 
 ### ✨ New Features
 
@@ -584,7 +604,7 @@
 
 * **Gboard:** 什麼都沒有添加。
 
-## [2.10.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.9.0...v2.10.0) (2026-08-14)
+## [2.10.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.9.0...v2.10.0) (2026-08-14)
 
 ### ✨ New Features
 
@@ -594,7 +614,7 @@
 
 * **Gboard:** 新增 `G Logo on Spacebar` Patch。
 
-## [2.10.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.9.0...v2.10.0-dev.1) (2026-08-14)
+## [2.10.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.9.0...v2.10.0-dev.1) (2026-08-14)
 
 ### ✨ New Features
 
@@ -604,7 +624,7 @@
 
 * **Gboard:** 新增 `G Logo on Spacebar` Patch。
 
-## [2.9.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.8.0...v2.9.0) (2026-08-13)
+## [2.9.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.8.0...v2.9.0) (2026-08-13)
 
 ### ✨ New Features
 
@@ -622,7 +642,7 @@
 * **Gboard:** 新增 `Enable split keyboard` Patch，提供 Access Point 控制與可選的自動分離設定。
 * **Gboard:** 新增 `Enable accessibility layout` Patch，顯示 Gboard 的無障礙鍵盤配置設定。
 
-## [2.9.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v2.8.0...v2.9.0-dev.2) (2026-08-13)
+## [2.9.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v2.8.0...v2.9.0-dev.2) (2026-08-13)
 
 ### ✨ New Features
 
@@ -640,7 +660,7 @@
 * **Gboard:** 新增 `Enable split keyboard` Patch，提供 Access Point 控制與可選的自動分離設定。
 * **Gboard:** 新增 `Enable accessibility layout` Patch，顯示 Gboard 的無障礙鍵盤配置設定。
 
-## [2.8.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.7.0...v2.8.0) (2026-08-12)
+## [2.8.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.7.0...v2.8.0) (2026-08-12)
 
 ### ✨ New Features
 
@@ -660,7 +680,7 @@
 
 * **Gboard:** 因多位使用者誤將自訂頂部列視為 Bug 並在 Reddit 回報，現將此功能改為預設停用，以減少使用上的困惑。
 
-## [2.8.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v2.7.0...v2.8.0-dev.2) (2026-08-11)
+## [2.8.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v2.7.0...v2.8.0-dev.2) (2026-08-11)
 
 ### ✨ New Features
 
@@ -680,7 +700,7 @@
 
 * **Gboard:** 因多位使用者誤將自訂頂部列視為 Bug 並在 Reddit 回報，現將此功能改為預設停用，以減少使用上的困惑。
 
-## [2.7.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.6.0...v2.7.0) (2026-08-08)
+## [2.7.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.6.0...v2.7.0) (2026-08-08)
 
 ### ✨ New Features
 
@@ -700,7 +720,7 @@
 
 * **Gboard:** 強化 Web Clipboard 的 loopback 驗證機制。
 
-## [2.7.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v2.7.0-dev.2...v2.7.0-dev.3) (2026-08-08)
+## [2.7.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v2.7.0-dev.2...v2.7.0-dev.3) (2026-08-08)
 
 ### 🐛 Bug Fixes
 
@@ -710,7 +730,7 @@
 
 * **Gboard:** 強化 Web Clipboard 的 loopback 驗證機制。
 
-## [2.7.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v2.7.0-dev.1...v2.7.0-dev.2) (2026-08-08)
+## [2.7.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v2.7.0-dev.1...v2.7.0-dev.2) (2026-08-08)
 
 ### ✨ New Features
 
@@ -720,7 +740,7 @@
 
 * **Gboard:** OCR 功能新增模型下載，透過 Google Play services 下載官方辨識模型。
 
-## [2.7.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.6.0...v2.7.0-dev.1) (2026-08-07)
+## [2.7.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.6.0...v2.7.0-dev.1) (2026-08-07)
 
 ### ✨ New Features
 
@@ -730,7 +750,7 @@
 
 * **Gboard:** 新增 `OCR / Scan Text` Patch，支援拉丁文、中文、日文、韓文與天城文辨識後端。
 
-## [2.6.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.5.0...v2.6.0) (2026-08-06)
+## [2.6.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.5.0...v2.6.0) (2026-08-06)
 
 ### ✨ New Features
 
@@ -740,7 +760,7 @@
 
 * **Gboard:** 新增「顯示敏感剪貼簿內容」選項，可顯示被標記為敏感的剪貼簿項目原文。
 
-## [2.6.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.5.0...v2.6.0-dev.1) (2026-08-06)
+## [2.6.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.5.0...v2.6.0-dev.1) (2026-08-06)
 
 ### ✨ New Features
 
@@ -750,7 +770,7 @@
 
 * **Gboard:** 新增「顯示敏感剪貼簿內容」選項，可顯示被標記為敏感的剪貼簿項目原文。
 
-## [2.5.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.4.0...v2.5.0) (2026-08-03)
+## [2.5.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.4.0...v2.5.0) (2026-08-03)
 
 ### ✨ New Features
 
@@ -762,7 +782,7 @@
 * **Gboard:** 新增 `Clipboard Custom Character Limit` Patch，可自訂每個文字剪貼簿項目的最大字元數。
 * **Gboard:** 新增選項，可讓每張剪貼簿卡片僅渲染前 `1,000` 個字元。
 
-## [2.5.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.4.0...v2.5.0-dev.1) (2026-08-02)
+## [2.5.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.4.0...v2.5.0-dev.1) (2026-08-02)
 
 ### ✨ New Features
 
@@ -774,7 +794,7 @@
 * **Gboard:** 新增 `Clipboard Custom Character Limit` Patch，可自訂每個文字剪貼簿項目的最大字元數。
 * **Gboard:** 新增選項，可讓每張剪貼簿卡片僅渲染前 `1,000` 個字元。
 
-## [2.4.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.3.0...v2.4.0) (2026-07-31)
+## [2.4.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.3.0...v2.4.0) (2026-07-31)
 
 ### ✨ New Features
 
@@ -784,7 +804,7 @@
 
 * **Gboard:** 新增 `Advanced Voice Typing` Patch；請前往 `Patches > Keyboard > Advanced Voice Typing` 查看啟用所需條件。
 
-## [2.4.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v2.3.0...v2.4.0-dev.2) (2026-07-31)
+## [2.4.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v2.3.0...v2.4.0-dev.2) (2026-07-31)
 
 ### ✨ New Features
 
@@ -794,7 +814,7 @@
 
 * **Gboard:** 新增 `Advanced Voice Typing` Patch；請前往 `Patches > Keyboard > Advanced Voice Typing` 查看啟用所需條件。
 
-## [2.3.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.2.0...v2.3.0) (2026-07-30)
+## [2.3.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.2.0...v2.3.0) (2026-07-30)
 
 ### ✨ New Features
 
@@ -804,7 +824,7 @@
 
 * **Gboard:** 新增 `Long-Press Editing Shortcuts` Patch。
 
-## [2.3.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.2.0...v2.3.0-dev.1) (2026-07-30)
+## [2.3.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.2.0...v2.3.0-dev.1) (2026-07-30)
 
 ### ✨ New Features
 
@@ -814,7 +834,7 @@
 
 * **Gboard:** 新增 `Long-Press Editing Shortcuts` Patch。
 
-## [2.2.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.1.0...v2.2.0) (2026-07-29)
+## [2.2.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.1.0...v2.2.0) (2026-07-29)
 
 ### ✨ New Features
 
@@ -824,7 +844,7 @@
 
 * **Gboard:** 新增 `Use Bluetooth Microphone` Patch。
 
-## [2.2.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.1.0...v2.2.0-dev.1) (2026-07-28)
+## [2.2.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.1.0...v2.2.0-dev.1) (2026-07-28)
 
 ### ✨ New Features
 
@@ -834,7 +854,7 @@
 
 * **Gboard:** 新增 `Use Bluetooth Microphone` Patch。
 
-## [2.1.0](https://github.com/jasonwu1994/Gboard-patches/compare/v2.0.0...v2.1.0) (2026-07-26)
+## [2.1.0](https://github.com/Burhanverse/shotgun-patches/compare/v2.0.0...v2.1.0) (2026-07-26)
 
 ### ✨ New Features
 
@@ -844,7 +864,7 @@
 
 * **Gboard:** 新增 `Developer options`，可隨時修改 Flag 值。
 
-## [2.1.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v2.0.0...v2.1.0-dev.1) (2026-07-25)
+## [2.1.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v2.0.0...v2.1.0-dev.1) (2026-07-25)
 
 ### ✨ New Features
 
@@ -854,7 +874,7 @@
 
 * **Gboard:** 新增 `Developer options`，可隨時修改 Flag 值。
 
-## [2.0.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.14.0...v2.0.0) (2026-07-24)
+## [2.0.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.14.0...v2.0.0) (2026-07-24)
 
 ### ✨ New Features
 
@@ -866,7 +886,7 @@
 * **Gboard:** 更新支援的 Gboard 版本至 `17.7.7.932364120-release-arm64-v8a`。
 * **Gboard:** 移除 `Chinese Online Voice Input`、`Clipboard Entity Extraction`、`Clipboard Item Edit` 與 `Enable Undo/Redo` 功能 Patch，因為新版 Gboard 已內建這些功能。
 
-## [2.0.0-dev.4](https://github.com/jasonwu1994/Gboard-patches/compare/v2.0.0-dev.3...v2.0.0-dev.4) (2026-07-24)
+## [2.0.0-dev.4](https://github.com/Burhanverse/shotgun-patches/compare/v2.0.0-dev.3...v2.0.0-dev.4) (2026-07-24)
 
 ### ✨ New Features
 
@@ -878,7 +898,7 @@
 * **Gboard:** 更新支援的 Gboard 版本至 `17.7.7.932364120-release-arm64-v8a`。
 * **Gboard:** 移除 `Chinese Online Voice Input`、`Clipboard Entity Extraction`、`Clipboard Item Edit` 與 `Enable Undo/Redo` 功能 Patch，因為新版 Gboard 已內建這些功能。
 
-## [1.14.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.13.0...v1.14.0) (2026-06-30)
+## [1.14.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.13.0...v1.14.0) (2026-06-30)
 
 ### ✨ New Features
 
@@ -888,7 +908,7 @@
 
 * **Gboard:** 新增 `Zhuyin Bottom Row Key Sizes`，可調整注音鍵盤底排 7 個欄位的按鍵大小，包含 `?123`、`，`、地球鍵、空白鍵、`ㄦ`、刪除鍵，以及搜尋 / 送出 / Enter 鍵。
 
-## [1.14.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.13.0...v1.14.0-dev.1) (2026-06-30)
+## [1.14.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.13.0...v1.14.0-dev.1) (2026-06-30)
 
 ### ✨ New Features
 
@@ -898,7 +918,7 @@
 
 * **Gboard:** 新增 `Zhuyin Bottom Row Key Sizes`，可調整注音鍵盤底排 7 個欄位的按鍵大小，包含 `?123`、`，`、地球鍵、空白鍵、`ㄦ`、刪除鍵，以及搜尋 / 送出 / Enter 鍵。
 
-## [1.13.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.12.0...v1.13.0) (2026-06-26)
+## [1.13.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.12.0...v1.13.0) (2026-06-26)
 
 ### ✨ New Features
 
@@ -908,7 +928,7 @@
 
 * **Gboard:** 新增 `Swipeable Custom Top Row`，可透過左右滑動在原生頂排與自訂輸入按鍵之間切換，並執行 JavaScript 腳本。
 
-## [1.13.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v1.12.0-dev.1...v1.13.0-dev.3) (2026-06-22)
+## [1.13.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v1.12.0-dev.1...v1.13.0-dev.3) (2026-06-22)
 
 ### ✨ New Features
 
@@ -918,7 +938,7 @@
 
 * **Gboard:** 新增 `Swipeable Custom Top Row`，可透過左右滑動在原生頂排與自訂輸入按鍵之間切換，並執行 JavaScript 腳本。
 
-## [1.12.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.11.0...v1.12.0) (2026-06-22)
+## [1.12.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.11.0...v1.12.0) (2026-06-22)
 
 ### ✨ New Features
 
@@ -928,7 +948,7 @@
 
 * **Gboard:** 新增 `Enable Inline Autofill Suggestions`，恢復密碼管理員與其他支援的自動填入提供者所提供的內嵌自動填入建議。
 
-## [1.12.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.11.0...v1.12.0-dev.1) (2026-06-22)
+## [1.12.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.11.0...v1.12.0-dev.1) (2026-06-22)
 
 ### ✨ New Features
 
@@ -938,7 +958,7 @@
 
 * **Gboard:** 新增 `Enable Inline Autofill Suggestions`，恢復密碼管理員與其他支援的自動填入提供者所提供的內嵌自動填入建議。
 
-## [1.11.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.10.0...v1.11.0) (2026-06-19)
+## [1.11.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.10.0...v1.11.0) (2026-06-19)
 
 ### ✨ New Features
 
@@ -948,7 +968,7 @@
 
 * **Gboard:** 將原本的 `English QWERTY Slide Symbols` 調整為 `English QWERTY Up-Flick Uppercase`，取消英文鍵盤的下滑符號輸入，保留上滑切換大小寫，並在 `Patches > Keyboard` 新增對應設定入口。
 
-## [1.11.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.10.0...v1.11.0-dev.1) (2026-06-19)
+## [1.11.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.10.0...v1.11.0-dev.1) (2026-06-19)
 
 ### ✨ New Features
 
@@ -958,7 +978,7 @@
 
 * **Gboard:** 將原本的 `English QWERTY Slide Symbols` 調整為 `English QWERTY Up-Flick Uppercase`，取消英文鍵盤的下滑符號輸入，保留上滑切換大小寫，並在 `Patches > Keyboard` 新增對應設定入口。
 
-## [1.10.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.9.1...v1.10.0) (2026-06-19)
+## [1.10.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.9.1...v1.10.0) (2026-06-19)
 
 ### ✨ New Features
 
@@ -968,7 +988,7 @@
 
 * **Gboard:** 新增 AI 撰寫工具
 
-## [1.10.0-dev.2](https://github.com/jasonwu1994/Gboard-patches/compare/v1.9.1-dev.1...v1.10.0-dev.2) (2026-06-18)
+## [1.10.0-dev.2](https://github.com/Burhanverse/shotgun-patches/compare/v1.9.1-dev.1...v1.10.0-dev.2) (2026-06-18)
 
 ### ✨ New Features
 
@@ -978,7 +998,7 @@
 
 * **Gboard:** 新增 AI 撰寫工具
 
-## [1.9.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.9.0...v1.9.1) (2026-06-16)
+## [1.9.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.9.0...v1.9.1) (2026-06-16)
 
 ### ✨ New Features
 
@@ -988,7 +1008,7 @@
 
 * **Gboard:** 為 `Custom Symbols` 新增英文分類標籤，讓分類 header 現在在中文語系顯示中文，其餘語系顯示英文。
 
-## [1.9.1-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.9.0...v1.9.1-dev.1) (2026-06-16)
+## [1.9.1-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.9.0...v1.9.1-dev.1) (2026-06-16)
 
 ### ✨ New Features
 
@@ -998,7 +1018,7 @@
 
 * **Gboard:** 為 `Custom Symbols` 新增英文分類標籤，讓分類 header 現在在中文語系顯示中文，其餘語系顯示英文。
 
-## [1.9.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.8.0...v1.9.0) (2026-06-13)
+## [1.9.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.8.0...v1.9.0) (2026-06-13)
 
 ### ✨ New Features
 
@@ -1010,7 +1030,7 @@
 * **Gboard:** 新增 `English Globe Key Ignore Delay` 設定，讓你可以覆寫英文鍵盤在輸入字母後切換語言前的等待時間；保留 stock 預設值 `500ms`，並可在 `0-1000ms` 間調整，包含設成 `0ms` 來完全取消等待。
 * **Gboard:** 重構 `Patches` 設定頁，讓功能分組更清楚，並改善多語系文案與頁面細節，提供更完整的設定體驗。
 
-## [1.9.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.8.0...v1.9.0-dev.1) (2026-06-13)
+## [1.9.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.8.0...v1.9.0-dev.1) (2026-06-13)
 
 ### ✨ New Features
 
@@ -1022,7 +1042,7 @@
 * **Gboard:** 新增 `English Globe Key Ignore Delay` 設定，讓你可以覆寫英文鍵盤在輸入字母後切換語言前的等待時間；保留 stock 預設值 `500ms`，並可在 `0-1000ms` 間調整，包含設成 `0ms` 來完全取消等待。
 * **Gboard:** 重構 `Patches` 設定頁，讓功能分組更清楚，並改善多語系文案與頁面細節，提供更完整的設定體驗。
 
-## [1.8.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.7.0...v1.8.0) (2026-06-09)
+## [1.8.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.7.0...v1.8.0) (2026-06-09)
 
 ### ✨ New Features
 
@@ -1032,7 +1052,7 @@
 
 * **Gboard:** 新增 `Web Clipboard` 功能，讓同一個區域網路中的桌面瀏覽器與已套用 patch 的 Gboard 之間同步剪貼簿內容，支援瀏覽器傳送文字到手機、手機剪貼簿同步到瀏覽器、4 碼配對碼驗證、快速設定開關，以及隨 patch 提供的內建 Web UI。
 
-## [1.8.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.7.0...v1.8.0-dev.1) (2026-06-09)
+## [1.8.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.7.0...v1.8.0-dev.1) (2026-06-09)
 
 ### ✨ New Features
 
@@ -1042,7 +1062,7 @@
 
 * **Gboard:** 新增 `Web Clipboard` 功能，讓同一個區域網路中的桌面瀏覽器與已套用 patch 的 Gboard 之間同步剪貼簿內容，支援瀏覽器傳送文字到手機、手機剪貼簿同步到瀏覽器、4 碼配對碼驗證、快速設定開關，以及隨 patch 提供的內建 Web UI。
 
-## [1.7.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.6.2...v1.7.0) (2026-05-21)
+## [1.7.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.6.2...v1.7.0) (2026-05-21)
 
 ### ✨ New Features
 
@@ -1060,7 +1080,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.6.2](https://github.com/jasonwu1994/Gboard-patches/compare/v1.6.1...v1.6.2) (2026-05-20)
+## [1.6.2](https://github.com/Burhanverse/shotgun-patches/compare/v1.6.1...v1.6.2) (2026-05-20)
 
 ### 🐛 Bug Fixes
 
@@ -1078,7 +1098,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.6.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.6.0...v1.6.1) (2026-05-20)
+## [1.6.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.6.0...v1.6.1) (2026-05-20)
 
 ### 🐛 Bug Fixes
 
@@ -1100,7 +1120,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.6.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.5.0...v1.6.0) (2026-05-20)
+## [1.6.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.5.0...v1.6.0) (2026-05-20)
 
 ### ✨ New Features
 
@@ -1122,7 +1142,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.5.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.4.0...v1.5.0) (2026-05-19)
+## [1.5.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.4.0...v1.5.0) (2026-05-19)
 
 ### ✨ New Features
 
@@ -1152,7 +1172,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.5.0-dev.3](https://github.com/jasonwu1994/Gboard-patches/compare/v1.4.0...v1.5.0-dev.3) (2026-05-19)
+## [1.5.0-dev.3](https://github.com/Burhanverse/shotgun-patches/compare/v1.4.0...v1.5.0-dev.3) (2026-05-19)
 
 ### ✨ New Features
 
@@ -1174,7 +1194,7 @@
 * **Gboard:** 新增 `Grammar Checker` 與 `Inline Suggestions`，可啟用 `修正和建議 > 文法檢查` 與 `修正和建議 > 智慧撰寫`。
 * **Gboard:** 新增 `Key Shape Selection`，可在 `主題詳情 > 按鍵形狀` 啟用圓角按鍵。
 
-## [1.4.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.3.1...v1.4.0) (2026-04-13)
+## [1.4.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.3.1...v1.4.0) (2026-04-13)
 
 ### ✨ New Features
 
@@ -1194,7 +1214,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.3.1](https://github.com/jasonwu1994/Gboard-patches/compare/v1.3.0...v1.3.1) (2026-04-10)
+## [1.3.1](https://github.com/Burhanverse/shotgun-patches/compare/v1.3.0...v1.3.1) (2026-04-10)
 
 ### 🐛 Bug Fixes
 
@@ -1216,7 +1236,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.3.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.2.0...v1.3.0) (2026-04-10)
+## [1.3.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.2.0...v1.3.0) (2026-04-10)
 
 ### ✨ New Features
 
@@ -1236,7 +1256,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.2.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.1.0...v1.2.0) (2026-04-08)
+## [1.2.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.1.0...v1.2.0) (2026-04-08)
 
 ### ✨ New Features
 
@@ -1256,7 +1276,7 @@
 
 * **Gboard:** 支援官方 Gboard `17.0.10.880768217-release-arm64-v8a`。
 
-## [1.1.0](https://github.com/jasonwu1994/Gboard-patches/compare/v1.0.0...v1.1.0) (2026-04-07)
+## [1.1.0](https://github.com/Burhanverse/shotgun-patches/compare/v1.0.0...v1.1.0) (2026-04-07)
 
 ### ✨ New Features
 

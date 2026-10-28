@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-28T17:15:00",
-  "description": "### 🚀 Updated App Support\n\n* **Gboard:** update supported Gboard version to `18.5.4.993608717-release-arm64-v8a`.\n* **Swipe Down to Dismiss Keyboard:** add patch with anti-accidental dismiss guards and Direct Boot safety.\n* **AMOLED Themes:** updated GM3 color token pipeline (`Lrmt;`) for Gboard 18.5.4 compatibility.\n* **Shotgun Keyboard:** updated gesture dispatcher, keycode, and key ID reflection discovery for Gboard 18.5.4 compatibility.\n\n### 🚀 支援版本與功能更新\n\n* **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。\n* **向下滑動關閉鍵盤:** 新增向下滑動關閉鍵盤功能並包含防誤觸及 Direct Boot 保護。\n* **AMOLED 主題:** 更新 Gboard 18.5.4 GM3 色彩管線支援。\n* **散彈槍擊鍵音效:** 更新 Gboard 18.5.4 擊鍵分派與按鍵識別反射相容性。",
-  "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v4.0.0-dev.5/patches-4.0.0-dev.5.mpp",
+  "created_at": "2026-10-28T17:30:00",
+  "description": "### 🚀 Updated App Support & Compatibility (v4.0.0-dev.6)\n\n* **Gboard:** update supported Gboard version to `18.5.4.993608717-release-arm64-v8a`.\n* **Swipe Down to Dismiss Keyboard:** add swipe down gesture to dismiss keyboard with anti-accidental dismiss guards and Direct Boot safety.\n* **AMOLED Pure Black Theme & Monet Keys:** update GM3 color token pipeline (`Lrmt;`) for Gboard 18.5.4 compatibility.\n* **Shotgun Keyboard:** update reflection discovery for 18.5.4 gesture dispatcher (`qil`), key ID (`f`), and action data (`qbc`).\n* **Web Clipboard:** verified and preserved phone-hosted Web Clipboard, pairing service, and Quick Settings Tile.\n* **Branding:** updated repository URLs and author links to Burhanverse.\n\n### 🚀 支援版本與功能更新 (v4.0.0-dev.6)\n\n* **Gboard:** 更新支援的 Gboard 版本至 `18.5.4.993608717-release-arm64-v8a`。\n* **向下滑動關閉鍵盤:** 新增向下滑動關閉鍵盤功能並包含防誤觸及 Direct Boot 保護。\n* **AMOLED 主題:** 完整適配 Gboard 18.5.4 GM3 色彩管線（`Lrmt;`）。\n* **散彈槍擊鍵音效:** 適配 18.5.4 鍵盤分派器、按鍵 ID 與按鍵動作資料結構。\n* **網頁剪貼簿 (Web Clipboard):** 完整保留手機端自架伺服器、網頁同步與快速設定開關。\n* **品牌資訊:** 更新專案儲存庫與作者連結至 Burhanverse。",
+  "download_url": "https://github.com/Burhanverse/shotgun-patches/releases/download/v4.0.0-dev.6/patches-4.0.0-dev.6.mpp",
   "signature_download_url": "",
-  "version": "4.0.0-dev.5"
+  "version": "4.0.0-dev.6"
 }
