@@ -237,6 +237,12 @@ Enables the Quick Insert panel and toolbar access point.
 </details>
 
 <details>
+  <summary><code>Hyperspeed Typing Animation</code></summary>
+
+Shows the animation during sustained fast typing with support for all keyboards.
+</details>
+
+<details>
   <summary><code>Close Proactive Suggestions</code></summary>
 
 Shows a dismiss button in the proactive suggestions bar.

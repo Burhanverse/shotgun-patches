@@ -57,6 +57,8 @@ import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardInline
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardInlineSuggestionsFlagValuePatch
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardKeyShapeSelectionFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.gboardKeyShapeSelectionFlagValuePatch
+import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeFeatureMarkerPatch
+import dev.jason.gboardpatches.patches.gboard.features.flowmode.gboardFlowModeGesturePatch
 import dev.jason.gboardpatches.patches.gboard.features.lanftp.gboardLanFtpFeatureMarkerPatch
 import dev.jason.gboardpatches.patches.gboard.features.lanftp.gboardLanFtpManifestPatch
 import dev.jason.gboardpatches.patches.gboard.features.latinglobe.gboardLatinGlobeKeyIgnoreIntervalBytecodePatch
@@ -485,6 +487,23 @@ val gboardCloseProactiveSuggestionsPatch = gboardPublicResourcePatch(
         gboardPatchesSettingsPatch,
         gboardCloseProactiveSuggestionsFeatureMarkerPatch,
         gboardCloseProactiveSuggestionsFlagValuePatch,
+    )
+}
+
+@Suppress("unused")
+val gboardFlowModeAnimationPatch = gboardPublicResourcePatch(
+    featureId = "flow_mode_animation",
+    name = "Hyperspeed Typing Animation",
+    description = "持續快速輸入時顯示動畫，並支援所有鍵盤\n" +
+        "Show the animation during sustained fast typing with support for all keyboards.",
+    default = true,
+) {
+    compatibleWith(COMPATIBILITY_GBOARD)
+
+    dependsOn(
+        gboardPatchesSettingsPatch,
+        gboardFlowModeFeatureMarkerPatch,
+        gboardFlowModeGesturePatch,
     )
 }
 
@@ -922,6 +941,7 @@ object GboardPublishedPatchCatalog {
         gboardFrostedGlassPatch,
         gboardAccessPointCountPatch,
         gboardCloseProactiveSuggestionsPatch,
+        gboardFlowModeAnimationPatch,
         gboardCustomThemePatch,
         gboardQuickInsertPatch,
         gboardZhuyinQuickTraditionalSimplifiedTogglePatch,

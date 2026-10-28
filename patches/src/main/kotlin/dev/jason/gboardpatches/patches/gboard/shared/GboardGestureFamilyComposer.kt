@@ -23,8 +23,9 @@ private const val TOP_ROW_HELPER_NAME = "jasondevDispatchWithTopRow"
 private const val TOGGLE_HELPER_NAME = "jasondevDispatchOrToggle"
 private const val LONG_PRESS_HELPER_NAME = "jasondevDispatchGlobeDrag"
 private const val SHOTGUN_HELPER_NAME = "jasondevDispatchWithShotgun"
+private const val FLOW_MODE_HELPER_NAME = "jasondevDispatchWithFlowMode"
 private val GESTURE_HELPER_NAMES =
-    setOf(LONG_PRESS_HELPER_NAME, TOP_ROW_HELPER_NAME, TOGGLE_HELPER_NAME, SHOTGUN_HELPER_NAME)
+    setOf(LONG_PRESS_HELPER_NAME, TOP_ROW_HELPER_NAME, TOGGLE_HELPER_NAME, SHOTGUN_HELPER_NAME, FLOW_MODE_HELPER_NAME)
 private val GESTURE_HELPER_ACCESS_FLAGS = AccessFlags.PRIVATE.value or AccessFlags.FINAL.value
 private val GESTURE_TARGET_ACCESS_FLAGS = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value
 private val GESTURE_STOCK_FIELD_ACCESS_FLAGS = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value
@@ -34,6 +35,7 @@ internal enum class GboardGestureFamilyFeature {
     TOP_ROW_SWIPE,
     ZHUYIN_TOGGLE,
     SHOTGUN_KEYBOARD,
+    FLOW_MODE_ANIMATION,
 }
 
 private sealed interface GestureOperand {
@@ -95,6 +97,17 @@ private enum class GboardGestureFamilyStage(
         feature = GboardGestureFamilyFeature.SHOTGUN_KEYBOARD,
         order = 400,
         call = RuntimeCallId.SHOTGUN_KEYBOARD_RUNTIME_MAYBE_PLAY_SHOTGUN_SOUND,
+        operands = listOf(
+            GestureOperand.Receiver,
+            GestureOperand.Parameter(1),
+            GestureOperand.Parameter(2),
+            GestureOperand.Parameter(3),
+        ),
+    ),
+    FLOW_MODE_ANIMATION(
+        feature = GboardGestureFamilyFeature.FLOW_MODE_ANIMATION,
+        order = 450,
+        call = RuntimeCallId.FLOW_MODE_RUNTIME_ON_GESTURE_DISPATCH,
         operands = listOf(
             GestureOperand.Receiver,
             GestureOperand.Parameter(1),
@@ -389,16 +402,31 @@ private fun MutableClass.applySelectedGestureFamily(
     selected: Set<GboardGestureFamilyFeature>,
     layout: GestureRegisterLayout,
 ) {
+    if (GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected) {
+        addGestureHelper(FLOW_MODE_HELPER_NAME, layout, renderFlowModeHelperBody(layout))
+    }
     if (GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected) {
-        addGestureHelper(SHOTGUN_HELPER_NAME, layout, renderShotgunHelperBody(layout))
+        addGestureHelper(
+            SHOTGUN_HELPER_NAME,
+            layout,
+            renderShotgunHelperBody(
+                layout = layout,
+                includeFlowMode = GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected,
+            ),
+        )
     }
     if (GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected) {
+        val nextHelperName = when {
+            GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected -> SHOTGUN_HELPER_NAME
+            GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected -> FLOW_MODE_HELPER_NAME
+            else -> null
+        }
         addGestureHelper(
             TOGGLE_HELPER_NAME,
             layout,
             renderToggleHelperBody(
                 layout = layout,
-                includeShotgun = GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected,
+                nextHelperName = nextHelperName,
             ),
         )
     }
@@ -406,6 +434,7 @@ private fun MutableClass.applySelectedGestureFamily(
         val nextHelperName = when {
             GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected -> TOGGLE_HELPER_NAME
             GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected -> SHOTGUN_HELPER_NAME
+            GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected -> FLOW_MODE_HELPER_NAME
             else -> null
         }
         addGestureHelper(
@@ -438,6 +467,7 @@ private fun renderLongPressHelperBody(
         GboardGestureFamilyFeature.TOP_ROW_SWIPE in selected -> TOP_ROW_HELPER_NAME
         GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected -> TOGGLE_HELPER_NAME
         GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected -> SHOTGUN_HELPER_NAME
+        GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected -> FLOW_MODE_HELPER_NAME
         else -> null
     }
     val continuation = if (nextHelper == null) {
@@ -533,15 +563,15 @@ private fun renderTopRowHelperBody(
 
 private fun renderToggleHelperBody(
     layout: GestureRegisterLayout,
-    includeShotgun: Boolean,
+    nextHelperName: String?,
 ): String {
     val toggle = GboardGestureFamilyStage.entries.single { stage ->
         stage.feature == GboardGestureFamilyFeature.ZHUYIN_TOGGLE
     }
-    val continuationLabel = if (includeShotgun) ":cond_dispatch_or_shotgun" else ":cond_dispatch_stock"
-    val continuation = if (includeShotgun) {
+    val continuationLabel = if (nextHelperName != null) ":cond_dispatch_next" else ":cond_dispatch_stock"
+    val continuation = if (nextHelperName != null) {
         """
-            invoke-direct/range {p0 .. p${layout.rangeEndParameterRegister}}, ${GboardVersionBindings.gestureDispatch.referenceNamed(SHOTGUN_HELPER_NAME)}
+            invoke-direct/range {p0 .. p${layout.rangeEndParameterRegister}}, ${GboardVersionBindings.gestureDispatch.referenceNamed(nextHelperName)}
 
             return-void
         """.trimIndent()
@@ -564,12 +594,42 @@ private fun renderToggleHelperBody(
     """.trimIndent()
 }
 
-private fun renderShotgunHelperBody(layout: GestureRegisterLayout): String {
+private fun renderShotgunHelperBody(
+    layout: GestureRegisterLayout,
+    includeFlowMode: Boolean,
+): String {
     val shotgun = GboardGestureFamilyStage.entries.single { stage ->
         stage.feature == GboardGestureFamilyFeature.SHOTGUN_KEYBOARD
     }
+    val continuation = if (includeFlowMode) {
+        """
+            invoke-direct/range {p0 .. p${layout.rangeEndParameterRegister}}, ${GboardVersionBindings.gestureDispatch.referenceNamed(FLOW_MODE_HELPER_NAME)}
+
+            return-void
+        """.trimIndent()
+    } else {
+        renderStockGestureDispatch(layout, includeReturn = false)
+    }
     return """
         ${emitGestureRuntimeCall(shotgun.call, layout.render(shotgun.operands))}
+
+        move-result v0
+
+        if-nez v0, :cond_return
+
+        $continuation
+
+        :cond_return
+        return-void
+    """.trimIndent()
+}
+
+private fun renderFlowModeHelperBody(layout: GestureRegisterLayout): String {
+    val flowMode = GboardGestureFamilyStage.entries.single { stage ->
+        stage.feature == GboardGestureFamilyFeature.FLOW_MODE_ANIMATION
+    }
+    return """
+        ${emitGestureRuntimeCall(flowMode.call, layout.render(flowMode.operands))}
 
         move-result v0
 
@@ -600,7 +660,8 @@ private fun Set<GboardGestureFamilyFeature>.entryHelperName(): String = when {
     GboardGestureFamilyFeature.LONG_PRESS_QUICK_ACTIONS in this -> LONG_PRESS_HELPER_NAME
     GboardGestureFamilyFeature.TOP_ROW_SWIPE in this -> TOP_ROW_HELPER_NAME
     GboardGestureFamilyFeature.ZHUYIN_TOGGLE in this -> TOGGLE_HELPER_NAME
-    else -> SHOTGUN_HELPER_NAME
+    GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in this -> SHOTGUN_HELPER_NAME
+    else -> FLOW_MODE_HELPER_NAME
 }
 
 private fun MutableClass.verifyExactGestureFamilyState(
@@ -615,6 +676,7 @@ private fun MutableClass.verifyExactGestureFamilyState(
         if (GboardGestureFamilyFeature.TOP_ROW_SWIPE in selected) add(TOP_ROW_HELPER_NAME)
         if (GboardGestureFamilyFeature.ZHUYIN_TOGGLE in selected) add(TOGGLE_HELPER_NAME)
         if (GboardGestureFamilyFeature.SHOTGUN_KEYBOARD in selected) add(SHOTGUN_HELPER_NAME)
+        if (GboardGestureFamilyFeature.FLOW_MODE_ANIMATION in selected) add(FLOW_MODE_HELPER_NAME)
     }
     val actualHelpers = methods.filter { method -> method.name in GESTURE_HELPER_NAMES }
     check(actualHelpers.mapTo(linkedSetOf()) { method -> method.name } == expectedHelperNames) {

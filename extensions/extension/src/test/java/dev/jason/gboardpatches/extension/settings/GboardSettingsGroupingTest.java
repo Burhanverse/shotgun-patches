@@ -115,6 +115,7 @@ public final class GboardSettingsGroupingTest {
                 "new GboardSwipeDismissSettingsFeature(context)");
         assertInOrder(layoutGroupSource.substring(layoutGroupSource.indexOf("Arrays.asList(")),
                 "new GboardSpacebarLogoSettingsFeature(context)",
+                "new GboardFlowModeSettingsFeature(context)",
                 "new GboardCloseProactiveSuggestionsSettingsFeature(context)",
                 "new GboardLatinGlobeKeyIgnoreIntervalSettingsFeature(context)",
                 "new GboardEnglishUppercaseToggleSettingsFeature(context)",
@@ -142,7 +143,8 @@ public final class GboardSettingsGroupingTest {
                 "dev.jason.gboardpatches.feature.bluetooth_microphone"));
         Assert.assertTrue(availabilitySource.contains(
                 "dev.jason.gboardpatches.feature.close_proactive_suggestions"));
-        Assert.assertFalse(availabilitySource.contains(
+        Assert.assertTrue(availabilitySource.contains("FEATURE_FLOW_MODE_ANIMATION"));
+        Assert.assertTrue(availabilitySource.contains(
                 "dev.jason.gboardpatches.feature.flow_mode_animation"));
         Assert.assertTrue(availabilitySource.contains(
                 "dev.jason.gboardpatches.feature.quick_insert"));
