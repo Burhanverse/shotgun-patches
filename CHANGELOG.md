@@ -1,3 +1,65 @@
+## [3.13.0-dev.8](https://github.com/maxcodl/shotgun-patches/compare/v3.13.0-dev.7...v3.13.0-dev.8) (2026-10-18)
+
+### 🐛 Bug Fixes
+
+* **Gboard (Web Clipboard):** the phone-side service now starts again after the phone reboots. Before, it stayed off after a reboot while the toggle still showed on.
+
+### 🐛 修復
+
+* **Gboard (Web Clipboard):** 手機重新開機後，手機端服務會自動重新啟動。先前重新開機後服務不會啟動，但開關仍顯示為開啟。
+
+## [3.13.0-dev.7](https://github.com/maxcodl/shotgun-patches/compare/v3.13.0-dev.6...v3.13.0-dev.7) (2026-10-14)
+
+### ✨ New Features
+
+* **Gboard:** add the `AMOLED Monet Keys` patch. On top of `AMOLED Pure Black Theme`, it adds sliders for Background tint, Key tint (0-200), Function key tint (0-200) and Text accent, so the keyboard can be pure black while keys, Shift/Backspace/?123 and icons keep a Monet tint.
+* **Gboard:** the Patches settings pages now follow your Material You colours on Android 12+ instead of fixed blue.
+* **Gboard:** add a `Monet` colour option for the `G Logo on Spacebar` patch, using your system accent colour.
+
+### 🐛 Bug Fixes
+
+* **Gboard (Web Clipboard):** the phone-side service now runs as a `connectedDevice` foreground service, so Android no longer stops it after the 6-hour `dataSync` limit while the toggle stays on.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `AMOLED Monet Keys` Patch。搭配 `AMOLED Pure Black Theme`，提供背景色調、按鍵色調（0-200）、功能鍵色調（0-200）與文字輔色滑桿，讓鍵盤保持純黑背景，同時按鍵、Shift/刪除/?123 與圖示保留 Monet 色調。
+* **Gboard:** Patches 設定頁面在 Android 12 以上改為跟隨 Material You 動態色彩，不再使用固定藍色。
+* **Gboard:** `G Logo on Spacebar` Patch 新增 `Monet` 顏色選項，使用系統強調色。
+
+### 🐛 修復
+
+* **Gboard (Web Clipboard):** 手機端服務改為 `connectedDevice` 前景服務，不再於 6 小時 `dataSync` 限制後被 Android 停止（開關仍顯示為開啟）。
+
+## [3.13.0-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.1-dev.1...v3.13.0-dev.1) (2026-10-14)
+
+### ✨ New Features
+
+* **Gboard:** add the `Swipe Down to Dismiss Keyboard` patch, allowing you to dismiss the keyboard by swiping down from the suggestion strip or toolbar.
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Swipe Down to Dismiss Keyboard` Patch，支援從建議列或工具列向下滑動以關閉鍵盤。
+
+## [3.12.1-dev.1](https://github.com/jasonwu1994/Gboard-patches/compare/v3.12.0...v3.12.1-dev.1) (2026-10-13)
+
+### 🐛 Bug Fixes
+
+* **Gboard:** fix an issue where the `Frosted Glass` patch could cause the keyboard to crash when entering the password upon device startup (Direct Boot).
+
+### 🐛 修復
+
+* **Gboard:** 修復 `Frosted Glass` Patch 在裝置開機輸入密碼時（Direct Boot）可能導致鍵盤崩潰的問題。
+
+## [3.12.0](https://github.com/jasonwu1994/Gboard-patches/compare/v3.11.0...v3.12.0) (2026-10-04)
+
+### ✨ New Features
+
+* **Gboard:** add the `Frosted Glass` patch, bringing real-time background blur and customizable theme transparency to the keyboard. 👀
+
+### ✨ 新功能
+
+* **Gboard:** 新增 `Frosted Glass` Patch，為鍵盤加入即時背景模糊效果，並支援自訂主題透明度。👀
+
 ## [3.12.0-dev.5](https://github.com/Burhanverse/shotgun-patches/compare/v3.11.0-dev.3...v3.12.0-dev.5) (2026-10-01)
 
 ### ✨ New Features

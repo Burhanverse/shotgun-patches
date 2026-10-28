@@ -11,13 +11,17 @@ public final class WebClipboardPackageReplacedReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            if (context == null || intent == null
-                    || !Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())) {
+            if (context == null || intent == null) {
                 return;
             }
-            WebClipboardTileController.reconcileAfterPackageReplace(context);
+            String action = intent.getAction();
+            if (!Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)
+                    && !Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+                return;
+            }
+            WebClipboardTileController.reconcileRuntime(context);
         } catch (Throwable throwable) {
-            Log.w(TAG, "Failed to reconcile Web Clipboard after package replace", throwable);
+            Log.w(TAG, "Failed to reconcile Web Clipboard after package replace or boot", throwable);
         }
     }
 }

@@ -85,10 +85,14 @@ public final class GboardPatchesFeatureAvailability {
             "dev.jason.gboardpatches.feature.simple_calculator";
     public static final String FEATURE_AMOLED_THEME =
             "dev.jason.gboardpatches.feature.amoled_theme";
+    public static final String FEATURE_AMOLED_MONET =
+            "dev.jason.gboardpatches.feature.amoled_monet";
     public static final String FEATURE_CUSTOM_THEME =
             "dev.jason.gboardpatches.feature.custom_theme";
     public static final String FEATURE_FROSTED_GLASS =
             "dev.jason.gboardpatches.feature.frosted_glass";
+    public static final String FEATURE_SWIPE_DISMISS =
+            "dev.jason.gboardpatches.feature.swipe_dismiss";
 
     private static final String TAG = "GboardPatches";
 

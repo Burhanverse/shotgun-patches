@@ -197,7 +197,7 @@ public final class GboardPatchesSettingsActivity extends Activity
         super.onCreate(savedInstanceState);
         try {
             scheduleRestartCrashRecoveryGuardRestore();
-            palette = Palette.forConfiguration(getResources().getConfiguration());
+            palette = Palette.forConfiguration(getResources().getConfiguration(), this);
             features = Collections.emptyList();
             featuresInitialized = false;
             configureWindow();
@@ -2774,7 +2774,7 @@ public final class GboardPatchesSettingsActivity extends Activity
         Log.e(TAG, reason, throwable);
         detachKeyboardPreviewSafely();
         if (palette == null) {
-            palette = Palette.forConfiguration(getResources().getConfiguration());
+            palette = Palette.forConfiguration(getResources().getConfiguration(), this);
         }
         toolbarView = null;
         toolbarTitleView = null;
@@ -3799,9 +3799,51 @@ public final class GboardPatchesSettingsActivity extends Activity
             this.pressedOverlay = pressedOverlay;
         }
 
-        static Palette forConfiguration(Configuration configuration) {
+        /** Material You palette from the system dynamic colours (Android 12+). */
+        private static Palette monet(Context context, boolean nightMode) {
+            int warning = Color.parseColor(nightMode ? "#3F2D16" : "#FEF3C7");
+            if (nightMode) {
+                int accent = context.getColor(android.R.color.system_accent1_200);
+                return new Palette(
+                        context.getColor(android.R.color.system_neutral1_900),
+                        context.getColor(android.R.color.system_neutral1_800),
+                        context.getColor(android.R.color.system_neutral1_900),
+                        Color.parseColor("#1FFFFFFF"),
+                        context.getColor(android.R.color.system_accent1_800),
+                        warning,
+                        context.getColor(android.R.color.system_accent2_800),
+                        context.getColor(android.R.color.system_neutral1_50),
+                        context.getColor(android.R.color.system_neutral2_200),
+                        context.getColor(android.R.color.system_neutral2_500),
+                        accent,
+                        (accent & 0x00FFFFFF) | 0x1F000000);
+            }
+            int accent = context.getColor(android.R.color.system_accent1_600);
+            return new Palette(
+                    context.getColor(android.R.color.system_neutral1_10),
+                    context.getColor(android.R.color.system_neutral1_0),
+                    context.getColor(android.R.color.system_accent2_50),
+                    Color.parseColor("#140F172A"),
+                    context.getColor(android.R.color.system_accent1_100),
+                    warning,
+                    context.getColor(android.R.color.system_neutral2_50),
+                    context.getColor(android.R.color.system_neutral1_900),
+                    context.getColor(android.R.color.system_neutral2_700),
+                    context.getColor(android.R.color.system_neutral2_300),
+                    accent,
+                    (accent & 0x00FFFFFF) | 0x14000000);
+        }
+
+        static Palette forConfiguration(Configuration configuration, Context context) {
             boolean nightMode = (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && context != null) {
+                try {
+                    return monet(context, nightMode);
+                } catch (Throwable ignored) {
+                    // Fall back to the fixed palette below.
+                }
+            }
             if (nightMode) {
                 return new Palette(
                         Color.parseColor("#FF0F1217"),

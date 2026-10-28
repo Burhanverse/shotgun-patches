@@ -268,6 +268,11 @@ final class GboardSpacebarLogoDialogs {
         } else if (GboardSpacebarLogoSettings.COLOR_VALUE_AUTO.equals(value)) {
             swatch.setText("A");
             swatch.setBackground(swatch(context, null, selected));
+        } else if (GboardSpacebarLogoSettings.COLOR_VALUE_MONET.equals(value)) {
+            swatch.setBackground(swatch(
+                    context, String.format(java.util.Locale.US, "#%06X",
+                            0xFFFFFF & GboardSpacebarLogoSettings.monetColor(context)),
+                    selected));
         } else {
             swatch.setBackground(swatch(context, custom ? summary : value, selected));
         }

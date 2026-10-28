@@ -229,6 +229,12 @@ public final class ClipboardSyncService extends Service {
     }
 
     @Override
+    public void onTimeout(int startId, int fgsType) {
+        Log.w(TAG, LOG_PREFIX + " foreground-service timeout, stopping");
+        stopSelf();
+    }
+
+    @Override
     public void onDestroy() {
         try {
             Log.i(TAG, LOG_PREFIX + " service onDestroy portal=" + describePortal(webPortal));
@@ -724,7 +730,7 @@ public final class ClipboardSyncService extends Service {
     private void startForeground(String statusText) {
         Notification notification = buildNotification(statusText);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
             return;
         }
         startForeground(NOTIFICATION_ID, notification);

@@ -31,6 +31,7 @@ public final class GboardSpacebarLogoSettingsFeature
             GboardSpacebarLogoSettings.GOOGLE_GREEN,
             GboardSpacebarLogoSettings.BLACK,
             GboardSpacebarLogoSettings.WHITE,
+            GboardSpacebarLogoSettings.COLOR_VALUE_MONET,
             GboardSpacebarLogoSettings.COLOR_SELECTION_CUSTOM
     };
 
@@ -94,6 +95,7 @@ public final class GboardSpacebarLogoSettingsFeature
                 textOrFallback(R.string.gboard_patches_spacebar_logo_color_google_green, "Green"),
                 textOrFallback(R.string.gboard_patches_spacebar_logo_color_black, "Black"),
                 textOrFallback(R.string.gboard_patches_spacebar_logo_color_white, "White"),
+                textOrFallback(R.string.gboard_patches_spacebar_logo_color_monet, "Monet"),
                 textOrFallback(R.string.gboard_patches_spacebar_logo_color_custom, "Custom")
         };
         errorTitle = textOrFallback(
@@ -177,7 +179,7 @@ public final class GboardSpacebarLogoSettingsFeature
         String[] summaries = {
                 colorAutomaticSummary,
                 COLOR_VALUES[1], COLOR_VALUES[2], COLOR_VALUES[3], COLOR_VALUES[4],
-                COLOR_VALUES[5], COLOR_VALUES[6], customColor == null ? "" : customColor
+                COLOR_VALUES[5], COLOR_VALUES[6], "", customColor == null ? "" : customColor
         };
         runSafely("show color dialog", () ->
                 GboardPatchesSettingsContract.showManagedDialog(host,
@@ -216,6 +218,7 @@ public final class GboardSpacebarLogoSettingsFeature
     }
 
     private String displayColor(String color) {
+        if (GboardSpacebarLogoSettings.isMonetColor(color)) return colorLabels[7];
         return GboardSpacebarLogoSettings.isAutomaticColor(color) ? colorLabels[0] : color;
     }
 

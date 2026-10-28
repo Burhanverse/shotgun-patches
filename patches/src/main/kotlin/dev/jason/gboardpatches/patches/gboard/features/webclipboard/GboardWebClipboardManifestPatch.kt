@@ -71,7 +71,7 @@ internal fun applyGboardWebClipboardManifest(document: Document) {
         CLIPBOARD_SYNC_SERVICE_CLASS,
     ).apply {
         setManifestAndroidAttribute("exported", "false")
-        setManifestAndroidAttribute("foregroundServiceType", "dataSync")
+        setManifestAndroidAttribute("foregroundServiceType", "connectedDevice")
     }
 
     val tileService = ensureManifestComponent(
@@ -110,6 +110,7 @@ internal fun applyGboardWebClipboardManifest(document: Document) {
         WEB_CLIPBOARD_PACKAGE_REPLACED_RECEIVER_CLASS,
     ).apply { setManifestAndroidAttribute("exported", "false") }
     ensureManifestIntentFilter(document, packageReplacedReceiver, ACTION_MY_PACKAGE_REPLACED)
+    ensureManifestIntentFilter(document, packageReplacedReceiver, ACTION_BOOT_COMPLETED)
 }
 
 context(context: ResourcePatchContext)
@@ -126,7 +127,9 @@ private val WEB_CLIPBOARD_PERMISSIONS = listOf(
     "android.permission.INTERNET",
     "android.permission.ACCESS_NETWORK_STATE",
     "android.permission.FOREGROUND_SERVICE",
-    "android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+    "android.permission.CHANGE_NETWORK_STATE",
+    "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
+    "android.permission.RECEIVE_BOOT_COMPLETED"
 )
 
 private const val PATCHES_SETTINGS_ACTIVITY_CLASS =
@@ -143,6 +146,7 @@ private const val ACTION_QS_TILE = "android.service.quicksettings.action.QS_TILE
 private const val ACTION_QS_TILE_PREFERENCES =
     "android.service.quicksettings.action.QS_TILE_PREFERENCES"
 private const val ACTION_MY_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
+private const val ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
 private const val CATEGORY_DEFAULT = "android.intent.category.DEFAULT"
 private const val BIND_QUICK_SETTINGS_TILE_PERMISSION =
     "android.permission.BIND_QUICK_SETTINGS_TILE"

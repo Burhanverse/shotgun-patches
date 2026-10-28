@@ -116,6 +116,32 @@ public final class AmoledThemeOverrideTest {
         assertArrayEquals(new int[] {1, 2, 3, 4}, result);
     }
 
+    @Test
+    public void scaleTowardsBlackKeepsStockAtFullTint() {
+        int monet = 0xFF406080;
+        assertEquals(0xFF000000, AmoledThemeOverride.scaleTowardsBlack(monet, 0));
+        assertEquals(monet, AmoledThemeOverride.scaleTowardsBlack(monet, 100));
+        assertEquals(0xFF203040, AmoledThemeOverride.scaleTowardsBlack(monet, 50));
+    }
+
+    @Test
+    public void scaleKeyBrightensAboveStockAndDarkensBelow() {
+        int stock = 0xFF406080;
+        assertEquals(stock, AmoledThemeOverride.scaleKey(stock, 100));
+        assertEquals(0xFF203040, AmoledThemeOverride.scaleKey(stock, 50));
+        assertEquals(0xFFFFFFFF, AmoledThemeOverride.scaleKey(stock, 200));
+        assertEquals(0xFF9FAFBF, AmoledThemeOverride.scaleKey(stock, 150));
+    }
+
+    @Test
+    public void mixBlendsAccentIntoText() {
+        int stock = 0xFFE0E0E0;
+        int accent = 0xFF2040C0;
+        assertEquals(stock, AmoledThemeOverride.mix(stock, accent, 0));
+        assertEquals(accent, AmoledThemeOverride.mix(stock, accent, 100));
+        assertEquals(0xFF8090D0, AmoledThemeOverride.mix(stock, accent, 50));
+    }
+
     private Context createContextWithNightMode(int nightMode) {
         Configuration config = new Configuration(application.getResources().getConfiguration());
         config.uiMode = (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK) | nightMode;

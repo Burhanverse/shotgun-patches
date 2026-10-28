@@ -2290,6 +2290,46 @@
         <translation locale="en">The AMOLED theme settings screen failed to load. Reopen Gboard settings and try again.</translation>
         <translation locale="zh-Hant">AMOLED 主題設定畫面載入失敗。請重新開啟 Gboard 設定再試一次。</translation>
     </string>
+    <string name="gboard_patches_amoled_background_tint_title">
+        <translation locale="en">Background tint</translation>
+        <translation locale="zh-Hant">背景色調</translation>
+    </string>
+    <string name="gboard_patches_amoled_background_tint_summary">
+        <translation locale="en">How much Monet colour the keyboard background keeps. 0 is pure black; 100 is the stock Monet background.</translation>
+        <translation locale="zh-Hant">鍵盤背景保留多少 Monet 色彩。0 為純黑；100 為原始 Monet 背景。</translation>
+    </string>
+    <string name="gboard_patches_amoled_key_fill_tint_title">
+        <translation locale="en">Key tint</translation>
+        <translation locale="zh-Hant">按鍵色調</translation>
+    </string>
+    <string name="gboard_patches_amoled_key_fill_tint_summary">
+        <translation locale="en">Brightness of the key fill. 100 is the stock key colour; below 100 darkens it towards black (keys can disappear), above 100 brightens it up to 200.</translation>
+        <translation locale="zh-Hant">按鍵填色亮度。100 為原始按鍵色彩；低於 100 會變暗（按鍵可能消失），高於 100 會變亮，最高 200。</translation>
+    </string>
+    <string name="gboard_patches_amoled_function_key_tint_title">
+        <translation locale="en">Function key tint</translation>
+        <translation locale="zh-Hant">功能鍵色調</translation>
+    </string>
+    <string name="gboard_patches_amoled_function_key_tint_summary">
+        <translation locale="en">Fill of Shift, Backspace, ?123, comma and period. 100 is the stock colour; below 100 darkens it, above 100 brightens it up to 200. Their icons follow Text accent.</translation>
+        <translation locale="zh-Hant">Shift、刪除、?123、逗號與句號的填色。100 為原始色彩；低於 100 會變暗，高於 100 會變亮，最高 200。圖示色彩跟隨文字輔色。</translation>
+    </string>
+    <string name="gboard_patches_amoled_text_tint_title">
+        <translation locale="en">Text accent</translation>
+        <translation locale="zh-Hant">文字色調</translation>
+    </string>
+    <string name="gboard_patches_amoled_text_tint_summary">
+        <translation locale="en">Mixes the Monet accent colour into letters and icons. 0 is the stock text colour; 100 is the full accent colour.</translation>
+        <translation locale="zh-Hant">將 Monet 輔色混入文字與圖示。0 為原始文字色彩；100 為完整輔色。</translation>
+    </string>
+    <string name="gboard_patches_amoled_key_fill_tint_hint">
+        <translation locale="en">Enter a value from 0 to 200.</translation>
+        <translation locale="zh-Hant">請輸入 0 到 200 之間的數值。</translation>
+    </string>
+    <string name="gboard_patches_amoled_key_tint_hint">
+        <translation locale="en">Enter a value from 0 to 100.</translation>
+        <translation locale="zh-Hant">請輸入 0 到 100 之間的數值。</translation>
+    </string>
     <string name="gboard_patches_amoled_theme_section">
         <translation locale="en">Appearance</translation>
         <translation locale="zh-Hant">外觀</translation>
@@ -2401,6 +2441,10 @@
     <string name="gboard_patches_spacebar_logo_color_black">
         <translation locale="en">Black</translation>
         <translation locale="zh-Hant">黑色</translation>
+    </string>
+    <string name="gboard_patches_spacebar_logo_color_monet">
+        <translation locale="en">Monet</translation>
+        <translation locale="zh-Hant">Monet 動態色</translation>
     </string>
     <string name="gboard_patches_spacebar_logo_color_white">
         <translation locale="en">White</translation>
@@ -3197,6 +3241,26 @@
     <string name="gboard_patches_calculator_error_summary">
         <translation locale="en">The calculator settings screen failed to load. Reopen Gboard settings and try again.</translation>
         <translation locale="zh-Hant">計算機設定畫面載入失敗。請重新開啟 Gboard 設定再試一次。</translation>
+    </string>
+    <string name="gboard_patches_swipe_dismiss_title">
+        <translation locale="en">Swipe Down to Dismiss Keyboard</translation>
+        <translation locale="zh-Hant">下滑關閉鍵盤</translation>
+    </string>
+    <string name="gboard_patches_swipe_dismiss_summary">
+        <translation locale="en">Swipe down from the suggestions or toolbar to close the keyboard.</translation>
+        <translation locale="zh-Hant">從建議列或工具列向下滑動以關閉鍵盤。</translation>
+    </string>
+    <string name="gboard_patches_swipe_dismiss_section">
+        <translation locale="en">General</translation>
+        <translation locale="zh-Hant">一般</translation>
+    </string>
+    <string name="gboard_patches_swipe_dismiss_enabled_title">
+        <translation locale="en">Enable swipe down to dismiss</translation>
+        <translation locale="zh-Hant">啟用下滑關閉</translation>
+    </string>
+    <string name="gboard_patches_swipe_dismiss_enabled_summary">
+        <translation locale="en">Only swipes starting in the keyboard header can close the keyboard.</translation>
+        <translation locale="zh-Hant">只有從鍵盤頂部開始的下滑手勢可以關閉鍵盤。</translation>
     </string>
     <string name="gboard_patches_custom_theme_title">
         <translation locale="en">Custom themes</translation>
