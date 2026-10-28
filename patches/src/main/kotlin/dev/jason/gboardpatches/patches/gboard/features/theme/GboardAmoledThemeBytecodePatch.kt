@@ -16,7 +16,7 @@ import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallEmitt
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
 import dev.jason.gboardpatches.patches.shared.Constants.COMPATIBILITY_GBOARD
 
-private const val COLOR_GM3_SCRIM_FIELD = "Lqyj;->V:I"
+private const val COLOR_GM3_SCRIM_FIELD = "Lrmt;->V:I"
 private const val APPLY_AMOLED_THEME_HELPER = "jasondevApplyAmoledTheme"
 
 internal val gboardAmoledThemeBytecodePatch = bytecodePatch(
@@ -34,8 +34,8 @@ internal val gboardAmoledThemeBytecodePatch = bytecodePatch(
             "AMOLED theme color token constructor binding has an unexpected prototype"
         }
 
-        val qyjClass = mutableClass(constructorTarget.ownerDescriptor)
-        qyjClass.installAmoledThemeHelper()
+        val rmtClass = mutableClass(constructorTarget.ownerDescriptor)
+        rmtClass.installAmoledThemeHelper()
 
         val constructorMethod = findMutableMethodOrThrow(constructorTarget)
         constructorMethod.injectAmoledThemeOverride()
@@ -51,7 +51,7 @@ internal fun MutableClass.installAmoledThemeHelper() {
         registerCount = 3,
         body = """
             :try_start_0
-            iget-boolean v0, p0, Lqyj;->a:Z
+            iget-boolean v0, p0, Lrmt;->a:Z
 
             if-nez v0, :cond_return
 
@@ -61,7 +61,7 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             if-eqz v0, :cond_return
 
-            iget v1, p0, Lqyj;->Q:I
+            iget v1, p0, Lrmt;->Q:I
 
             const/4 v0, 0x0
 
@@ -69,19 +69,9 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->Q:I
+            iput v1, p0, Lrmt;->Q:I
 
-            iget v1, p0, Lqyj;->I:I
-
-            const/4 v0, 0x0
-
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
-
-            move-result v1
-
-            iput v1, p0, Lqyj;->I:I
-
-            iget v1, p0, Lqyj;->R:I
+            iget v1, p0, Lrmt;->I:I
 
             const/4 v0, 0x0
 
@@ -89,19 +79,9 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->R:I
+            iput v1, p0, Lrmt;->I:I
 
-            iget v1, p0, Lqyj;->S:I
-
-            const/4 v0, 0x0
-
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
-
-            move-result v1
-
-            iput v1, p0, Lqyj;->S:I
-
-            iget v1, p0, Lqyj;->T:I
+            iget v1, p0, Lrmt;->R:I
 
             const/4 v0, 0x0
 
@@ -109,19 +89,9 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->T:I
+            iput v1, p0, Lrmt;->R:I
 
-            iget v1, p0, Lqyj;->U:I
-
-            const/4 v0, 0x0
-
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
-
-            move-result v1
-
-            iput v1, p0, Lqyj;->U:I
-
-            iget v1, p0, Lqyj;->P:I
+            iget v1, p0, Lrmt;->S:I
 
             const/4 v0, 0x0
 
@@ -129,9 +99,9 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->P:I
+            iput v1, p0, Lrmt;->S:I
 
-            iget v1, p0, Lqyj;->G:I
+            iget v1, p0, Lrmt;->T:I
 
             const/4 v0, 0x0
 
@@ -139,9 +109,39 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->G:I
+            iput v1, p0, Lrmt;->T:I
 
-            iget v1, p0, Lqyj;->O:I
+            iget v1, p0, Lrmt;->U:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lrmt;->U:I
+
+            iget v1, p0, Lrmt;->P:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lrmt;->P:I
+
+            iget v1, p0, Lrmt;->G:I
+
+            const/4 v0, 0x0
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lrmt;->G:I
+
+            iget v1, p0, Lrmt;->O:I
 
             const/4 v0, 0x1
 
@@ -149,29 +149,29 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->O:I
+            iput v1, p0, Lrmt;->O:I
 
-            iget v1, p0, Lqyj;->J:I
+            iget v1, p0, Lrmt;->J:I
 
-            iget v0, p0, Lqyj;->b:I
-
-            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
-
-            move-result v1
-
-            iput v1, p0, Lqyj;->J:I
-
-            iget v1, p0, Lqyj;->L:I
-
-            iget v0, p0, Lqyj;->b:I
+            iget v0, p0, Lrmt;->b:I
 
             ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
 
             move-result v1
 
-            iput v1, p0, Lqyj;->L:I
+            iput v1, p0, Lrmt;->J:I
 
-            iget v1, p0, Lqyj;->m:I
+            iget v1, p0, Lrmt;->L:I
+
+            iget v0, p0, Lrmt;->b:I
+
+            ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
+
+            move-result v1
+
+            iput v1, p0, Lrmt;->L:I
+
+            iget v1, p0, Lrmt;->m:I
 
             const/4 v0, 0x2
 
@@ -179,17 +179,17 @@ internal fun MutableClass.installAmoledThemeHelper() {
 
             move-result v1
 
-            iput v1, p0, Lqyj;->m:I
+            iput v1, p0, Lrmt;->m:I
 
-            iget v1, p0, Lqyj;->n:I
+            iget v1, p0, Lrmt;->n:I
 
-            iget v0, p0, Lqyj;->b:I
+            iget v0, p0, Lrmt;->b:I
 
             ${RuntimeCallEmitter.invoke(RuntimeCallId.AMOLED_THEME_RUNTIME_BLEND_TEXT_COLOR, "v1, v0")}
 
             move-result v1
 
-            iput v1, p0, Lqyj;->n:I
+            iput v1, p0, Lrmt;->n:I
 
             :cond_return
             return-void

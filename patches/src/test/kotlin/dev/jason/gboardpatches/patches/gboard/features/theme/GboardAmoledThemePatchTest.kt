@@ -41,29 +41,29 @@ class GboardAmoledThemePatchTest {
     }
 
     @Test
-    fun `reviewed bindings declare the exact 1803 qyj constructor target`() {
+    fun `reviewed bindings declare the exact 1854 rmt constructor target`() {
         val constructorTarget = GboardVersionBindings.amoledThemeColorTokenConstructor
-        assertEquals("Lqyj;", constructorTarget.ownerDescriptor)
+        assertEquals("Lrmt;", constructorTarget.ownerDescriptor)
         assertEquals("<init>", constructorTarget.name)
         assertEquals(listOf("Landroid/content/Context;", "Z"), constructorTarget.parameterTypes)
         assertEquals("V", constructorTarget.returnType)
-        assertEquals("Lqyj;-><init>(Landroid/content/Context;Z)V", constructorTarget.reference)
+        assertEquals("Lrmt;-><init>(Landroid/content/Context;Z)V", constructorTarget.reference)
     }
 
     @Test
     fun `bytecode patch source wires runtime abi call and updates target fields`() {
         val source = Files.readString(root().resolve(BYTECODE), StandardCharsets.UTF_8)
         assertTrue(source.contains("RuntimeCallId.AMOLED_THEME_RUNTIME_IS_ACTIVE"))
-        assertTrue(source.contains("Lqyj;->V:I"))
-        assertTrue(source.contains("Lqyj;->a:Z"))
-        assertTrue(source.contains("Lqyj;->Q:I"))
-        assertTrue(source.contains("Lqyj;->I:I"))
-        assertTrue(source.contains("Lqyj;->R:I"))
-        assertTrue(source.contains("Lqyj;->S:I"))
-        assertTrue(source.contains("Lqyj;->T:I"))
-        assertTrue(source.contains("Lqyj;->U:I"))
-        assertTrue(source.contains("Lqyj;->P:I"))
-        assertTrue(source.contains("Lqyj;->G:I"))
+        assertTrue(source.contains("Lrmt;->V:I"))
+        assertTrue(source.contains("Lrmt;->a:Z"))
+        assertTrue(source.contains("Lrmt;->Q:I"))
+        assertTrue(source.contains("Lrmt;->I:I"))
+        assertTrue(source.contains("Lrmt;->R:I"))
+        assertTrue(source.contains("Lrmt;->S:I"))
+        assertTrue(source.contains("Lrmt;->T:I"))
+        assertTrue(source.contains("Lrmt;->U:I"))
+        assertTrue(source.contains("Lrmt;->P:I"))
+        assertTrue(source.contains("Lrmt;->G:I"))
         assertTrue(source.contains("RuntimeCallId.AMOLED_THEME_RUNTIME_ADJUST_COLOR"))
         assertTrue(source.contains("jasondevApplyAmoledTheme"))
         assertTrue(source.contains("installAmoledThemeHelper"))

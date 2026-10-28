@@ -20,21 +20,17 @@ public final class GboardShotgunKeyboardRuntime {
     }
 
     public static final class ReflectionHandles {
-        private final Field contextField;
-        private final Field keyIdField;
-        private final Field entryKeycodeField;
-        private final Field entryPayloadField;
+        private volatile Field contextField;
+        private volatile Field keyIdField;
+        private volatile Field entryKeycodeField;
+        private volatile Field entryPayloadField;
 
         public ReflectionHandles(ClassLoader classLoader) {
             Field ctxField = null;
-            try {
-                Class<?> dispatcherClass = Class.forName("pvf", false, classLoader);
+            // 18.5.4 uses qil, 18.0.3 uses pvf
+            for (String className : new String[]{"qil", "pvf"}) {
                 try {
-                    ctxField = dispatcherClass.getDeclaredField("b");
-                    ctxField.setAccessible(true);
-                } catch (Throwable ignored) {
-                }
-                if (ctxField == null) {
+                    Class<?> dispatcherClass = Class.forName(className, false, classLoader);
                     for (Field field : dispatcherClass.getDeclaredFields()) {
                         if (Context.class.isAssignableFrom(field.getType())) {
                             field.setAccessible(true);
@@ -42,8 +38,9 @@ public final class GboardShotgunKeyboardRuntime {
                             break;
                         }
                     }
+                    if (ctxField != null) break;
+                } catch (Throwable ignored) {
                 }
-            } catch (Throwable ignored) {
             }
             contextField = ctxField;
 
@@ -51,71 +48,139 @@ public final class GboardShotgunKeyboardRuntime {
             try {
                 Class<?> softKeyDefClass = Class.forName(
                         "com.google.android.libraries.inputmethod.metadata.SoftKeyDef", false, classLoader);
-                kIdField = softKeyDefClass.getDeclaredField("d");
-                kIdField.setAccessible(true);
+                // 18.5.4 uses "f", 18.0.3 uses "d"
+                for (String fieldName : new String[]{"f", "d"}) {
+                    try {
+                        Field candidate = softKeyDefClass.getDeclaredField(fieldName);
+                        if (candidate.getType() == int.class) {
+                            candidate.setAccessible(true);
+                            kIdField = candidate;
+                            break;
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                }
             } catch (Throwable ignored) {
             }
             keyIdField = kIdField;
 
             Field codeField = null;
             Field payloadField = null;
-            try {
-                Class<?> actionEntryClass = Class.forName("pnu", false, classLoader);
-                codeField = actionEntryClass.getDeclaredField("c");
-                codeField.setAccessible(true);
-                payloadField = actionEntryClass.getDeclaredField("e");
-                payloadField.setAccessible(true);
-            } catch (Throwable ignored) {
+            // 18.5.4 uses qbc, 18.0.3 uses pnu
+            for (String className : new String[]{"qbc", "pnu"}) {
+                try {
+                    Class<?> actionEntryClass = Class.forName(className, false, classLoader);
+                    try {
+                        Field c = actionEntryClass.getDeclaredField("c");
+                        if (c.getType() == int.class) {
+                            c.setAccessible(true);
+                            codeField = c;
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                    try {
+                        Field e = actionEntryClass.getDeclaredField("e");
+                        e.setAccessible(true);
+                        payloadField = e;
+                    } catch (Throwable ignored) {
+                    }
+                    if (codeField != null && payloadField != null) break;
+                } catch (Throwable ignored) {
+                }
             }
             entryKeycodeField = codeField;
             entryPayloadField = payloadField;
         }
 
         public Context extractContext(Object dispatcher) {
-            if (dispatcher != null && contextField != null) {
-                try {
-                    Object val = contextField.get(dispatcher);
-                    if (val instanceof Context ctx) {
-                        return ctx;
+            if (dispatcher != null) {
+                if (contextField == null) {
+                    for (Field field : dispatcher.getClass().getDeclaredFields()) {
+                        if (Context.class.isAssignableFrom(field.getType())) {
+                            field.setAccessible(true);
+                            contextField = field;
+                            break;
+                        }
                     }
-                } catch (Throwable ignored) {
+                }
+                if (contextField != null) {
+                    try {
+                        Object val = contextField.get(dispatcher);
+                        if (val instanceof Context ctx) {
+                            return ctx;
+                        }
+                    } catch (Throwable ignored) {
+                    }
                 }
             }
             return resolveApplicationContext();
         }
 
         public int extractKeyId(Object softKeyDef) {
-            if (softKeyDef == null || keyIdField == null) {
+            if (softKeyDef == null) {
                 return 0;
             }
-            try {
-                return keyIdField.getInt(softKeyDef);
-            } catch (Throwable ignored) {
-                return 0;
+            if (keyIdField == null) {
+                for (Field field : softKeyDef.getClass().getDeclaredFields()) {
+                    if (field.getType() == int.class && !java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                        field.setAccessible(true);
+                        keyIdField = field;
+                        break;
+                    }
+                }
             }
+            if (keyIdField != null) {
+                try {
+                    return keyIdField.getInt(softKeyDef);
+                } catch (Throwable ignored) {
+                }
+            }
+            return 0;
         }
 
         public int extractKeycode(Object actionData) {
-            if (actionData == null || entryKeycodeField == null) {
+            if (actionData == null) {
                 return 0;
             }
-            try {
-                return entryKeycodeField.getInt(actionData);
-            } catch (Throwable ignored) {
-                return 0;
+            if (entryKeycodeField == null) {
+                try {
+                    Field c = actionData.getClass().getDeclaredField("c");
+                    if (c.getType() == int.class) {
+                        c.setAccessible(true);
+                        entryKeycodeField = c;
+                    }
+                } catch (Throwable ignored) {
+                }
             }
+            if (entryKeycodeField != null) {
+                try {
+                    return entryKeycodeField.getInt(actionData);
+                } catch (Throwable ignored) {
+                }
+            }
+            return 0;
         }
 
         public String extractPayload(Object actionData) {
-            if (actionData == null || entryPayloadField == null) {
+            if (actionData == null) {
                 return null;
             }
-            try {
-                Object val = entryPayloadField.get(actionData);
-                return val instanceof CharSequence charSequence ? charSequence.toString() : (val != null ? val.toString() : null);
-            } catch (Throwable ignored) {
-                return null;
+            if (entryPayloadField == null) {
+                try {
+                    Field e = actionData.getClass().getDeclaredField("e");
+                    e.setAccessible(true);
+                    entryPayloadField = e;
+                } catch (Throwable ignored) {
+                }
             }
+            if (entryPayloadField != null) {
+                try {
+                    Object val = entryPayloadField.get(actionData);
+                    return val instanceof CharSequence charSequence ? charSequence.toString() : (val != null ? val.toString() : null);
+                } catch (Throwable ignored) {
+                }
+            }
+            return null;
         }
     }
 

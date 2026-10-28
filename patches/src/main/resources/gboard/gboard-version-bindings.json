@@ -8,7 +8,7 @@
   "bindings": {
     "amoled_theme_color_token_constructor": {
       "kind": "method",
-      "class_type": "Lqyj;",
+      "class_type": "Lrmt;",
       "method_name": "<init>",
       "parameter_types": [
         "Landroid/content/Context;",
