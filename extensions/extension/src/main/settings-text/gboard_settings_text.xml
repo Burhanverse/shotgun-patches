@@ -1390,6 +1390,14 @@
         <translation locale="en">Enable Web Clipboard</translation>
         <translation locale="zh-Hant">啟用網頁剪貼簿</translation>
     </string>
+    <string name="gboard_patches_web_clipboard_accept_files_title">
+        <translation locale="en">Accept files from PC</translation>
+        <translation locale="zh-Hant">接收電腦傳送的檔案</translation>
+    </string>
+    <string name="gboard_patches_web_clipboard_accept_files_summary">
+        <translation locale="en">Allow paired desktop clients to upload files to Downloads/WebClip.</translation>
+        <translation locale="zh-Hant">允許已配對的電腦端傳送檔案至 Downloads/WebClip。</translation>
+    </string>
     <string name="gboard_patches_web_clipboard_port_title">
         <translation locale="en">Web server port</translation>
         <translation locale="zh-Hant">Web 伺服器連接埠</translation>

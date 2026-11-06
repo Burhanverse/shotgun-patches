@@ -49,6 +49,40 @@ public final class GboardWebClipboardSettingsFeatureTest {
                 ((GboardPatchesSettingsContract.ToggleRow) screen.getRows().get(0)).getSummary());
     }
 
+    @Test
+    public void acceptFilesToggleDefaultsToTrueAndPersists() {
+        InMemorySharedPreferences preferences = new InMemorySharedPreferences();
+        WebClipboardPreferences.ensureDefaults(preferences);
+        CapturingHost host = new CapturingHost(preferences);
+
+        GboardPatchesSettingsContract.Screen screen =
+                new GboardWebClipboardSettingsFeature().buildScreen(host);
+
+        GboardPatchesSettingsContract.ToggleRow acceptFilesRow =
+                findToggleRow(screen, "Accept files from PC");
+
+        Assert.assertTrue(acceptFilesRow.isEnabled());
+        Assert.assertTrue(acceptFilesRow.isChecked());
+
+        acceptFilesRow.getToggleAction().accept(false);
+        Assert.assertFalse(WebClipboardPreferences.isAcceptFiles(preferences));
+
+        acceptFilesRow.getToggleAction().accept(true);
+        Assert.assertTrue(WebClipboardPreferences.isAcceptFiles(preferences));
+    }
+
+    private static GboardPatchesSettingsContract.ToggleRow findToggleRow(
+            GboardPatchesSettingsContract.Screen screen,
+            String titlePrefix) {
+        for (GboardPatchesSettingsContract.Row row : screen.getRows()) {
+            if (row instanceof GboardPatchesSettingsContract.ToggleRow toggleRow
+                    && row.getTitle().toString().startsWith(titlePrefix)) {
+                return toggleRow;
+            }
+        }
+        throw new AssertionError("Missing toggle row with title prefix: " + titlePrefix);
+    }
+
     private static GboardPatchesSettingsContract.SelectorRow findSelectorRow(
             GboardPatchesSettingsContract.Screen screen,
             String titlePrefix) {

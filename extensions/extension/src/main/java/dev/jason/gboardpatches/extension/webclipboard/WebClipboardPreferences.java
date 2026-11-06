@@ -13,6 +13,7 @@ public final class WebClipboardPreferences {
     public static final String PREF_KEY_RUNTIME_ACTIVE = "pref_web_clipboard_runtime_active";
     public static final String PREF_KEY_PAIRING_REQUIRED =
             "pref_web_clipboard_pairing_required";
+    public static final String PREF_KEY_ACCEPT_FILES = "pref_web_clipboard_accept_files";
     public static final String PREF_KEY_PAIRING_CODE = "pref_web_clipboard_pairing_code";
     public static final String PREF_KEY_LOOPBACK_INGRESS_TOKEN =
             "pref_web_clipboard_loopback_ingress_token";
@@ -22,6 +23,7 @@ public final class WebClipboardPreferences {
     public static final int DEFAULT_PORT = 8080;
     public static final boolean DEFAULT_RUNTIME_ACTIVE = false;
     public static final boolean DEFAULT_PAIRING_REQUIRED = true;
+    public static final boolean DEFAULT_ACCEPT_FILES = true;
     public static final String DEFAULT_PAIRING_CODE = "0000";
     public static final String DEFAULT_LOOPBACK_INGRESS_TOKEN = "";
 
@@ -64,6 +66,10 @@ public final class WebClipboardPreferences {
         if (!preferences.contains(PREF_KEY_PAIRING_REQUIRED)) {
             editor = ensureEditor(editor, preferences);
             editor.putBoolean(PREF_KEY_PAIRING_REQUIRED, DEFAULT_PAIRING_REQUIRED);
+        }
+        if (!preferences.contains(PREF_KEY_ACCEPT_FILES)) {
+            editor = ensureEditor(editor, preferences);
+            editor.putBoolean(PREF_KEY_ACCEPT_FILES, DEFAULT_ACCEPT_FILES);
         }
 
         Object rawPairingCode = preferences.getAll().get(PREF_KEY_PAIRING_CODE);
@@ -186,6 +192,23 @@ public final class WebClipboardPreferences {
             return;
         }
         preferences.edit().putBoolean(PREF_KEY_PAIRING_REQUIRED, required).commit();
+    }
+
+    public static boolean isAcceptFiles(SharedPreferences preferences) {
+        ensureDefaults(preferences);
+        if (preferences == null) {
+            return DEFAULT_ACCEPT_FILES;
+        }
+        Object rawValue = preferences.getAll().get(PREF_KEY_ACCEPT_FILES);
+        Boolean value = readBooleanObject(rawValue);
+        return value != null ? value.booleanValue() : DEFAULT_ACCEPT_FILES;
+    }
+
+    public static void setAcceptFiles(SharedPreferences preferences, boolean acceptFiles) {
+        if (preferences == null) {
+            return;
+        }
+        preferences.edit().putBoolean(PREF_KEY_ACCEPT_FILES, acceptFiles).commit();
     }
 
     public static String getPairingCode(SharedPreferences preferences) {

@@ -26,5 +26,10 @@ class GboardWebClipboardManifestPatchSourceTest {
         assertTrue(source.contains("GboardClipboardSettingsFeature;"))
         assertFalse(source.contains("WebClipboardTilePreferencesActivity"))
         assertTrue(source.contains("ACTION_QS_TILE_PREFERENCES"))
+        assertTrue(source.contains("WebClipShareActivity"))
+        assertTrue(source.contains("Send to PC (WebClip)"))
+        assertTrue(source.contains("Theme.Translucent.NoTitleBar"))
+        assertTrue(source.contains("ACTION_SEND"))
+        assertTrue(source.contains("ACTION_SEND_MULTIPLE"))
     }
 }

@@ -27,6 +27,8 @@ final class GboardClipboardSyncSettingsSection {
     private final String sectionNetwork;
     private final String sectionConnectedClients;
     private final String titleEnable;
+    private final String titleAcceptFiles;
+    private final String acceptFilesSummary;
     private final String titlePort;
     private final String titlePairing;
     private final String titlePairingCode;
@@ -76,6 +78,8 @@ final class GboardClipboardSyncSettingsSection {
         sectionNetwork = textLookup.sectionNetwork();
         sectionConnectedClients = textLookup.sectionConnectedClients();
         titleEnable = textLookup.titleEnable();
+        titleAcceptFiles = textLookup.titleAcceptFiles();
+        acceptFilesSummary = textLookup.acceptFilesSummary();
         titlePort = textLookup.titlePort();
         titlePairing = textLookup.titlePairing();
         titlePairingCode = textLookup.titlePairingCode();
@@ -123,6 +127,15 @@ final class GboardClipboardSyncSettingsSection {
                 true,
                 enabled,
                 value -> applyEnabledWithPermission(host, value)));
+        generalRows.add(new GboardPatchesSettingsContract.ToggleRow(
+                titleAcceptFiles,
+                acceptFilesSummary,
+                true,
+                WebClipboardPreferences.isAcceptFiles(preferences),
+                value -> {
+                    WebClipboardPreferences.setAcceptFiles(preferences, value);
+                    GboardPatchesSettingsContract.refresh(host);
+                }));
 
         List<GboardPatchesSettingsContract.Row> securityRows =
                 new ArrayList<GboardPatchesSettingsContract.Row>();
@@ -301,6 +314,8 @@ final class GboardClipboardSyncSettingsSection {
         String sectionNetwork();
         String sectionConnectedClients();
         String titleEnable();
+        String titleAcceptFiles();
+        String acceptFilesSummary();
         String titlePort();
         String titlePairing();
         String titlePairingCode();
@@ -389,6 +404,20 @@ final class GboardClipboardSyncSettingsSection {
             return GboardSettingsText.get(
                     context,
                     R.string.gboard_patches_web_clipboard_enable_title);
+        }
+
+        @Override
+        public String titleAcceptFiles() {
+            return GboardSettingsText.get(
+                    context,
+                    R.string.gboard_patches_web_clipboard_accept_files_title);
+        }
+
+        @Override
+        public String acceptFilesSummary() {
+            return GboardSettingsText.get(
+                    context,
+                    R.string.gboard_patches_web_clipboard_accept_files_summary);
         }
 
         @Override
@@ -619,6 +648,16 @@ final class GboardClipboardSyncSettingsSection {
         @Override
         public String titleEnable() {
             return "Enable Web Clipboard";
+        }
+
+        @Override
+        public String titleAcceptFiles() {
+            return "Accept files from PC";
+        }
+
+        @Override
+        public String acceptFilesSummary() {
+            return "Allow paired desktop clients to upload files to Downloads/WebClip.";
         }
 
         @Override

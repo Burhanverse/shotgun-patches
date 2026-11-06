@@ -40,6 +40,16 @@ internal fun ensureManifestIntentFilter(
     actionName: String,
     categoryName: String? = null,
 ) {
+    ensureManifestIntentFilterData(document, component, actionName, categoryName, null)
+}
+
+internal fun ensureManifestIntentFilterData(
+    document: Document,
+    component: Element,
+    actionName: String,
+    categoryName: String? = null,
+    mimeType: String? = null,
+) {
     val intentFilter = component.childElements("intent-filter").firstOrNull {
         it.childElements("action").any { action ->
             action.manifestAndroidAttribute("name") == actionName
@@ -48,6 +58,12 @@ internal fun ensureManifestIntentFilter(
     ensureNamedManifestChild(document, intentFilter, "action", actionName)
     categoryName?.let { category ->
         ensureNamedManifestChild(document, intentFilter, "category", category)
+    }
+    mimeType?.let { mime ->
+        val data = intentFilter.childElements("data").firstOrNull {
+            it.manifestAndroidAttribute("mimeType") == mime
+        } ?: document.createElement("data").also(intentFilter::appendChild)
+        data.setManifestAndroidAttribute("mimeType", mime)
     }
 }
 

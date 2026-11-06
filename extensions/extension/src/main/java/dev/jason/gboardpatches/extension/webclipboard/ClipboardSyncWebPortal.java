@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,7 +30,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+
+import dev.jason.gboardpatches.extension.filetransfer.FileOffer;
+import dev.jason.gboardpatches.extension.filetransfer.FileOfferRegistry;
+import dev.jason.gboardpatches.extension.filetransfer.FileStreamHandler;
+import dev.jason.gboardpatches.extension.filetransfer.FileUploadHandler;
 
 public final class ClipboardSyncWebPortal {
     public static final int DEFAULT_PORT = 8080;
@@ -54,6 +62,11 @@ public final class ClipboardSyncWebPortal {
     private final Set<String> revokedClientIds = new LinkedHashSet<>();
     private final WebClipboardEchoSuppressor webEchoSuppressor =
             new WebClipboardEchoSuppressor(WEB_ECHO_SUPPRESSION_WINDOW_MS);
+    private final FileStreamHandler fileStreamHandler = new FileStreamHandler();
+    private final PairingRateLimiter pairingRateLimiter = new PairingRateLimiter();
+    private FileUploadHandler fileUploadHandler = new FileUploadHandler(null, null);
+    private FileOfferRegistry fileOfferRegistry = FileOfferRegistry.getInstance();
+    private ExecutorService fileOfferBroadcastExecutor = createBroadcastExecutor();
 
     private ServerSocket serverSocket;
     private ServerSocket httpsServerSocket;
@@ -73,11 +86,11 @@ public final class ClipboardSyncWebPortal {
     private volatile long latestWebClipboardAtMs;
     private long nextEventClientId = 1L;
 
-    ClipboardSyncWebPortal(int port, ClipboardBridge bridge) {
+    public ClipboardSyncWebPortal(int port, ClipboardBridge bridge) {
         this(port, bridge, WebAssets.empty());
     }
 
-    ClipboardSyncWebPortal(int port, ClipboardBridge bridge, WebAssets webAssets) {
+    public ClipboardSyncWebPortal(int port, ClipboardBridge bridge, WebAssets webAssets) {
         this(port, ClipboardSyncHttpsSocketFactory.defaultHttpsPortFor(port), bridge, webAssets);
     }
 
@@ -106,7 +119,7 @@ public final class ClipboardSyncWebPortal {
         }
     }
 
-    interface WebAssets {
+    public interface WebAssets {
         byte[] read(String path) throws IOException;
 
         static WebAssets from(Context context) {
@@ -128,7 +141,7 @@ public final class ClipboardSyncWebPortal {
             };
         }
 
-        static WebAssets empty() {
+        public static WebAssets empty() {
             return path -> null;
         }
     }
@@ -177,7 +190,7 @@ public final class ClipboardSyncWebPortal {
         }
     }
 
-    void start() throws Exception {
+    public void start() throws Exception {
         if (serverSocket != null && !serverSocket.isClosed()) {
             return;
         }
@@ -187,6 +200,9 @@ public final class ClipboardSyncWebPortal {
         serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(requestedPort));
         stopped = false;
+        if (fileOfferBroadcastExecutor == null || fileOfferBroadcastExecutor.isShutdown()) {
+            fileOfferBroadcastExecutor = createBroadcastExecutor();
+        }
         acceptThread = startAcceptThread(serverSocket, "ClipboardSyncWebPortalHttp");
         try {
             httpsServerSocket = ClipboardSyncHttpsSocketFactory.createServerSocket(
@@ -207,11 +223,17 @@ public final class ClipboardSyncWebPortal {
                 + ", httpsPort=" + getHttpsPort());
     }
 
-    void stop() {
+    public void stop() {
         logInfo(LOG_PREFIX + " portal stopping"
                 + " instance=" + portalInstanceId
                 + ", clients=" + eventClientCount());
         stopped = true;
+        if (fileOfferBroadcastExecutor != null) {
+            fileOfferBroadcastExecutor.shutdownNow();
+        }
+        fileStreamHandler.abortAll();
+        fileUploadHandler.abortAll();
+        pairingRateLimiter.clear();
         closeQuietly(serverSocket);
         closeQuietly(httpsServerSocket);
         Thread thread = acceptThread;
@@ -237,7 +259,7 @@ public final class ClipboardSyncWebPortal {
         }
     }
 
-    int getPort() {
+    public int getPort() {
         ServerSocket socket = serverSocket;
         return socket == null ? 0 : socket.getLocalPort();
     }
@@ -245,6 +267,20 @@ public final class ClipboardSyncWebPortal {
     int getHttpsPort() {
         ServerSocket socket = httpsServerSocket;
         return socket == null ? 0 : socket.getLocalPort();
+    }
+
+    PairingRateLimiter getPairingRateLimiter() {
+        return pairingRateLimiter;
+    }
+
+    void setFileUploadHandler(FileUploadHandler handler) {
+        if (handler != null) {
+            this.fileUploadHandler = handler;
+        }
+    }
+
+    FileUploadHandler getFileUploadHandler() {
+        return fileUploadHandler;
     }
 
     public List<ConnectedClientSnapshot> getConnectedClients() {
@@ -455,6 +491,92 @@ public final class ClipboardSyncWebPortal {
         removeFailedEventClients(failedClients);
     }
 
+    public void broadcastFileOffer(FileOffer offer) {
+        if (offer == null || stopped) {
+            return;
+        }
+        synchronized (clientsLock) {
+            ensureClientHeartbeatThreadLocked();
+        }
+        fileOfferBroadcastExecutor.execute(() -> {
+            try {
+                JSONObject payload = new JSONObject();
+                payload.put("token", offer.getToken());
+                payload.put("name", offer.getName());
+                payload.put("size", offer.getSize());
+                payload.put("mimeType", offer.getMimeType());
+                payload.put("batchId", offer.getBatchId());
+                payload.put("index", offer.getIndex());
+                payload.put("total", offer.getTotal());
+                payload.put("clientId", offer.getTargetClientId() != null ? offer.getTargetClientId() : "");
+                String frame = "event: file\r\ndata: " + payload.toString() + "\r\n\r\n";
+                List<EventClient> allClients = snapshotEventClients();
+                List<EventClient> targetClients = new ArrayList<>();
+                for (EventClient client : allClients) {
+                    if (isEligibleFileOfferClient(client, offer.getTargetClientId())) {
+                        targetClients.add(client);
+                    }
+                }
+                if (!targetClients.isEmpty()) {
+                    List<EventClient> failed = writeFrameToClients(targetClients, frame, "file");
+                    removeFailedEventClients(failed);
+                }
+            } catch (Throwable ignored) {
+            }
+        });
+    }
+
+    private static boolean isEligibleFileOfferClient(EventClient client, String targetClientId) {
+        if (client == null || client.id == null || client.id.isBlank()) {
+            return false;
+        }
+        if (client.id.startsWith("web-")) {
+            return false;
+        }
+        boolean isDesktop = client.id.startsWith("linux-")
+                || client.id.startsWith("win-")
+                || client.id.startsWith("mac-")
+                || (client.agent != null && client.agent.startsWith("WebClip/"));
+        if (!isDesktop) {
+            return false;
+        }
+        if (targetClientId != null && !targetClientId.isBlank()) {
+            return targetClientId.equals(client.id);
+        }
+        return true;
+    }
+
+    public boolean hasConnectedDesktopClients() {
+        synchronized (clientsLock) {
+            for (EventClient client : eventClients) {
+                if (isEligibleFileOfferClient(client, null)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public FileStreamHandler getFileStreamHandler() {
+        return fileStreamHandler;
+    }
+
+    public FileOfferRegistry getFileOfferRegistry() {
+        return fileOfferRegistry;
+    }
+
+    public void setFileOfferRegistry(FileOfferRegistry registry) {
+        this.fileOfferRegistry = registry != null ? registry : FileOfferRegistry.getInstance();
+    }
+
+    private static ExecutorService createBroadcastExecutor() {
+        return Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "ClipboardSyncFileOfferBroadcast");
+            t.setDaemon(true);
+            return t;
+        });
+    }
+
     private JSONObject buildClientsPayloadLocked() {
         JSONObject payload = new JSONObject();
         JSONArray clients = new JSONArray();
@@ -583,21 +705,27 @@ public final class ClipboardSyncWebPortal {
                 if (stopped) {
                     return;
                 }
+                long now = System.currentTimeMillis();
+                fileStreamHandler.checkStalledStreams(now, 45_000L);
+                fileOfferRegistry.cleanExpiredOffers(now);
+                fileUploadHandler.cleanExpiredSessions(now);
                 List<EventClient> clients = snapshotEventClients();
-                if (clients.isEmpty()) {
+                if (clients.isEmpty() && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads()) {
                     stopClientHeartbeatThreadIfIdle();
                     return;
                 }
-                List<EventClient> failedClients = writeFrameToClients(
-                        clients,
-                        ": heartbeat\r\n\r\n",
-                        "heartbeat");
-                removeFailedEventClients(failedClients);
-                if (eventClientCount() == 0) {
-                    return;
-                }
-                if (!failedClients.isEmpty()) {
-                    broadcastClientsEvent();
+                if (!clients.isEmpty()) {
+                    List<EventClient> failedClients = writeFrameToClients(
+                            clients,
+                            ": heartbeat\r\n\r\n",
+                            "heartbeat");
+                    removeFailedEventClients(failedClients);
+                    if (eventClientCount() == 0 && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads()) {
+                        return;
+                    }
+                    if (!failedClients.isEmpty()) {
+                        broadcastClientsEvent();
+                    }
                 }
             }
         } finally {
@@ -629,13 +757,7 @@ public final class ClipboardSyncWebPortal {
                 closeQuietly(socket);
                 return;
             }
-            Request request = readRequest(requestLine, input);
-            if (request.bodyTooLarge) {
-                writeResponse(socket, 413, "Payload Too Large",
-                        "application/json; charset=utf-8",
-                        "{\"ok\":false,\"error\":\"payload_too_large\"}");
-                return;
-            }
+            Request request = readRequestHeaders(requestLine, input);
             if (requiresActiveClientSession(request)
                     && isRevokedClientId(requestClientId(request))) {
                 writeResponse(socket, 401, "Unauthorized", "application/json; charset=utf-8",
@@ -662,9 +784,44 @@ public final class ClipboardSyncWebPortal {
                         buildStatusJson(request, socket));
                 return;
             }
-            if (requiresPairing(request, socket) && !isAuthorized(request)) {
-                writeResponse(socket, 401, "Unauthorized", "application/json; charset=utf-8",
-                        "{\"ok\":false,\"error\":\"pairing_required\"}");
+            if (requiresPairing(request, socket)) {
+                InetAddress remoteAddress = socket != null ? socket.getInetAddress() : null;
+                long retryAfter = pairingRateLimiter.getRetryAfterSeconds(remoteAddress);
+                if (retryAfter > 0) {
+                    writeResponse(socket, 429, "Too Many Requests", "application/json; charset=utf-8",
+                            "{\"ok\":false,\"error\":\"rate_limited\"}",
+                            Collections.singletonMap("Retry-After", String.valueOf(retryAfter)));
+                    return;
+                }
+                String suppliedCode = extractSuppliedPairingCode(request);
+                if (suppliedCode.isBlank()) {
+                    writeResponse(socket, 401, "Unauthorized", "application/json; charset=utf-8",
+                            "{\"ok\":false,\"error\":\"pairing_required\"}");
+                    return;
+                }
+                if (!isAuthorized(request)) {
+                    pairingRateLimiter.recordFailure(remoteAddress);
+                    writeResponse(socket, 401, "Unauthorized", "application/json; charset=utf-8",
+                            "{\"ok\":false,\"error\":\"pairing_required\"}");
+                    return;
+                }
+                pairingRateLimiter.recordSuccess(remoteAddress);
+            }
+            if ("GET".equals(request.method) && request.path.startsWith("/files/upload/")) {
+                String uploadId = request.path.substring("/files/upload/".length());
+                fileUploadHandler.handleUploadStatus(socket, uploadId, this::writeResponse);
+                return;
+            }
+            if ("POST".equals(request.method) && "/files/upload".equals(request.path)) {
+                ensureClientHeartbeatThreadLocked();
+                fileUploadHandler.handleUpload(socket, input, request.headers, this::writeResponse);
+                return;
+            }
+            readRequestBody(request, input);
+            if (request.bodyTooLarge) {
+                writeResponse(socket, 413, "Payload Too Large",
+                        "application/json; charset=utf-8",
+                        "{\"ok\":false,\"error\":\"payload_too_large\"}");
                 return;
             }
             if ("GET".equals(request.method) && "/events".equals(request.path)) {
@@ -687,6 +844,15 @@ public final class ClipboardSyncWebPortal {
                 }
                 return;
             }
+            if ("GET".equals(request.method) && request.path.startsWith("/files/")) {
+                fileStreamHandler.handleFileDownload(
+                        socket,
+                        request.path.substring("/files/".length()),
+                        request.header("range"),
+                        fileOfferRegistry,
+                        () -> stopped);
+                return;
+            }
             if ("POST".equals(request.method) && "/clipboard".equals(request.path)) {
                 handleClipboardPost(socket, request.body);
                 return;
@@ -707,6 +873,12 @@ public final class ClipboardSyncWebPortal {
     }
 
     private Request readRequest(String requestLine, InputStream input) throws Exception {
+        Request request = readRequestHeaders(requestLine, input);
+        readRequestBody(request, input);
+        return request;
+    }
+
+    private Request readRequestHeaders(String requestLine, InputStream input) throws Exception {
         String[] parts = requestLine.split(" ");
         Request request = new Request();
         request.method = parts.length > 0 ? parts[0].toUpperCase(Locale.US) : "";
@@ -734,11 +906,18 @@ public final class ClipboardSyncWebPortal {
                 contentLength = parsePositiveInt(value);
             }
         }
+        request.contentLength = contentLength;
+        request.body = "";
+        return request;
+    }
+
+    private void readRequestBody(Request request, InputStream input) throws Exception {
+        int contentLength = request.contentLength;
         if (contentLength > 0) {
             if (contentLength > MAX_REQUEST_BODY_BYTES) {
                 request.bodyTooLarge = true;
                 request.body = "";
-                return request;
+                return;
             }
             byte[] bytes = new byte[contentLength];
             int read = 0;
@@ -753,7 +932,6 @@ public final class ClipboardSyncWebPortal {
         } else {
             request.body = "";
         }
-        return request;
     }
 
     private Map<String, String> parseQuery(String query) {
@@ -788,16 +966,17 @@ public final class ClipboardSyncWebPortal {
         }
         return "/events".equals(request.path)
                 || "/state".equals(request.path)
-                || "/status".equals(request.path)
+                || "/image/latest".equals(request.path)
                 || "/clipboard".equals(request.path)
                 || "/clients".equals(request.path)
                 || "/clients/kick".equals(request.path)
-                || "/phone-clipboard".equals(request.path);
+                || "/phone-clipboard".equals(request.path)
+                || request.path.startsWith("/files/");
     }
 
-    private boolean isAuthorized(Request request) {
-        if (!securityConfig.pairingRequired) {
-            return true;
+    private String extractSuppliedPairingCode(Request request) {
+        if (request == null) {
+            return "";
         }
         String suppliedCode = request.query("code");
         if (suppliedCode.isBlank()) {
@@ -812,11 +991,22 @@ public final class ClipboardSyncWebPortal {
         if (suppliedCode.isBlank()) {
             suppliedCode = extractField(request.body, "pairingCode");
         }
+        return suppliedCode;
+    }
+
+    private boolean isAuthorized(Request request) {
+        if (!securityConfig.pairingRequired) {
+            return true;
+        }
+        String suppliedCode = extractSuppliedPairingCode(request);
         if (suppliedCode.isBlank()) {
             return false;
         }
-        return securityConfig.pairingCode.equals(
-                WebClipboardPreferences.sanitizePairingCode(suppliedCode));
+        String expectedCode = securityConfig.pairingCode == null ? "" : securityConfig.pairingCode;
+        String sanitizedSuppliedCode = WebClipboardPreferences.sanitizePairingCode(suppliedCode);
+        return MessageDigest.isEqual(
+                expectedCode.getBytes(StandardCharsets.UTF_8),
+                sanitizedSuppliedCode.getBytes(StandardCharsets.UTF_8));
     }
 
     private boolean isLoopbackIngressAuthorized(Request request) {
@@ -1368,7 +1558,7 @@ public final class ClipboardSyncWebPortal {
     private void stopClientHeartbeatThreadIfIdle() {
         Thread threadToInterrupt = null;
         synchronized (clientsLock) {
-            if (!eventClients.isEmpty()) {
+            if (!eventClients.isEmpty() || fileStreamHandler.hasActiveStreams() || fileOfferRegistry.size() > 0 || fileUploadHandler.hasActiveUploads()) {
                 return;
             }
             Thread existingHeartbeatThread = clientHeartbeatThread;
@@ -1450,11 +1640,22 @@ public final class ClipboardSyncWebPortal {
 
     private void writeResponse(Socket socket, int status, String reason, String contentType,
             String body) throws Exception {
-        writeResponse(socket, status, reason, contentType, body.getBytes(StandardCharsets.UTF_8));
+        writeResponse(socket, status, reason, contentType, body, null);
+    }
+
+    private void writeResponse(Socket socket, int status, String reason, String contentType,
+            String body, Map<String, String> extraHeaders) throws Exception {
+        writeResponse(socket, status, reason, contentType, body.getBytes(StandardCharsets.UTF_8),
+                extraHeaders);
     }
 
     private void writeResponse(Socket socket, int status, String reason, String contentType,
             byte[] bytes) throws Exception {
+        writeResponse(socket, status, reason, contentType, bytes, null);
+    }
+
+    private void writeResponse(Socket socket, int status, String reason, String contentType,
+            byte[] bytes, Map<String, String> extraHeaders) throws Exception {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 socket.getOutputStream(), StandardCharsets.UTF_8));
         writer.write("HTTP/1.1 " + status + " " + reason + "\r\n");
@@ -1464,6 +1665,11 @@ public final class ClipboardSyncWebPortal {
         writer.write("Pragma: no-cache\r\n");
         writer.write("Expires: 0\r\n");
         writer.write("Connection: close\r\n");
+        if (extraHeaders != null) {
+            for (Map.Entry<String, String> entry : extraHeaders.entrySet()) {
+                writer.write(entry.getKey() + ": " + entry.getValue() + "\r\n");
+            }
+        }
         writer.write("\r\n");
         writer.flush();
         socket.getOutputStream().write(bytes);
@@ -1553,6 +1759,7 @@ public final class ClipboardSyncWebPortal {
         Map<String, String> headers;
         Map<String, String> query;
         boolean bodyTooLarge;
+        int contentLength;
 
         String header(String name) {
             if (headers == null || name == null) {

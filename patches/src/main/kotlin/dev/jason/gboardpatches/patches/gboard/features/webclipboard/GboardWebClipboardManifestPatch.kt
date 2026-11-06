@@ -5,6 +5,7 @@ import app.morphe.patcher.patch.resourcePatch
 import dev.jason.gboardpatches.patches.gboard.shared.childElements
 import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestComponent
 import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestIntentFilter
+import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestIntentFilterData
 import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestMetaData
 import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestUsesPermission
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesSettingsPatch
@@ -111,6 +112,31 @@ internal fun applyGboardWebClipboardManifest(document: Document) {
     ).apply { setManifestAndroidAttribute("exported", "false") }
     ensureManifestIntentFilter(document, packageReplacedReceiver, ACTION_MY_PACKAGE_REPLACED)
     ensureManifestIntentFilter(document, packageReplacedReceiver, ACTION_BOOT_COMPLETED)
+
+    val shareActivity = ensureManifestComponent(
+        document,
+        application,
+        "activity",
+        WEB_CLIP_SHARE_ACTIVITY_CLASS,
+    ).apply {
+        setManifestAndroidAttribute("exported", "true")
+        setManifestAndroidAttribute("label", "Send to PC (WebClip)")
+        setManifestAndroidAttribute("theme", "@android:style/Theme.Translucent.NoTitleBar")
+    }
+    ensureManifestIntentFilterData(
+        document,
+        shareActivity,
+        ACTION_SEND,
+        CATEGORY_DEFAULT,
+        "*/*",
+    )
+    ensureManifestIntentFilterData(
+        document,
+        shareActivity,
+        ACTION_SEND_MULTIPLE,
+        CATEGORY_DEFAULT,
+        "*/*",
+    )
 }
 
 context(context: ResourcePatchContext)
@@ -156,4 +182,8 @@ private const val TILE_NAVIGATION_PATH_META_DATA =
 private const val WEB_CLIPBOARD_NAVIGATION_PATH =
     "dev.jason.gboardpatches.extension.clipboard.GboardClipboardSettingsFeature;" +
         "dev.jason.gboardpatches.extension.clipboard.GboardWebClipboardSettingsFeature"
+private const val WEB_CLIP_SHARE_ACTIVITY_CLASS =
+    "dev.jason.gboardpatches.extension.filetransfer.WebClipShareActivity"
+private const val ACTION_SEND = "android.intent.action.SEND"
+private const val ACTION_SEND_MULTIPLE = "android.intent.action.SEND_MULTIPLE"
 private const val WEB_CLIPBOARD_RESOURCE_ROOT = "web-clipboard-res"

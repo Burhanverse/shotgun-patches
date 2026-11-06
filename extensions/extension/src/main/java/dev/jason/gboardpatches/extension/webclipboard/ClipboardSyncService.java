@@ -28,6 +28,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import dev.jason.gboardpatches.extension.filetransfer.FileTransferLockController;
+import dev.jason.gboardpatches.extension.filetransfer.FileTransferNotificationManager;
+import dev.jason.gboardpatches.extension.filetransfer.FileUploadHandler;
+import dev.jason.gboardpatches.extension.filetransfer.WebClipShareActivity;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -53,6 +57,12 @@ public final class ClipboardSyncService extends Service {
             "dev.jason.gboardpatches.extension.webclipboard.action.STOP";
     private static final String ACTION_LOCAL_CLIP =
             "dev.jason.gboardpatches.extension.webclipboard.action.LOCAL_CLIP";
+    public static final String ACTION_CANCEL_FILE_TRANSFER =
+            "dev.jason.gboardpatches.extension.filetransfer.action.CANCEL_FILE_TRANSFER";
+    public static final String ACTION_CANCEL_FILE_UPLOAD =
+            "dev.jason.gboardpatches.extension.filetransfer.action.CANCEL_FILE_UPLOAD";
+    public static final String EXTRA_BATCH_ID = "batch_id";
+    public static final String EXTRA_UPLOAD_ID = "upload_id";
     private static final String EXTRA_TEXT = "text";
     private static final String NOTIFICATION_CHANNEL_ID = "web_clipboard";
     private static final int NOTIFICATION_ID = 1002;
@@ -143,6 +153,14 @@ public final class ClipboardSyncService extends Service {
         }
     }
 
+    public static ClipboardSyncWebPortal getActivePortal() {
+        return activePortal;
+    }
+
+    public static void setActivePortalForTesting(ClipboardSyncWebPortal portal) {
+        activePortal = portal;
+    }
+
     public static List<ClipboardSyncWebPortal.ConnectedClientSnapshot>
             getConnectedClientSnapshots() {
         ClipboardSyncWebPortal portal = activePortal;
@@ -176,6 +194,8 @@ public final class ClipboardSyncService extends Service {
             super.onCreate();
             activeService = this;
             Log.i(TAG, LOG_PREFIX + " service onCreate");
+            WebClipShareActivity.cleanOrphanedStagedFiles(this);
+            FileUploadHandler.cleanOrphanedPendingRows(this);
             ensureNotificationChannel();
             startForeground("Starting Web Clipboard");
             WebClipboardTileController.markRuntimeActive(this, false);
@@ -211,6 +231,19 @@ public final class ClipboardSyncService extends Service {
                 stopSelf();
                 return START_NOT_STICKY;
             }
+            if (ACTION_CANCEL_FILE_TRANSFER.equals(action)) {
+                String batchId = intent != null ? intent.getStringExtra(EXTRA_BATCH_ID) : null;
+                if (batchId != null) {
+                    FileTransferNotificationManager.getInstance().cancelBatch(batchId);
+                }
+                return START_STICKY;
+            }
+            if (ACTION_CANCEL_FILE_UPLOAD.equals(action)) {
+                String uploadId = intent != null ? intent.getStringExtra(EXTRA_UPLOAD_ID) : null;
+                String batchId = intent != null ? intent.getStringExtra(EXTRA_BATCH_ID) : null;
+                FileTransferNotificationManager.getInstance().cancelUpload(uploadId, batchId);
+                return START_STICKY;
+            }
             if (ACTION_LOCAL_CLIP.equals(action)) {
                 String text = intent != null ? intent.getStringExtra(EXTRA_TEXT) : null;
                 if (hasClipboardText(text)) {
@@ -243,6 +276,7 @@ public final class ClipboardSyncService extends Service {
             }
             unregisterClipboardListener();
             clipboardPublishExecutor.shutdownNow();
+            FileTransferNotificationManager.getInstance().cancelAll();
             stopWebPortal();
             WebClipboardTileController.requestTileRefresh(this);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -332,6 +366,19 @@ public final class ClipboardSyncService extends Service {
                         loopbackIngressToken));
         try {
             portal.start();
+            FileTransferLockController lockController = new FileTransferLockController(this);
+            FileTransferNotificationManager notificationManager = FileTransferNotificationManager.getInstance();
+            notificationManager.init(this);
+            notificationManager.setFileStreamHandler(portal.getFileStreamHandler());
+            notificationManager.setFileOfferRegistry(portal.getFileOfferRegistry());
+            portal.getFileStreamHandler().setLockController(lockController);
+            portal.getFileStreamHandler().setNotificationManager(notificationManager);
+            portal.getFileUploadHandler().setContext(this);
+            portal.getFileUploadHandler().setLockController(lockController);
+            portal.getFileUploadHandler().setNotificationManager(notificationManager);
+            notificationManager.setActiveUploadRegistry(portal.getFileUploadHandler().getActiveUploadRegistry());
+            portal.getFileUploadHandler().setAcceptFilesSupplier(() ->
+                    WebClipboardPreferences.isAcceptFiles(WebClipboardPreferences.preferences(this)));
             webPortal = portal;
             activePortal = portal;
             currentPortalPort = port;
