@@ -1,3 +1,22 @@
+## [4.0.0-dev.8](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.7...v4.0.0-dev.8) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.8`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.8），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### ✨ New Features & Improvements
+
+* **Web Clipboard Consent Engine & Offer Gating:** introduced `IncomingOfferRegistry` to gate and require user confirmation on the phone before accepting incoming file transfers.
+* **Notifications & Permissions:** added a dedicated file offers notification channel with interactive accept/reject actions, and declared `POST_NOTIFICATIONS` permission in manifest for Android 13+ support.
+* **Storage Reliability:** improved error handling to reliably return HTTP 5xx responses when MediaStore or storage sinks fail.
+
+### ✨ 新功能與改善
+
+* **網頁剪貼簿傳輸確認與閘道控制 (Consent Engine):** 新增 `IncomingOfferRegistry`，在手機接收來自網頁端的檔案傳輸前進行閘道管控與確認機制。
+* **通知與權限強化:** 新增專屬傳輸請求通知管道與互動式確認/拒絕操作，並於資訊清單中宣告 `POST_NOTIFICATIONS` 權限（相容 Android 13+）。
+* **儲存穩定性提升:** 完善錯誤處理機制，於 MediaStore 或儲存空間寫入失敗時回傳 HTTP 5xx 錯誤碼。
+
 ## [4.0.0-dev.7](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.6...v4.0.0-dev.7) (2026-11-08)
 
 > [!WARNING]
