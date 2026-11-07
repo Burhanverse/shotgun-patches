@@ -1,3 +1,22 @@
+## [4.0.0-dev.9](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.8...v4.0.0-dev.9) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.9`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.9），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### 🐛 Fixes & Improvements
+
+* **Direct File Upload Sink:** added `DirectFileUploadSink` as a robust fallback storage sink when MediaStore insertion or URI creation fails.
+* **Storage Permissions:** declared storage permissions (`READ_EXTERNAL_STORAGE`, `WRITE_EXTERNAL_STORAGE`) in the manifest for compatible file transfer access across API levels.
+* **MediaStore Open Mode:** fixed open mode in `MediaStoreUploadSink` to ensure reliable writing of incoming files to shared media collections.
+
+### 🐛 修復與改善
+
+* **直接檔案上傳接收器 (Direct File Upload Sink):** 新增 `DirectFileUploadSink`，在 MediaStore 建立或寫入失敗時作為可靠的備用儲存機制。
+* **儲存權限宣告:** 於資訊清單中宣告儲存讀寫權限（`READ_EXTERNAL_STORAGE`、`WRITE_EXTERNAL_STORAGE`），提升跨 Android 版本檔案接收相容性。
+* **MediaStore 開啟模式修復:** 修正 `MediaStoreUploadSink` 中的檔案開啟模式，確保接收檔案能穩定寫入共用儲存空間。
+
 ## [4.0.0-dev.8](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.7...v4.0.0-dev.8) (2026-11-08)
 
 > [!WARNING]
