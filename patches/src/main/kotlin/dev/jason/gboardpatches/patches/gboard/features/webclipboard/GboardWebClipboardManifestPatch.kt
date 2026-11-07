@@ -42,6 +42,8 @@ internal fun applyGboardWebClipboardManifest(document: Document) {
         ensureManifestUsesPermission(document, manifest, permissionName)
     }
 
+    application.setManifestAndroidAttribute("requestLegacyExternalStorage", "true")
+
     ensureManifestComponent(
         document,
         application,
@@ -156,7 +158,10 @@ private val WEB_CLIPBOARD_PERMISSIONS = listOf(
     "android.permission.FOREGROUND_SERVICE",
     "android.permission.CHANGE_NETWORK_STATE",
     "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE",
-    "android.permission.RECEIVE_BOOT_COMPLETED"
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.WRITE_EXTERNAL_STORAGE"
 )
 
 private const val PATCHES_SETTINGS_ACTIVITY_CLASS =

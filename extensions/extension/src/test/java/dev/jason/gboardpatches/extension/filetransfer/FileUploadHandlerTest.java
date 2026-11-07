@@ -1,7 +1,11 @@
 package dev.jason.gboardpatches.extension.filetransfer;
 
+import android.content.Context;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,6 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@RunWith(RobolectricTestRunner.class)
 public final class FileUploadHandlerTest {
     private static final String LOOPBACK_TOKEN =
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -984,5 +989,73 @@ public final class FileUploadHandlerTest {
 
         Assert.assertTrue(sink.isPublished());
         Assert.assertEquals(0L, tempFile.length());
+    }
+
+    @Test
+    public void sinkCreationFailureReturns500() throws Exception {
+        ActiveUploadRegistry registry = new ActiveUploadRegistry();
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                registry,
+                null,
+                null,
+                () -> true,
+                () -> 100_000_000L,
+                (name, mime) -> {
+                    throw new java.io.IOException("Failed to create MediaStore entry");
+                },
+                () -> 30);
+
+        try (ServerSocket server = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))) {
+            int port = server.getLocalPort();
+            CountDownLatch serverLatch = new CountDownLatch(1);
+            new Thread(() -> {
+                try (Socket accepted = server.accept()) {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("content-length", "10");
+                    headers.put("x-upload-id", "up-fail-sink");
+                    headers.put("x-file-name", "fail.bin");
+                    headers.put("x-file-size", "10");
+                    headers.put("x-file-offset", "0");
+
+                    handler.handleUpload(accepted, accepted.getInputStream(), headers,
+                            (s, status, reason, ct, body, extra) -> {
+                                OutputStream out = s.getOutputStream();
+                                out.write(("HTTP/1.1 " + status + " " + reason + "\r\n").getBytes(StandardCharsets.UTF_8));
+                                out.write(("Content-Length: " + body.length() + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                                out.write(body.getBytes(StandardCharsets.UTF_8));
+                                out.flush();
+                            });
+                } catch (Throwable ignored) {
+                } finally {
+                    serverLatch.countDown();
+                }
+            }).start();
+
+            try (Socket client = new Socket("127.0.0.1", port)) {
+                HttpResponse response = readResponse(client);
+                Assert.assertEquals(500, response.statusCode);
+                Assert.assertTrue(response.bodyString().contains("sink_creation_failed"));
+                Assert.assertTrue(response.bodyString().contains("detail"));
+            }
+            Assert.assertTrue(serverLatch.await(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    public void directFileUploadSinkLifecycle() throws Exception {
+        Context context = RuntimeEnvironment.getApplication();
+        DirectFileUploadSink sink = new DirectFileUploadSink(context, "direct_test.bin");
+        try {
+            byte[] data = "payload".getBytes(StandardCharsets.UTF_8);
+            sink.writeAt(0, data, data.length);
+            sink.fsync();
+            Assert.assertEquals(data.length, sink.getPosition());
+            sink.publish();
+            Assert.assertNotNull(sink.getUri());
+        } finally {
+            sink.close();
+            sink.abort();
+        }
     }
 }

@@ -33,24 +33,53 @@ public final class MediaStoreUploadSink implements UploadSink {
         ContentResolver resolver = this.context.getContentResolver();
         ContentValues values = new ContentValues();
         values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-        values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
-        values.put(MediaStore.Downloads.RELATIVE_PATH, "Download/WebClip");
+        values.put(MediaStore.Downloads.MIME_TYPE, (mimeType != null && !mimeType.isEmpty()) ? mimeType : "application/octet-stream");
+        values.put(MediaStore.Downloads.RELATIVE_PATH, "Download/WebClip/");
         values.put(MediaStore.Downloads.IS_PENDING, 1);
 
-        this.uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-        if (this.uri == null) {
+        Uri createdUri = null;
+        try {
+            createdUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        } catch (Throwable ignored) {
+        }
+        if (createdUri == null) {
+            values.put(MediaStore.Downloads.RELATIVE_PATH, "Download/");
+            try {
+                createdUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            } catch (Throwable ignored) {
+            }
+        }
+        if (createdUri == null) {
+            values.remove(MediaStore.Downloads.RELATIVE_PATH);
+            try {
+                createdUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            } catch (Throwable ignored) {
+            }
+        }
+        if (createdUri == null) {
             throw new IOException("Failed to create MediaStore entry");
         }
+        this.uri = createdUri;
         try {
-            this.pfd = resolver.openFileDescriptor(this.uri, "rw");
-            if (this.pfd == null) {
+            ParcelFileDescriptor descriptor = null;
+            try {
+                descriptor = resolver.openFileDescriptor(this.uri, "rwt");
+            } catch (Throwable ignored) {
+                try {
+                    descriptor = resolver.openFileDescriptor(this.uri, "w");
+                } catch (Throwable ignored2) {
+                    descriptor = resolver.openFileDescriptor(this.uri, "rw");
+                }
+            }
+            if (descriptor == null) {
                 throw new IOException("Failed to open file descriptor");
             }
+            this.pfd = descriptor;
             this.fos = new FileOutputStream(this.pfd.getFileDescriptor());
             this.channel = this.fos.getChannel();
         } catch (Throwable throwable) {
             abort();
-            throw new IOException("Failed to open sink output stream", throwable);
+            throw new IOException("Failed to open sink output stream: " + throwable.getMessage(), throwable);
         }
     }
 
@@ -126,4 +155,3 @@ public final class MediaStoreUploadSink implements UploadSink {
         return currentPosition;
     }
 }
-

@@ -1,7 +1,10 @@
 package dev.jason.gboardpatches.extension.webclipboard;
 
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -33,11 +36,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BooleanSupplier;
 
 import dev.jason.gboardpatches.extension.filetransfer.FileOffer;
 import dev.jason.gboardpatches.extension.filetransfer.FileOfferRegistry;
 import dev.jason.gboardpatches.extension.filetransfer.FileStreamHandler;
+import dev.jason.gboardpatches.extension.filetransfer.FileTransferNotificationManager;
 import dev.jason.gboardpatches.extension.filetransfer.FileUploadHandler;
+import dev.jason.gboardpatches.extension.filetransfer.IncomingOfferRegistry;
 
 public final class ClipboardSyncWebPortal {
     public static final int DEFAULT_PORT = 8080;
@@ -66,7 +72,11 @@ public final class ClipboardSyncWebPortal {
     private final PairingRateLimiter pairingRateLimiter = new PairingRateLimiter();
     private FileUploadHandler fileUploadHandler = new FileUploadHandler(null, null);
     private FileOfferRegistry fileOfferRegistry = FileOfferRegistry.getInstance();
+    private final IncomingOfferRegistry incomingOfferRegistry = IncomingOfferRegistry.getInstance();
     private ExecutorService fileOfferBroadcastExecutor = createBroadcastExecutor();
+    private volatile Context context;
+    private volatile BooleanSupplier askReceiveFilesSupplier = () -> true;
+    private volatile BooleanSupplier notificationsEnabledSupplier;
 
     private ServerSocket serverSocket;
     private ServerSocket httpsServerSocket;
@@ -111,6 +121,7 @@ public final class ClipboardSyncWebPortal {
         this.bridge = bridge;
         this.webAssets = webAssets == null ? WebAssets.empty() : webAssets;
         this.securityConfig = securityConfig == null ? SecurityConfig.disabled() : securityConfig;
+        this.fileUploadHandler.setIncomingOfferRegistry(incomingOfferRegistry);
     }
 
     public interface ClipboardBridge {
@@ -276,7 +287,50 @@ public final class ClipboardSyncWebPortal {
     void setFileUploadHandler(FileUploadHandler handler) {
         if (handler != null) {
             this.fileUploadHandler = handler;
+            this.fileUploadHandler.setIncomingOfferRegistry(incomingOfferRegistry);
+            if (context != null) {
+                this.fileUploadHandler.setContext(context);
+            }
         }
+    }
+
+    public IncomingOfferRegistry getIncomingOfferRegistry() {
+        return incomingOfferRegistry;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+        if (fileUploadHandler != null) {
+            fileUploadHandler.setContext(context);
+        }
+    }
+
+    public void setAskReceiveFilesSupplier(BooleanSupplier supplier) {
+        this.askReceiveFilesSupplier = supplier != null ? supplier : () -> true;
+    }
+
+    public void setNotificationsEnabledSupplier(BooleanSupplier supplier) {
+        this.notificationsEnabledSupplier = supplier;
+    }
+
+    public boolean areNotificationsEnabled() {
+        if (notificationsEnabledSupplier != null) {
+            return notificationsEnabledSupplier.getAsBoolean();
+        }
+        Context ctx = context;
+        if (ctx == null) {
+            return true;
+        }
+        NotificationManager manager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null || !manager.areNotificationsEnabled()) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ctx.checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     FileUploadHandler getFileUploadHandler() {
@@ -709,8 +763,9 @@ public final class ClipboardSyncWebPortal {
                 fileStreamHandler.checkStalledStreams(now, 45_000L);
                 fileOfferRegistry.cleanExpiredOffers(now);
                 fileUploadHandler.cleanExpiredSessions(now);
+                incomingOfferRegistry.cleanExpiredOffers(now);
                 List<EventClient> clients = snapshotEventClients();
-                if (clients.isEmpty() && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads()) {
+                if (clients.isEmpty() && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads() && incomingOfferRegistry.size() == 0) {
                     stopClientHeartbeatThreadIfIdle();
                     return;
                 }
@@ -720,7 +775,7 @@ public final class ClipboardSyncWebPortal {
                             ": heartbeat\r\n\r\n",
                             "heartbeat");
                     removeFailedEventClients(failedClients);
-                    if (eventClientCount() == 0 && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads()) {
+                    if (eventClientCount() == 0 && !fileStreamHandler.hasActiveStreams() && fileOfferRegistry.size() == 0 && !fileUploadHandler.hasActiveUploads() && incomingOfferRegistry.size() == 0) {
                         return;
                     }
                     if (!failedClients.isEmpty()) {
@@ -812,6 +867,11 @@ public final class ClipboardSyncWebPortal {
                 fileUploadHandler.handleUploadStatus(socket, uploadId, this::writeResponse);
                 return;
             }
+            if ("GET".equals(request.method) && request.path.startsWith("/files/offer/")) {
+                String batchId = request.path.substring("/files/offer/".length());
+                handleGetFileOfferStatus(socket, batchId);
+                return;
+            }
             if ("POST".equals(request.method) && "/files/upload".equals(request.path)) {
                 ensureClientHeartbeatThreadLocked();
                 fileUploadHandler.handleUpload(socket, input, request.headers, this::writeResponse);
@@ -853,6 +913,16 @@ public final class ClipboardSyncWebPortal {
                         () -> stopped);
                 return;
             }
+            if ("POST".equals(request.method) && "/files/offer".equals(request.path)) {
+                handlePostFileOffer(socket, request.body);
+                return;
+            }
+            if ("POST".equals(request.method) && request.path.startsWith("/files/offer/") && request.path.endsWith("/respond")) {
+                String sub = request.path.substring("/files/offer/".length());
+                String batchId = sub.substring(0, sub.length() - "/respond".length());
+                handlePostFileOfferRespond(socket, batchId, request.body);
+                return;
+            }
             if ("POST".equals(request.method) && "/clipboard".equals(request.path)) {
                 handleClipboardPost(socket, request.body);
                 return;
@@ -867,9 +937,140 @@ public final class ClipboardSyncWebPortal {
             }
             writeResponse(socket, 404, "Not Found", "application/json; charset=utf-8",
                     "{\"ok\":false,\"error\":\"not_found\"}");
-        } catch (Throwable ignored) {
+        } catch (Throwable throwable) {
+            logInfo(LOG_PREFIX + " error handling client request: " + throwable.getMessage());
+            try {
+                if (socket != null && !socket.isClosed() && !socket.isOutputShutdown()) {
+                    writeResponse(socket, 500, "Internal Server Error", "application/json; charset=utf-8",
+                            "{\"ok\":false,\"error\":\"internal_server_error\"}");
+                }
+            } catch (Throwable ignored) {
+            }
             closeQuietly(socket);
         }
+    }
+
+    private void handleGetFileOfferStatus(Socket socket, String batchId) throws Exception {
+        if (batchId == null || batchId.isBlank()) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"invalid_batch_id\"}");
+            return;
+        }
+        IncomingOfferRegistry.OfferState state = incomingOfferRegistry.getState(batchId);
+        if (state != null) {
+            writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
+                    "{\"ok\":true,\"state\":\"" + state.name().toLowerCase(Locale.US) + "\"}");
+            return;
+        }
+        if (fileOfferRegistry.hasBatch(batchId)) {
+            boolean accepted = fileOfferRegistry.isBatchAccepted(batchId);
+            writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
+                    "{\"ok\":true,\"state\":\"" + (accepted ? "accepted" : "pending") + "\"}");
+            return;
+        }
+        writeResponse(socket, 404, "Not Found", "application/json; charset=utf-8",
+                "{\"ok\":false,\"error\":\"offer_not_found\"}");
+    }
+
+    private void handlePostFileOffer(Socket socket, String body) throws Exception {
+        if (!fileUploadHandler.isAcceptFilesAllowed()) {
+            writeResponse(socket, 403, "Forbidden", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"uploads_disabled\"}");
+            return;
+        }
+        JSONObject json;
+        try {
+            json = new JSONObject(body != null ? body : "{}");
+        } catch (Throwable t) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"invalid_json\"}");
+            return;
+        }
+        String batchId = json.optString("batchId", "");
+        if (batchId.isBlank()) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"missing_batch_id\"}");
+            return;
+        }
+        long totalSize = json.optLong("totalSize", 0L);
+        JSONArray filesArray = json.optJSONArray("files");
+        List<IncomingOfferRegistry.FileInfo> files = new ArrayList<>();
+        if (filesArray != null) {
+            for (int i = 0; i < filesArray.length(); i++) {
+                JSONObject fileObj = filesArray.optJSONObject(i);
+                if (fileObj != null) {
+                    files.add(new IncomingOfferRegistry.FileInfo(
+                            fileObj.optString("name", "file"),
+                            fileObj.optLong("size", 0L)));
+                }
+            }
+        }
+        boolean ask = askReceiveFilesSupplier != null ? askReceiveFilesSupplier.getAsBoolean() : true;
+        if (!ask) {
+            incomingOfferRegistry.register(batchId, files, totalSize, true);
+            ensureClientHeartbeatThreadLocked();
+            writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
+                    "{\"ok\":true,\"state\":\"accepted\"}");
+            return;
+        }
+        if (!areNotificationsEnabled()) {
+            writeResponse(socket, 409, "Conflict", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"notifications_disabled\"}");
+            return;
+        }
+        incomingOfferRegistry.register(batchId, files, totalSize, false);
+        ensureClientHeartbeatThreadLocked();
+        FileTransferNotificationManager.getInstance().showOfferNotification(batchId, files, totalSize);
+        writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
+                "{\"ok\":true,\"state\":\"pending\"}");
+    }
+
+    private void handlePostFileOfferRespond(Socket socket, String batchId, String body) throws Exception {
+        if (batchId == null || batchId.isBlank()) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"invalid_batch_id\"}");
+            return;
+        }
+        JSONObject json;
+        try {
+            json = new JSONObject(body != null ? body : "{}");
+        } catch (Throwable t) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"invalid_json\"}");
+            return;
+        }
+        if (!json.has("accept")) {
+            writeResponse(socket, 400, "Bad Request", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"missing_accept_field\"}");
+            return;
+        }
+        boolean accept = json.optBoolean("accept", false);
+        boolean incomingHandled = false;
+        if (incomingOfferRegistry.get(batchId) != null) {
+            if (accept) {
+                incomingOfferRegistry.accept(batchId);
+            } else {
+                incomingOfferRegistry.decline(batchId);
+            }
+            FileTransferNotificationManager.getInstance().dismissOfferNotification(batchId);
+            incomingHandled = true;
+        }
+        boolean outgoingHandled = false;
+        if (fileOfferRegistry.hasBatch(batchId)) {
+            if (accept) {
+                fileOfferRegistry.acceptBatch(batchId);
+            } else {
+                fileOfferRegistry.declineBatch(batchId);
+            }
+            outgoingHandled = true;
+        }
+        if (!incomingHandled && !outgoingHandled) {
+            writeResponse(socket, 404, "Not Found", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"offer_not_found\"}");
+            return;
+        }
+        writeResponse(socket, 200, "OK", "application/json; charset=utf-8",
+                "{\"ok\":true,\"state\":\"" + (accept ? "accepted" : "declined") + "\"}");
     }
 
     private Request readRequest(String requestLine, InputStream input) throws Exception {

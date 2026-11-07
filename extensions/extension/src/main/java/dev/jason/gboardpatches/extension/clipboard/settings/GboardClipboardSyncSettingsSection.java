@@ -2,6 +2,8 @@ package dev.jason.gboardpatches.extension.clipboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +31,8 @@ final class GboardClipboardSyncSettingsSection {
     private final String titleEnable;
     private final String titleAcceptFiles;
     private final String acceptFilesSummary;
+    private final String titleAskReceiveFiles;
+    private final String askReceiveFilesSummary;
     private final String titlePort;
     private final String titlePairing;
     private final String titlePairingCode;
@@ -80,6 +84,8 @@ final class GboardClipboardSyncSettingsSection {
         titleEnable = textLookup.titleEnable();
         titleAcceptFiles = textLookup.titleAcceptFiles();
         acceptFilesSummary = textLookup.acceptFilesSummary();
+        titleAskReceiveFiles = textLookup.titleAskReceiveFiles();
+        askReceiveFilesSummary = textLookup.askReceiveFilesSummary();
         titlePort = textLookup.titlePort();
         titlePairing = textLookup.titlePairing();
         titlePairingCode = textLookup.titlePairingCode();
@@ -134,6 +140,15 @@ final class GboardClipboardSyncSettingsSection {
                 WebClipboardPreferences.isAcceptFiles(preferences),
                 value -> {
                     WebClipboardPreferences.setAcceptFiles(preferences, value);
+                    GboardPatchesSettingsContract.refresh(host);
+                }));
+        generalRows.add(new GboardPatchesSettingsContract.ToggleRow(
+                titleAskReceiveFiles,
+                askReceiveFilesSummary,
+                WebClipboardPreferences.isAcceptFiles(preferences),
+                WebClipboardPreferences.isAskReceiveFiles(preferences),
+                value -> {
+                    WebClipboardPreferences.setAskReceiveFiles(preferences, value);
                     GboardPatchesSettingsContract.refresh(host);
                 }));
 
@@ -316,6 +331,8 @@ final class GboardClipboardSyncSettingsSection {
         String titleEnable();
         String titleAcceptFiles();
         String acceptFilesSummary();
+        String titleAskReceiveFiles();
+        String askReceiveFilesSummary();
         String titlePort();
         String titlePairing();
         String titlePairingCode();
@@ -418,6 +435,20 @@ final class GboardClipboardSyncSettingsSection {
             return GboardSettingsText.get(
                     context,
                     R.string.gboard_patches_web_clipboard_accept_files_summary);
+        }
+
+        @Override
+        public String titleAskReceiveFiles() {
+            return GboardSettingsText.get(
+                    context,
+                    R.string.gboard_patches_web_clipboard_ask_receive_files_title);
+        }
+
+        @Override
+        public String askReceiveFilesSummary() {
+            return GboardSettingsText.get(
+                    context,
+                    R.string.gboard_patches_web_clipboard_ask_receive_files_summary);
         }
 
         @Override
@@ -661,6 +692,16 @@ final class GboardClipboardSyncSettingsSection {
         }
 
         @Override
+        public String titleAskReceiveFiles() {
+            return "Ask before receiving files";
+        }
+
+        @Override
+        public String askReceiveFilesSummary() {
+            return "Show a notification to accept or decline incoming file transfers from PC.";
+        }
+
+        @Override
         public String titlePort() {
             return "Web server port";
         }
@@ -797,18 +838,50 @@ final class GboardClipboardSyncSettingsSection {
         }
     }
 
-    private static void applyEnabledWithPermission(GboardPatchesSettingsContract.FeatureHost host,boolean enabled) {
-        Context context=host.getContext();
-        if(!enabled || dev.jason.gboardpatches.extension.webclipboard.WebClipboardLocalNetworkPermission.isGranted(context)) {
-            WebClipboardTileController.applyEnabled(context,enabled);
-            GboardPatchesSettingsContract.refresh(host);return;
+    private static void applyEnabledWithPermission(GboardPatchesSettingsContract.FeatureHost host, boolean enabled) {
+        Context context = host.getContext();
+        if (!enabled) {
+            WebClipboardTileController.applyEnabled(context, false);
+            GboardPatchesSettingsContract.refresh(host);
+            return;
         }
-        GboardPatchesSettingsContract.requestRuntimePermission(host,
-                dev.jason.gboardpatches.extension.webclipboard.WebClipboardLocalNetworkPermission.NAME,
-                granted->{
-                    if(granted)WebClipboardTileController.applyEnabled(context,true);
-                    else GboardPatchesSettingsContract.showMessage(host,"Local network permission is required to start Web Clipboard");
-                    GboardPatchesSettingsContract.refresh(host);
-                });
+        if (!dev.jason.gboardpatches.extension.webclipboard.WebClipboardLocalNetworkPermission.isGranted(context)) {
+            GboardPatchesSettingsContract.requestRuntimePermission(host,
+                    dev.jason.gboardpatches.extension.webclipboard.WebClipboardLocalNetworkPermission.NAME,
+                    granted -> {
+                        if (granted) {
+                            checkNotificationPermissionAndEnable(host, context);
+                        } else {
+                            GboardPatchesSettingsContract.showMessage(host, "Local network permission is required to start Web Clipboard");
+                            GboardPatchesSettingsContract.refresh(host);
+                        }
+                    });
+            return;
+        }
+        checkNotificationPermissionAndEnable(host, context);
+    }
+
+    private static void checkNotificationPermissionAndEnable(GboardPatchesSettingsContract.FeatureHost host, Context context) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q && context.checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED) {
+            GboardPatchesSettingsContract.requestRuntimePermission(host,
+                    "android.permission.WRITE_EXTERNAL_STORAGE",
+                    granted -> checkPostNotificationPermissionAndEnable(host, context));
+            return;
+        }
+        checkPostNotificationPermissionAndEnable(host, context);
+    }
+
+    private static void checkPostNotificationPermissionAndEnable(GboardPatchesSettingsContract.FeatureHost host, Context context) {
+        if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+            GboardPatchesSettingsContract.requestRuntimePermission(host,
+                    "android.permission.POST_NOTIFICATIONS",
+                    granted -> {
+                        WebClipboardTileController.applyEnabled(context, true);
+                        GboardPatchesSettingsContract.refresh(host);
+                    });
+            return;
+        }
+        WebClipboardTileController.applyEnabled(context, true);
+        GboardPatchesSettingsContract.refresh(host);
     }
 }

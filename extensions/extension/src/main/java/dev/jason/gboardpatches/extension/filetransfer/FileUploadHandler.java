@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import java.io.Closeable;
@@ -35,6 +36,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.IntSupplier;
 
 public final class FileUploadHandler {
+    private static final String TAG = "FileUploadHandler";
     public static final long FREE_SPACE_MARGIN_BYTES = 50L * 1024L * 1024L;
     public static final long STALL_TIMEOUT_MS = 45_000L;
     public static final int BUFFER_SIZE = 64 * 1024;
@@ -58,6 +60,7 @@ public final class FileUploadHandler {
 
     private volatile Context context;
     private final ActiveUploadRegistry activeUploadRegistry;
+    private volatile IncomingOfferRegistry incomingOfferRegistry;
     private volatile FileTransferLockController lockController;
     private volatile FileTransferNotificationManager notificationManager;
     private final Semaphore uploadSemaphore = new Semaphore(2);
@@ -117,8 +120,20 @@ public final class FileUploadHandler {
         this.acceptFilesSupplier = acceptFilesSupplier != null ? acceptFilesSupplier : () -> true;
     }
 
+    public boolean isAcceptFilesAllowed() {
+        return acceptFilesSupplier.getAsBoolean();
+    }
+
     public void setNotificationManager(FileTransferNotificationManager notificationManager) {
         this.notificationManager = notificationManager;
+    }
+
+    public void setIncomingOfferRegistry(IncomingOfferRegistry incomingOfferRegistry) {
+        this.incomingOfferRegistry = incomingOfferRegistry;
+    }
+
+    public IncomingOfferRegistry getIncomingOfferRegistry() {
+        return incomingOfferRegistry;
     }
 
     public ActiveUploadRegistry getActiveUploadRegistry() {
@@ -311,6 +326,12 @@ public final class FileUploadHandler {
             return;
         }
 
+        if (incomingOfferRegistry != null && batchId != null && !batchId.isBlank() && !incomingOfferRegistry.isAccepted(batchId)) {
+            writer.write(socket, 403, "Forbidden", "application/json; charset=utf-8",
+                    "{\"ok\":false,\"error\":\"batch_not_accepted\"}", null);
+            return;
+        }
+
         ActiveUploadRegistry.UploadSession session = activeUploadRegistry.get(uploadId);
         boolean sessionWriterLocked = false;
         if (session != null) {
@@ -387,9 +408,22 @@ public final class FileUploadHandler {
                 String rawFileName = header(headers, "x-file-name");
                 String sanitizedName = sanitizeFileName(rawFileName);
                 String mimeType = resolveMimeType(sanitizedName);
-                UploadSink sink = sinkFactory != null
-                        ? sinkFactory.create(sanitizedName, mimeType)
-                        : new MediaStoreUploadSink(context, sanitizedName, mimeType);
+                UploadSink sink;
+                try {
+                    sink = createSink(sanitizedName, mimeType);
+                } catch (Throwable throwable) {
+                    logError("Failed to create upload sink for " + sanitizedName, throwable);
+                    boolean isStorage = throwable instanceof IOException
+                            && throwable.getMessage() != null
+                            && throwable.getMessage().toLowerCase(Locale.US).contains("storage");
+                    int statusCode = isStorage ? 507 : 500;
+                    String statusText = isStorage ? "Insufficient Storage" : "Internal Server Error";
+                    String error = isStorage ? "insufficient_storage" : "sink_creation_failed";
+                    String detail = throwable.getMessage() != null ? throwable.getMessage() : throwable.getClass().getSimpleName();
+                    writer.write(socket, statusCode, statusText, "application/json; charset=utf-8",
+                            "{\"ok\":false,\"error\":\"" + error + "\",\"detail\":\"" + escapeJson(detail) + "\"}", null);
+                    return;
+                }
                 session = new ActiveUploadRegistry.UploadSession(
                         uploadId, sanitizedName, fileSize, sink, fileOffset, System.currentTimeMillis(), batchId);
                 try {
@@ -596,6 +630,55 @@ public final class FileUploadHandler {
                 closeable.close();
             } catch (Throwable ignored) {
             }
+        }
+    }
+
+    private UploadSink createSink(String sanitizedName, String mimeType) throws IOException {
+        if (sinkFactory != null) {
+            return sinkFactory.create(sanitizedName, mimeType);
+        }
+        try {
+            return new MediaStoreUploadSink(context, sanitizedName, mimeType);
+        } catch (Throwable throwable) {
+            logError("MediaStoreUploadSink failed, falling back to DirectFileUploadSink", throwable);
+            try {
+                return new DirectFileUploadSink(context, sanitizedName);
+            } catch (Throwable directThrowable) {
+                throw new IOException("Sink creation failed: " + throwable.getMessage(), throwable);
+            }
+        }
+    }
+
+    private static String escapeJson(String text) {
+        if (text == null) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '"') {
+                builder.append("\\\"");
+            } else if (c == '\\') {
+                builder.append("\\\\");
+            } else if (c == '\n') {
+                builder.append("\\n");
+            } else if (c == '\r') {
+                builder.append("\\r");
+            } else if (c == '\t') {
+                builder.append("\\t");
+            } else if (c < 0x20) {
+                builder.append(String.format(Locale.US, "\\u%04x", (int) c));
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
+
+    private static void logError(String message, Throwable throwable) {
+        try {
+            Log.e(TAG, message, throwable);
+        } catch (Throwable ignored) {
         }
     }
 }

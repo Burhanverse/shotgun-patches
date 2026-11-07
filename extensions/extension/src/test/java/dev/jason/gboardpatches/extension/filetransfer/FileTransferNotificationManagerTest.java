@@ -292,4 +292,29 @@ public class FileTransferNotificationManagerTest {
         assertEquals("Transfer interrupted", zeroResult.extras.getString(Notification.EXTRA_TITLE));
         assertFalse((zeroResult.flags & Notification.FLAG_ONGOING_EVENT) != 0);
     }
+
+    @Test
+    public void offerNotificationPublishesWithAcceptAndDeclineActionsAndDismisses() {
+        Context context = RuntimeEnvironment.getApplication();
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        org.robolectric.shadows.ShadowNotificationManager shadowNm = org.robolectric.Shadows.shadowOf(nm);
+        nm.cancelAll();
+
+        manager.showOfferNotification("batch-offer-1",
+                Collections.singletonList(new IncomingOfferRegistry.FileInfo("document.pdf", 2048L)),
+                2048L);
+
+        Notification notification = shadowNm.getNotification(FileTransferNotificationManager.NOTIFICATION_ID_OFFER);
+        assertTrue(notification != null);
+        assertEquals("Incoming file from PC", notification.extras.getString(Notification.EXTRA_TITLE));
+        assertTrue(notification.extras.getString(Notification.EXTRA_TEXT).contains("document.pdf"));
+        assertTrue(notification.actions != null);
+        assertEquals(2, notification.actions.length);
+        assertEquals("Accept", notification.actions[0].title.toString());
+        assertEquals("Decline", notification.actions[1].title.toString());
+
+        manager.dismissOfferNotification("batch-offer-1");
+        assertNull(shadowNm.getNotification(FileTransferNotificationManager.NOTIFICATION_ID_OFFER));
+    }
 }

@@ -61,6 +61,10 @@ public final class ClipboardSyncService extends Service {
             "dev.jason.gboardpatches.extension.filetransfer.action.CANCEL_FILE_TRANSFER";
     public static final String ACTION_CANCEL_FILE_UPLOAD =
             "dev.jason.gboardpatches.extension.filetransfer.action.CANCEL_FILE_UPLOAD";
+    public static final String ACTION_ACCEPT_FILE_OFFER =
+            "dev.jason.gboardpatches.extension.filetransfer.action.ACCEPT_FILE_OFFER";
+    public static final String ACTION_DECLINE_FILE_OFFER =
+            "dev.jason.gboardpatches.extension.filetransfer.action.DECLINE_FILE_OFFER";
     public static final String EXTRA_BATCH_ID = "batch_id";
     public static final String EXTRA_UPLOAD_ID = "upload_id";
     private static final String EXTRA_TEXT = "text";
@@ -244,6 +248,28 @@ public final class ClipboardSyncService extends Service {
                 FileTransferNotificationManager.getInstance().cancelUpload(uploadId, batchId);
                 return START_STICKY;
             }
+            if (ACTION_ACCEPT_FILE_OFFER.equals(action)) {
+                String batchId = intent != null ? intent.getStringExtra(EXTRA_BATCH_ID) : null;
+                if (batchId != null) {
+                    if (webPortal != null) {
+                        webPortal.getIncomingOfferRegistry().accept(batchId);
+                        webPortal.getFileOfferRegistry().acceptBatch(batchId);
+                    }
+                    FileTransferNotificationManager.getInstance().dismissOfferNotification(batchId);
+                }
+                return START_STICKY;
+            }
+            if (ACTION_DECLINE_FILE_OFFER.equals(action)) {
+                String batchId = intent != null ? intent.getStringExtra(EXTRA_BATCH_ID) : null;
+                if (batchId != null) {
+                    if (webPortal != null) {
+                        webPortal.getIncomingOfferRegistry().decline(batchId);
+                        webPortal.getFileOfferRegistry().declineBatch(batchId);
+                    }
+                    FileTransferNotificationManager.getInstance().dismissOfferNotification(batchId);
+                }
+                return START_STICKY;
+            }
             if (ACTION_LOCAL_CLIP.equals(action)) {
                 String text = intent != null ? intent.getStringExtra(EXTRA_TEXT) : null;
                 if (hasClipboardText(text)) {
@@ -371,11 +397,15 @@ public final class ClipboardSyncService extends Service {
             notificationManager.init(this);
             notificationManager.setFileStreamHandler(portal.getFileStreamHandler());
             notificationManager.setFileOfferRegistry(portal.getFileOfferRegistry());
+            portal.setContext(this);
+            portal.setAskReceiveFilesSupplier(() ->
+                    WebClipboardPreferences.isAskReceiveFiles(WebClipboardPreferences.preferences(this)));
             portal.getFileStreamHandler().setLockController(lockController);
             portal.getFileStreamHandler().setNotificationManager(notificationManager);
             portal.getFileUploadHandler().setContext(this);
             portal.getFileUploadHandler().setLockController(lockController);
             portal.getFileUploadHandler().setNotificationManager(notificationManager);
+            portal.getFileUploadHandler().setIncomingOfferRegistry(portal.getIncomingOfferRegistry());
             notificationManager.setActiveUploadRegistry(portal.getFileUploadHandler().getActiveUploadRegistry());
             portal.getFileUploadHandler().setAcceptFilesSupplier(() ->
                     WebClipboardPreferences.isAcceptFiles(WebClipboardPreferences.preferences(this)));
