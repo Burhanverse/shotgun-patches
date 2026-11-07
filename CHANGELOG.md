@@ -1,3 +1,26 @@
+## [4.0.0-dev.7](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.6...v4.0.0-dev.7) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.7`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.7），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### ✨ New Features
+
+* **Web Clipboard File Transfer:** bidirectional file transfer support between phone and desktop browser.
+* **Upload Receiver:** upload files directly from desktop browser to phone storage with `ActiveUploadRegistry`, `FileUploadHandler`, and `MediaStoreUploadSink`.
+* **Share to Web:** share files from phone apps via system share sheet to connected web browser sessions.
+* **Security & Reliability:** pairing brute-force protection with IP rate limiting and constant-time auth, single-writer upload takeover, idle lock timeouts, and upload idempotency caching.
+* **Notifications & Settings:** status notifications for incoming file transfers and settings toggle in Gboard preferences.
+
+### ✨ 新功能
+
+* **網頁剪貼簿檔案傳輸 (Web Clipboard File Transfer):** 支援手機與電腦瀏覽器之間的雙向檔案傳輸。
+* **檔案上傳接收器:** 支援由電腦瀏覽器直接上傳檔案並儲存至手機儲存空間。
+* **分享發送至網頁:** 透過系統分享選單直接將手機檔案傳送至已配對的網頁端。
+* **安全性與可靠性:** 配對防暴力破解（IP 速率限制與常數時間驗證）、單一寫入鎖定、閒置超時與上傳冪等快取。
+* **通知與設定:** 檔案接收通知顯示以及 Gboard 偏好設定中的檔案傳輸開關。
+
 ## [4.0.0-dev.6](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.5...v4.0.0-dev.6) (2026-10-28)
 
 ### 🚀 Updated App Support & Compatibility
