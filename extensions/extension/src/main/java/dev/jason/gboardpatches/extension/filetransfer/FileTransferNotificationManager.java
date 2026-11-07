@@ -25,10 +25,12 @@ import dev.jason.gboardpatches.extension.webclipboard.ClipboardSyncService;
 
 public final class FileTransferNotificationManager {
     public static final String CHANNEL_ID = "webclip_file_transfer";
+    public static final String CHANNEL_ID_OFFERS = "webclip_file_offers";
     public static final int NOTIFICATION_ID_PROGRESS = 1022;
     public static final int NOTIFICATION_ID_RESULT = 1023;
     public static final int NOTIFICATION_ID_RECEIVE_PROGRESS = 1024;
     public static final int NOTIFICATION_ID_RECEIVE_RESULT = 1025;
+    public static final int NOTIFICATION_ID_OFFER = 1026;
     private static final long PROGRESS_THROTTLE_MS = 500L;
     public static final long STALE_BATCH_TIMEOUT_MS = 2L * 60L * 1000L;
     private static final String TAG = "GboardFileTransferNotif";
@@ -445,7 +447,7 @@ public final class FileTransferNotificationManager {
                 return;
             }
             Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                    ? new Notification.Builder(context, CHANNEL_ID)
+                    ? new Notification.Builder(context, CHANNEL_ID_OFFERS)
                     : new Notification.Builder(context);
 
             builder.setSmallIcon(android.R.drawable.stat_sys_upload)
@@ -555,7 +557,7 @@ public final class FileTransferNotificationManager {
                 return;
             }
             Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                    ? new Notification.Builder(context, CHANNEL_ID)
+                    ? new Notification.Builder(context, CHANNEL_ID_OFFERS)
                     : new Notification.Builder(context);
 
             builder.setSmallIcon(android.R.drawable.stat_sys_download)
@@ -594,6 +596,87 @@ public final class FileTransferNotificationManager {
             manager.notify(NOTIFICATION_ID_RECEIVE_RESULT, builder.build());
         } catch (Throwable throwable) {
             Log.w(TAG, "Failed to publish receive result notification", throwable);
+        }
+    }
+
+    public void showOfferNotification(String batchId, List<IncomingOfferRegistry.FileInfo> files, long totalSize) {
+        Context context = appContext;
+        if (context == null) {
+            return;
+        }
+        try {
+            ensureChannel(context);
+            NotificationManager manager = (NotificationManager)
+                    context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager == null) {
+                return;
+            }
+            Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    ? new Notification.Builder(context, CHANNEL_ID_OFFERS)
+                    : new Notification.Builder(context);
+
+            int fileCount = files != null ? files.size() : 1;
+            String firstFileName = (files != null && !files.isEmpty()) ? files.get(0).name : "file";
+            String title;
+            String text;
+            if (fileCount <= 1) {
+                title = "Incoming file from PC";
+                text = firstFileName + " (" + formatSize(totalSize) + ")";
+            } else {
+                title = "Incoming " + fileCount + " files from PC";
+                text = firstFileName + " and " + (fileCount - 1) + " more (" + formatSize(totalSize) + ")";
+            }
+
+            builder.setSmallIcon(android.R.drawable.stat_sys_download)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setOngoing(false)
+                    .setAutoCancel(true);
+
+            Intent acceptIntent = new Intent(context, ClipboardSyncService.class);
+            acceptIntent.setAction(ClipboardSyncService.ACTION_ACCEPT_FILE_OFFER);
+            acceptIntent.putExtra(ClipboardSyncService.EXTRA_BATCH_ID, batchId);
+            PendingIntent pendingAccept = PendingIntent.getService(
+                    context,
+                    batchId != null ? batchId.hashCode() : 1026,
+                    acceptIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            Intent declineIntent = new Intent(context, ClipboardSyncService.class);
+            declineIntent.setAction(ClipboardSyncService.ACTION_DECLINE_FILE_OFFER);
+            declineIntent.putExtra(ClipboardSyncService.EXTRA_BATCH_ID, batchId);
+            PendingIntent pendingDecline = PendingIntent.getService(
+                    context,
+                    (batchId != null ? batchId.hashCode() : 1026) + 1,
+                    declineIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            Notification.Action acceptAction = new Notification.Action.Builder(
+                    0, "Accept", pendingAccept).build();
+            Notification.Action declineAction = new Notification.Action.Builder(
+                    0, "Decline", pendingDecline).build();
+            builder.addAction(acceptAction);
+            builder.addAction(declineAction);
+
+            manager.notify(NOTIFICATION_ID_OFFER, builder.build());
+        } catch (Throwable throwable) {
+            Log.w(TAG, "Failed to publish offer notification", throwable);
+        }
+    }
+
+    public void dismissOfferNotification(String batchId) {
+        Context context = appContext;
+        if (context == null) {
+            return;
+        }
+        try {
+            NotificationManager manager = (NotificationManager)
+                    context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.cancel(NOTIFICATION_ID_OFFER);
+            }
+        } catch (Throwable throwable) {
+            Log.w(TAG, "Failed to cancel offer notification", throwable);
         }
     }
 
@@ -640,12 +723,19 @@ public final class FileTransferNotificationManager {
         NotificationManager manager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
-            NotificationChannel channel = new NotificationChannel(
+            NotificationChannel transferChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "WebClip File Transfer",
                     NotificationManager.IMPORTANCE_LOW);
-            channel.setDescription("Progress and status for WebClip file transfers");
-            manager.createNotificationChannel(channel);
+            transferChannel.setDescription("Progress for WebClip file transfers");
+            manager.createNotificationChannel(transferChannel);
+
+            NotificationChannel offersChannel = new NotificationChannel(
+                    CHANNEL_ID_OFFERS,
+                    "WebClip File Offers & Alerts",
+                    NotificationManager.IMPORTANCE_HIGH);
+            offersChannel.setDescription("Consent prompts and completion status for WebClip file transfers");
+            manager.createNotificationChannel(offersChannel);
         }
     }
 

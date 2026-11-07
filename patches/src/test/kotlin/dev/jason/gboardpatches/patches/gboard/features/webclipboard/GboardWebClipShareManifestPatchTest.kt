@@ -57,6 +57,18 @@ class GboardWebClipShareManifestPatchTest {
         )
     }
 
+    @Test
+    fun manifestInjectsPostNotificationsPermission() {
+        val manifest = parse(MINIMAL_MANIFEST)
+        applyGboardWebClipboardManifest(manifest)
+
+        val permissions = manifest.documentElement.childElements("uses-permission").map {
+            it.manifestAndroidAttribute("name")
+        }.toSet()
+
+        org.junit.Assert.assertTrue(permissions.contains("android.permission.POST_NOTIFICATIONS"))
+    }
+
     private fun parse(xml: String): Document = DocumentBuilderFactory.newInstance().apply {
         isNamespaceAware = true
     }.newDocumentBuilder().parse(ByteArrayInputStream(xml.toByteArray(Charsets.UTF_8)))

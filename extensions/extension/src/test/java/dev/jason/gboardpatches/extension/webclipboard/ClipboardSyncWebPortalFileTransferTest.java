@@ -9,6 +9,7 @@ import dev.jason.gboardpatches.extension.filetransfer.ActiveUploadRegistry;
 import dev.jason.gboardpatches.extension.filetransfer.FileOffer;
 import dev.jason.gboardpatches.extension.filetransfer.FileOfferRegistry;
 import dev.jason.gboardpatches.extension.filetransfer.FileUploadHandler;
+import dev.jason.gboardpatches.extension.filetransfer.IncomingOfferRegistry;
 import dev.jason.gboardpatches.extension.filetransfer.TempFileUploadSink;
 
 import java.io.BufferedReader;
@@ -626,6 +627,381 @@ public final class ClipboardSyncWebPortalFileTransferTest {
             }
         } finally {
             portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileOfferLifecycleAndUploadGating() throws Exception {
+        File tempFile = File.createTempFile("webclip-offer-test", ".bin");
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                new ActiveUploadRegistry(),
+                null,
+                Executors.newSingleThreadScheduledExecutor(),
+                () -> true,
+                () -> Long.MAX_VALUE,
+                (name, mime) -> new TempFileUploadSink(tempFile),
+                () -> 30);
+        portal.setFileUploadHandler(handler);
+        portal.setNotificationsEnabledSupplier(() -> true);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            String offerBody = "{\"batchId\":\"batch-lifecycle-1\",\"files\":[{\"name\":\"test.txt\",\"size\":5}],\"totalSize\":5}";
+            HttpResponse offerResp = sendRequest(port,
+                    "POST /files/offer HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + offerBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + offerBody);
+            Assert.assertEquals(200, offerResp.statusCode);
+            Assert.assertTrue(offerResp.bodyString().contains("\"state\":\"pending\""));
+
+            HttpResponse statusResp = sendRequest(port,
+                    "GET /files/offer/batch-lifecycle-1 HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Connection: close\r\n\r\n");
+            Assert.assertEquals(200, statusResp.statusCode);
+            Assert.assertTrue(statusResp.bodyString().contains("\"state\":\"pending\""));
+
+            HttpResponse unacceptedUpload = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-lifecycle-1\r\n"
+                            + "X-File-Name: test.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "X-Batch-Id: batch-lifecycle-1\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "hello");
+            Assert.assertEquals(403, unacceptedUpload.statusCode);
+            Assert.assertTrue(unacceptedUpload.bodyString().contains("batch_not_accepted"));
+
+            String respondBody = "{\"accept\":true}";
+            HttpResponse respondResp = sendRequest(port,
+                    "POST /files/offer/batch-lifecycle-1/respond HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + respondBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + respondBody);
+            Assert.assertEquals(200, respondResp.statusCode);
+            Assert.assertTrue(respondResp.bodyString().contains("\"state\":\"accepted\""));
+
+            HttpResponse acceptedStatusResp = sendRequest(port,
+                    "GET /files/offer/batch-lifecycle-1 HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Connection: close\r\n\r\n");
+            Assert.assertEquals(200, acceptedStatusResp.statusCode);
+            Assert.assertTrue(acceptedStatusResp.bodyString().contains("\"state\":\"accepted\""));
+
+            HttpResponse acceptedUpload = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-lifecycle-1\r\n"
+                            + "X-File-Name: test.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "X-Batch-Id: batch-lifecycle-1\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "hello");
+            Assert.assertEquals(200, acceptedUpload.statusCode);
+            Assert.assertTrue(acceptedUpload.bodyString().contains("\"status\":\"complete\""));
+        } finally {
+            portal.stop();
+            tempFile.delete();
+        }
+    }
+
+    @Test
+    public void portalFileOfferNotificationsDisabledReturns409() throws Exception {
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+        portal.setNotificationsEnabledSupplier(() -> false);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            String offerBody = "{\"batchId\":\"batch-notif-off\",\"files\":[{\"name\":\"test.txt\",\"size\":5}],\"totalSize\":5}";
+            HttpResponse offerResp = sendRequest(port,
+                    "POST /files/offer HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + offerBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + offerBody);
+            Assert.assertEquals(409, offerResp.statusCode);
+            Assert.assertTrue(offerResp.bodyString().contains("notifications_disabled"));
+        } finally {
+            portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileOfferAutoAcceptWhenAskDisabled() throws Exception {
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+        portal.setAskReceiveFilesSupplier(() -> false);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            String offerBody = "{\"batchId\":\"batch-auto-accept\",\"files\":[{\"name\":\"test.txt\",\"size\":5}],\"totalSize\":5}";
+            HttpResponse offerResp = sendRequest(port,
+                    "POST /files/offer HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + offerBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + offerBody);
+            Assert.assertEquals(200, offerResp.statusCode);
+            Assert.assertTrue(offerResp.bodyString().contains("\"state\":\"accepted\""));
+        } finally {
+            portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileOfferExpiryReturnsExpiredAndRejectsUpload() throws Exception {
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                new ActiveUploadRegistry(),
+                null,
+                Executors.newSingleThreadScheduledExecutor(),
+                () -> true,
+                () -> Long.MAX_VALUE,
+                (name, mime) -> null,
+                () -> 30);
+        portal.setFileUploadHandler(handler);
+        portal.start();
+        try {
+            int port = portal.getPort();
+            String offerBody = "{\"batchId\":\"batch-expire-test\",\"files\":[{\"name\":\"test.txt\",\"size\":5}],\"totalSize\":5}";
+            HttpResponse offerResp = sendRequest(port,
+                    "POST /files/offer HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + offerBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + offerBody);
+            Assert.assertEquals(200, offerResp.statusCode);
+
+            IncomingOfferRegistry.IncomingOffer offer = portal.getIncomingOfferRegistry().get("batch-expire-test");
+            Assert.assertNotNull(offer);
+            offer.setState(IncomingOfferRegistry.OfferState.EXPIRED);
+
+            HttpResponse statusResp = sendRequest(port,
+                    "GET /files/offer/batch-expire-test HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Connection: close\r\n\r\n");
+            Assert.assertEquals(200, statusResp.statusCode);
+            Assert.assertTrue(statusResp.bodyString().contains("\"state\":\"expired\""));
+
+            HttpResponse uploadResp = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-expired-1\r\n"
+                            + "X-File-Name: test.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "X-Batch-Id: batch-expire-test\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "hello");
+            Assert.assertEquals(403, uploadResp.statusCode);
+            Assert.assertTrue(uploadResp.bodyString().contains("batch_not_accepted"));
+        } finally {
+            portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileUploadSinkFailureReturns500() throws Exception {
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                new ActiveUploadRegistry(),
+                null,
+                Executors.newSingleThreadScheduledExecutor(),
+                () -> true,
+                () -> Long.MAX_VALUE,
+                (name, mime) -> {
+                    throw new java.io.IOException("Failed to insert MediaStore record");
+                },
+                () -> 30);
+        portal.setFileUploadHandler(handler);
+        portal.setAskReceiveFilesSupplier(() -> false);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            HttpResponse response = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-sink-fail\r\n"
+                            + "X-File-Name: doc.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "world");
+            Assert.assertEquals(500, response.statusCode);
+            Assert.assertTrue(response.bodyString().contains("sink_creation_failed"));
+        } finally {
+            portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileUploadSinkStorageFailureReturns507() throws Exception {
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                new ActiveUploadRegistry(),
+                null,
+                Executors.newSingleThreadScheduledExecutor(),
+                () -> true,
+                () -> Long.MAX_VALUE,
+                (name, mime) -> {
+                    throw new java.io.IOException("No storage space available");
+                },
+                () -> 30);
+        portal.setFileUploadHandler(handler);
+        portal.setAskReceiveFilesSupplier(() -> false);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            HttpResponse response = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-sink-storage\r\n"
+                            + "X-File-Name: doc.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "world");
+            Assert.assertEquals(507, response.statusCode);
+            Assert.assertTrue(response.bodyString().contains("insufficient_storage"));
+        } finally {
+            portal.stop();
+        }
+    }
+
+    @Test
+    public void portalFileOfferAcceptViaRegistryEnablesUpload() throws Exception {
+        File tempFile = File.createTempFile("webclip-action-test", ".bin");
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                text -> { },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+
+        FileUploadHandler handler = new FileUploadHandler(
+                null,
+                new ActiveUploadRegistry(),
+                null,
+                Executors.newSingleThreadScheduledExecutor(),
+                () -> true,
+                () -> Long.MAX_VALUE,
+                (name, mime) -> new TempFileUploadSink(tempFile),
+                () -> 30);
+        portal.setFileUploadHandler(handler);
+
+        portal.start();
+        try {
+            int port = portal.getPort();
+            String offerBody = "{\"batchId\":\"batch-action-accept\",\"files\":[{\"name\":\"test.txt\",\"size\":5}],\"totalSize\":5}";
+            HttpResponse offerResp = sendRequest(port,
+                    "POST /files/offer HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + offerBody.length() + "\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + offerBody);
+            Assert.assertEquals(200, offerResp.statusCode);
+            Assert.assertTrue(offerResp.bodyString().contains("\"state\":\"pending\""));
+
+            portal.getIncomingOfferRegistry().accept("batch-action-accept");
+
+            HttpResponse statusResp = sendRequest(port,
+                    "GET /files/offer/batch-action-accept HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "Connection: close\r\n\r\n");
+            Assert.assertEquals(200, statusResp.statusCode);
+            Assert.assertTrue(statusResp.bodyString().contains("\"state\":\"accepted\""));
+
+            HttpResponse uploadResp = sendRequest(port,
+                    "POST /files/upload HTTP/1.1\r\n"
+                            + "Host: 127.0.0.1\r\n"
+                            + "X-Pairing-Code: 1234\r\n"
+                            + "X-Upload-Id: up-action-accept-1\r\n"
+                            + "X-File-Name: test.txt\r\n"
+                            + "X-File-Size: 5\r\n"
+                            + "X-File-Offset: 0\r\n"
+                            + "X-Batch-Id: batch-action-accept\r\n"
+                            + "Content-Length: 5\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "hello");
+            Assert.assertEquals(200, uploadResp.statusCode);
+            Assert.assertTrue(uploadResp.bodyString().contains("\"status\":\"complete\""));
+        } finally {
+            portal.stop();
+            tempFile.delete();
         }
     }
 }

@@ -14,6 +14,7 @@ public final class WebClipboardPreferences {
     public static final String PREF_KEY_PAIRING_REQUIRED =
             "pref_web_clipboard_pairing_required";
     public static final String PREF_KEY_ACCEPT_FILES = "pref_web_clipboard_accept_files";
+    public static final String PREF_KEY_ASK_RECEIVE_FILES = "pref_web_clipboard_ask_receive_files";
     public static final String PREF_KEY_PAIRING_CODE = "pref_web_clipboard_pairing_code";
     public static final String PREF_KEY_LOOPBACK_INGRESS_TOKEN =
             "pref_web_clipboard_loopback_ingress_token";
@@ -24,6 +25,7 @@ public final class WebClipboardPreferences {
     public static final boolean DEFAULT_RUNTIME_ACTIVE = false;
     public static final boolean DEFAULT_PAIRING_REQUIRED = true;
     public static final boolean DEFAULT_ACCEPT_FILES = true;
+    public static final boolean DEFAULT_ASK_RECEIVE_FILES = true;
     public static final String DEFAULT_PAIRING_CODE = "0000";
     public static final String DEFAULT_LOOPBACK_INGRESS_TOKEN = "";
 
@@ -70,6 +72,10 @@ public final class WebClipboardPreferences {
         if (!preferences.contains(PREF_KEY_ACCEPT_FILES)) {
             editor = ensureEditor(editor, preferences);
             editor.putBoolean(PREF_KEY_ACCEPT_FILES, DEFAULT_ACCEPT_FILES);
+        }
+        if (!preferences.contains(PREF_KEY_ASK_RECEIVE_FILES)) {
+            editor = ensureEditor(editor, preferences);
+            editor.putBoolean(PREF_KEY_ASK_RECEIVE_FILES, DEFAULT_ASK_RECEIVE_FILES);
         }
 
         Object rawPairingCode = preferences.getAll().get(PREF_KEY_PAIRING_CODE);
@@ -209,6 +215,23 @@ public final class WebClipboardPreferences {
             return;
         }
         preferences.edit().putBoolean(PREF_KEY_ACCEPT_FILES, acceptFiles).commit();
+    }
+
+    public static boolean isAskReceiveFiles(SharedPreferences preferences) {
+        ensureDefaults(preferences);
+        if (preferences == null) {
+            return DEFAULT_ASK_RECEIVE_FILES;
+        }
+        Object rawValue = preferences.getAll().get(PREF_KEY_ASK_RECEIVE_FILES);
+        Boolean value = readBooleanObject(rawValue);
+        return value != null ? value.booleanValue() : DEFAULT_ASK_RECEIVE_FILES;
+    }
+
+    public static void setAskReceiveFiles(SharedPreferences preferences, boolean askReceiveFiles) {
+        if (preferences == null) {
+            return;
+        }
+        preferences.edit().putBoolean(PREF_KEY_ASK_RECEIVE_FILES, askReceiveFiles).commit();
     }
 
     public static String getPairingCode(SharedPreferences preferences) {

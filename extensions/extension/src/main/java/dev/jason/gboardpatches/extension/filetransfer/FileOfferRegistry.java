@@ -23,6 +23,7 @@ public final class FileOfferRegistry {
     private final ConcurrentHashMap<String, FileOffer> offers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Set<String>> batchTokens = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicLong> batchLastActivityMs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, IncomingOfferRegistry.OfferState> batchConsent = new ConcurrentHashMap<>();
     private final Set<String> completedTokens = ConcurrentHashMap.newKeySet();
     private final long idleTimeoutMs;
     private final ScheduledExecutorService sweepExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -115,10 +116,42 @@ public final class FileOfferRegistry {
         return token != null && completedTokens.contains(token);
     }
 
+    public boolean hasBatch(String batchId) {
+        return batchId != null && (batchTokens.containsKey(batchId) || batchConsent.containsKey(batchId));
+    }
+
+    public void registerBatch(String batchId, boolean autoAccept) {
+        if (batchId != null && !batchId.isBlank()) {
+            batchConsent.put(batchId, autoAccept ? IncomingOfferRegistry.OfferState.ACCEPTED : IncomingOfferRegistry.OfferState.PENDING);
+        }
+    }
+
+    public void acceptBatch(String batchId) {
+        if (batchId != null && !batchId.isBlank()) {
+            batchConsent.put(batchId, IncomingOfferRegistry.OfferState.ACCEPTED);
+        }
+    }
+
+    public void declineBatch(String batchId) {
+        if (batchId != null && !batchId.isBlank()) {
+            batchConsent.put(batchId, IncomingOfferRegistry.OfferState.DECLINED);
+            cancelBatch(batchId);
+        }
+    }
+
+    public boolean isBatchAccepted(String batchId) {
+        if (batchId == null || batchId.isBlank()) {
+            return true;
+        }
+        IncomingOfferRegistry.OfferState state = batchConsent.get(batchId);
+        return state == null || state == IncomingOfferRegistry.OfferState.ACCEPTED;
+    }
+
     public void cancelBatch(String batchId) {
         if (batchId == null) {
             return;
         }
+        batchConsent.remove(batchId);
         batchLastActivityMs.remove(batchId);
         Set<String> tokens = batchTokens.remove(batchId);
         if (tokens != null) {
@@ -202,6 +235,7 @@ public final class FileOfferRegistry {
 
     public void clear() {
         completedTokens.clear();
+        batchConsent.clear();
         batchLastActivityMs.clear();
         batchTokens.clear();
         for (FileOffer offer : offers.values()) {

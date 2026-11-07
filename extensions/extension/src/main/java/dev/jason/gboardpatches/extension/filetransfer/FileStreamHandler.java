@@ -95,6 +95,10 @@ public final class FileStreamHandler {
             writeJson(socket, 410, "Gone", "{\"ok\":false,\"error\":\"gone\"}");
             return;
         }
+        if (!registry.isBatchAccepted(offer.getBatchId())) {
+            writeJson(socket, 403, "Forbidden", "{\"ok\":false,\"error\":\"batch_not_accepted\"}");
+            return;
+        }
         if (!offer.isSeekable()) {
             if (!offer.markSingleShotStarted()) {
                 writeJson(socket, 410, "Gone", "{\"ok\":false,\"error\":\"gone\"}");
