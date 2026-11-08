@@ -28,6 +28,10 @@ final class ClipboardSyncHttpsSocketFactory {
                 .getServerSocketFactory()
                 .createServerSocket();
         socket.setReuseAddress(true);
+        try {
+            socket.setReceiveBufferSize(512 * 1024);
+        } catch (Throwable ignored) {
+        }
         socket.bind(new InetSocketAddress(port));
         return socket;
     }

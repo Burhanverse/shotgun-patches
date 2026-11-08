@@ -92,7 +92,9 @@ public final class MediaStoreUploadSink implements UploadSink {
         if (published) {
             throw new IOException("Sink already published");
         }
-        channel.position(offset);
+        if (currentPosition != offset) {
+            channel.position(offset);
+        }
         channel.write(ByteBuffer.wrap(data, 0, length));
         currentPosition = offset + length;
     }

@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 
 public final class FileStreamHandler {
-    private static final int BUFFER_SIZE = 64 * 1024;
+    private static final int BUFFER_SIZE = 512 * 1024;
     private static final int MAX_ACTIVE_STREAMS = 2;
 
     private final Semaphore activeStreamSemaphore = new Semaphore(MAX_ACTIVE_STREAMS);
@@ -188,6 +188,7 @@ public final class FileStreamHandler {
         ByteBuffer byteBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         byte[] array = byteBuffer.array();
         long remaining = bytesToTransfer;
+        long lastThrottleUpdateMs = System.currentTimeMillis();
 
         while (remaining > 0L && !isStopped.getAsBoolean()) {
             int toRead = (int) Math.min(remaining, BUFFER_SIZE);
@@ -199,25 +200,37 @@ public final class FileStreamHandler {
             } else {
                 read = offer.getInputStream().read(array, 0, toRead);
             }
+
             if (read < 0) {
                 break;
             }
             outputStream.write(array, 0, read);
-            outputStream.flush();
 
             currentOffset += read;
             remaining -= read;
 
             long now = System.currentTimeMillis();
-            activeStream.touch(now);
             offer.recordBytesServed(read, now);
-            registry.touch(offer.getToken(), now);
-            if (lockController != null) {
-                lockController.touch();
+            if (now - lastThrottleUpdateMs >= 500L) {
+                lastThrottleUpdateMs = now;
+                activeStream.touch(now);
+                registry.touch(offer.getToken(), now);
+                if (lockController != null) {
+                    lockController.touch();
+                }
+                if (notificationManager != null) {
+                    notificationManager.onBytesServed(offer.getBatchId(), read);
+                }
             }
-            if (notificationManager != null) {
-                notificationManager.onBytesServed(offer.getBatchId(), read);
-            }
+        }
+
+        outputStream.flush();
+
+        long finishNow = System.currentTimeMillis();
+        activeStream.touch(finishNow);
+        registry.touch(offer.getToken(), finishNow);
+        if (lockController != null) {
+            lockController.touch();
         }
 
         if (offer.getBytesServed() >= offer.getSize() || currentOffset >= offer.getSize()) {

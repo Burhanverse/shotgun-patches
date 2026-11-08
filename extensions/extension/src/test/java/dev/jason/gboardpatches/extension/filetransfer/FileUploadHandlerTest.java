@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1056,6 +1057,53 @@ public final class FileUploadHandlerTest {
         } finally {
             sink.close();
             sink.abort();
+        }
+    }
+
+    @Test
+    @Config(sdk = 33)
+    public void constructWithNullContextThenSetContextUploadsSuccessfully() throws Exception {
+        Context context = RuntimeEnvironment.getApplication();
+        ActiveUploadRegistry registry = new ActiveUploadRegistry();
+        FileUploadHandler handler = new FileUploadHandler(null, null);
+        handler.setContext(context);
+        handler.setFreeSpaceProvider(() -> Long.MAX_VALUE);
+
+        try (ServerSocket server = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))) {
+            int port = server.getLocalPort();
+            CountDownLatch serverLatch = new CountDownLatch(1);
+            new Thread(() -> {
+                try (Socket accepted = server.accept()) {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("content-length", "11");
+                    headers.put("x-upload-id", "up-test-deferred-ctx");
+                    headers.put("x-file-name", "deferred.txt");
+                    headers.put("x-file-size", "11");
+                    headers.put("x-file-offset", "0");
+
+                    handler.handleUpload(accepted, accepted.getInputStream(), headers,
+                            (s, status, reason, ct, body, extra) -> {
+                                OutputStream out = s.getOutputStream();
+                                out.write(("HTTP/1.1 " + status + " " + reason + "\r\n").getBytes(StandardCharsets.UTF_8));
+                                out.write(("Content-Length: " + body.length() + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                                out.write(body.getBytes(StandardCharsets.UTF_8));
+                                out.flush();
+                            });
+                } catch (Throwable ignored) {
+                } finally {
+                    serverLatch.countDown();
+                }
+            }).start();
+
+            try (Socket client = new Socket("127.0.0.1", port)) {
+                OutputStream out = client.getOutputStream();
+                out.write("hello world".getBytes(StandardCharsets.UTF_8));
+                out.flush();
+                HttpResponse response = readResponse(client);
+                Assert.assertEquals(200, response.statusCode);
+                Assert.assertTrue(response.bodyString().contains("\"status\":\"complete\""));
+            }
+            Assert.assertTrue(serverLatch.await(5, TimeUnit.SECONDS));
         }
     }
 }

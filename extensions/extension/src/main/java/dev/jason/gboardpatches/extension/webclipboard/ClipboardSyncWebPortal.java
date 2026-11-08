@@ -209,6 +209,11 @@ public final class ClipboardSyncWebPortal {
             revokedClientIds.clear();
         }
         serverSocket = new ServerSocket();
+        serverSocket.setReuseAddress(true);
+        try {
+            serverSocket.setReceiveBufferSize(512 * 1024);
+        } catch (Throwable ignored) {
+        }
         serverSocket.bind(new InetSocketAddress(requestedPort));
         stopped = false;
         if (fileOfferBroadcastExecutor == null || fileOfferBroadcastExecutor.isShutdown()) {
@@ -793,6 +798,12 @@ public final class ClipboardSyncWebPortal {
         while (!stopped) {
             try {
                 Socket socket = listenSocket.accept();
+                try {
+                    socket.setTcpNoDelay(true);
+                    socket.setReceiveBufferSize(512 * 1024);
+                    socket.setSendBufferSize(512 * 1024);
+                } catch (Throwable ignored) {
+                }
                 Thread thread = new Thread(() -> handleClient(socket), "ClipboardSyncWebPortalClient");
                 thread.setDaemon(true);
                 thread.start();

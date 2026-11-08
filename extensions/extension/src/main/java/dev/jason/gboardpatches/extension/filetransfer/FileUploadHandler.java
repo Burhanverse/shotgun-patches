@@ -39,7 +39,7 @@ public final class FileUploadHandler {
     private static final String TAG = "FileUploadHandler";
     public static final long FREE_SPACE_MARGIN_BYTES = 50L * 1024L * 1024L;
     public static final long STALL_TIMEOUT_MS = 45_000L;
-    public static final int BUFFER_SIZE = 64 * 1024;
+    public static final int BUFFER_SIZE = 512 * 1024;
     public static final int MAX_FILENAME_BYTES = 255;
 
     @FunctionalInterface
@@ -66,7 +66,7 @@ public final class FileUploadHandler {
     private final Semaphore uploadSemaphore = new Semaphore(2);
     private final ScheduledExecutorService scheduledExecutor;
     private volatile BooleanSupplier acceptFilesSupplier;
-    private final FreeSpaceProvider freeSpaceProvider;
+    private volatile FreeSpaceProvider freeSpaceProvider;
     private final UploadSinkFactory sinkFactory;
     private final IntSupplier sdkVersionSupplier;
 
@@ -110,6 +110,10 @@ public final class FileUploadHandler {
 
     public void setContext(Context context) {
         this.context = context;
+    }
+
+    public void setFreeSpaceProvider(FreeSpaceProvider freeSpaceProvider) {
+        this.freeSpaceProvider = freeSpaceProvider != null ? freeSpaceProvider : defaultFreeSpaceProvider();
     }
 
     public void setLockController(FileTransferLockController lockController) {
@@ -455,6 +459,7 @@ public final class FileUploadHandler {
             byte[] buffer = new byte[BUFFER_SIZE];
             long currentOffset = fileOffset;
             long remaining = contentLength;
+            long lastThrottleUpdateMs = System.currentTimeMillis();
             try {
                 while (remaining > 0) {
                     int toRead = (int) Math.min(buffer.length, remaining);
@@ -469,8 +474,11 @@ public final class FileUploadHandler {
                     long now = System.currentTimeMillis();
                     lastByteTimeMs.set(now);
                     session.touch(now);
-                    if (currentLockController != null) {
-                        currentLockController.touch();
+                    if (now - lastThrottleUpdateMs >= 500L) {
+                        lastThrottleUpdateMs = now;
+                        if (currentLockController != null) {
+                            currentLockController.touch();
+                        }
                     }
                     if (currentNotificationManager != null) {
                         currentNotificationManager.onUploadProgress(uploadId, currentOffset, fileSize);
@@ -479,6 +487,9 @@ public final class FileUploadHandler {
             } finally {
                 if (watchdog != null) {
                     watchdog.cancel(false);
+                }
+                if (currentLockController != null) {
+                    currentLockController.touch();
                 }
             }
 

@@ -96,7 +96,7 @@ class GboardWebClipboardRuntimePreservationTest {
         // Web Clipboard FGS type intentionally moved dataSync -> connectedDevice (6h dataSync limit);
         // runtime restarts on BOOT_COMPLETED.
         const val RUNTIME_JAVA_SHA256 =
-            "91EB7E78ADAC0349DACB791330FE6A46E2A9BA62BB60729DFEB019971CF85301"
+            "F20CFAC943802B2989684E6E789D00A04CED2F77B3DBFB9694EAF254AD48EA81"
         const val PORTAL_ASSETS_SHA256 =
             "E9AACB386C26A695C070FC3DA99DD6DEB36DEF5E60D23EFC949502793F433287"
         const val RESOURCE_SHA256 =
