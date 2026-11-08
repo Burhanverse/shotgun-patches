@@ -498,6 +498,7 @@ public final class ClipboardSyncWebPortal {
         JSONObject payload = new JSONObject();
         try {
             payload.put("type", "image");
+            payload.put("hasImage", true);
             payload.put("mimeType", mimeType);
             payload.put("imageSize", imageBytes.length);
             payload.put("imageUrl", "/image/latest?source=" + source);

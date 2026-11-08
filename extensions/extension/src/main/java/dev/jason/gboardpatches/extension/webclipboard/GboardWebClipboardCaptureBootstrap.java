@@ -153,7 +153,6 @@ public final class GboardWebClipboardCaptureBootstrap {
             return;
         }
 
-        // Check for image content in clipboard
         if (hasImageContent(clipData)) {
             android.net.Uri imageUri = currentClipboardImageUri(clipData);
             if (imageUri != null) {
@@ -180,11 +179,11 @@ public final class GboardWebClipboardCaptureBootstrap {
                             lastDispatchedElapsedMs = SystemClock.elapsedRealtime();
                         }
                     } catch (Throwable ignored) {
-                        // Best effort.
                     }
                     return;
                 }
             }
+            return;
         }
 
         CharSequence text = currentClipboardText(context, clipData);

@@ -494,6 +494,7 @@ public final class ClipboardSyncService extends Service {
                         return;
                     }
                 }
+                return;
             }
             CharSequence currentText = currentClipboardText(clipboardManager);
             if (currentText != null) {
@@ -712,6 +713,28 @@ public final class ClipboardSyncService extends Service {
             clipboardManager = getSystemService(ClipboardManager.class);
         }
         if (clipboardManager == null) {
+            return;
+        }
+        ClipData clipData = currentClipboardData(clipboardManager);
+        if (clipData == null || isWebClipboardEcho(clipData)) {
+            return;
+        }
+        if (hasImageContent(clipData)) {
+            Uri imageUri = currentClipboardImageUri(clipData);
+            if (imageUri != null) {
+                byte[] imageBytes = readImageBytes(this, imageUri, MAX_IMAGE_BYTES);
+                if (imageBytes != null && imageBytes.length > 0) {
+                    String mimeType = getContentResolver().getType(imageUri);
+                    if (mimeType == null || mimeType.isEmpty()) {
+                        mimeType = "image/png";
+                    }
+                    String hash = "img:" + sha256Hex(imageBytes);
+                    lastPublishedImageHash = hash;
+                    lastPublishedImageAtElapsedMs = SystemClock.elapsedRealtime();
+                    portal.publishPhoneImageClipboard(imageBytes, mimeType);
+                    return;
+                }
+            }
             return;
         }
         CharSequence currentText = currentClipboardText(clipboardManager);

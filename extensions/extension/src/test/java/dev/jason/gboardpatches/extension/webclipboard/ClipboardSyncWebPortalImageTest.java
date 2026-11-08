@@ -103,6 +103,97 @@ public final class ClipboardSyncWebPortalImageTest {
         }
     }
 
+    @Test
+    public void phoneImageIngressWithPairingBroadcastsImageMetadataAndAllowsAuthorizedFetch() throws Exception {
+        byte[] testImageBytes = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x02 };
+        String base64Image = Base64.getEncoder().encodeToString(testImageBytes);
+
+        ClipboardSyncWebPortal portal = new ClipboardSyncWebPortal(
+                0,
+                0,
+                new ClipboardSyncWebPortal.ClipboardBridge() {
+                    @Override
+                    public void applyDesktopClipboard(String text) {
+                    }
+
+                    @Override
+                    public void applyDesktopImage(byte[] imageBytes, String mimeType) {
+                    }
+                },
+                ClipboardSyncWebPortal.WebAssets.empty(),
+                new ClipboardSyncWebPortal.SecurityConfig(true, "1234", LOOPBACK_TOKEN));
+        portal.start();
+        try {
+            Socket sseSocket = new Socket("127.0.0.1", portal.getPort());
+            BufferedWriter sseWriter = new BufferedWriter(new OutputStreamWriter(
+                    sseSocket.getOutputStream(), StandardCharsets.UTF_8));
+            sseWriter.write("GET /events?code=1234&clientId=desktop-1 HTTP/1.1\r\n"
+                    + "Host: 127.0.0.1\r\n"
+                    + "Connection: keep-alive\r\n\r\n");
+            sseWriter.flush();
+
+            java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+            StringBuilder sseOutput = new StringBuilder();
+            Thread readerThread = new Thread(() -> {
+                try {
+                    BufferedReader sseReader = new BufferedReader(new InputStreamReader(
+                            sseSocket.getInputStream(), StandardCharsets.UTF_8));
+                    String line;
+                    boolean seenEvent = false;
+                    while ((line = sseReader.readLine()) != null) {
+                        sseOutput.append(line).append('\n');
+                        if (line.contains("event: clipboard")) {
+                            seenEvent = true;
+                        }
+                        if (seenEvent && line.startsWith("data:")) {
+                            latch.countDown();
+                            break;
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            });
+            readerThread.setDaemon(true);
+            readerThread.start();
+
+            Thread.sleep(100);
+
+            String jsonBody = "{\"type\":\"image\",\"mimeType\":\"image/png\",\"data\":\"" + base64Image + "\"}";
+            HttpResponse postResp = request(portal.getPort(),
+                    phoneImageClipboardRequest(jsonBody, LOOPBACK_TOKEN));
+            Assert.assertEquals(200, postResp.statusCode);
+
+            boolean received = latch.await(2, java.util.concurrent.TimeUnit.SECONDS);
+            sseSocket.close();
+            Assert.assertTrue(received);
+
+            String sseData = sseOutput.toString();
+            Assert.assertTrue(sseData.contains("\"hasImage\":true"));
+            Assert.assertTrue(sseData.contains("\"type\":\"image\""));
+            Assert.assertTrue(sseData.contains("image/latest?source=phone") || sseData.contains("image\\/latest?source=phone"));
+            Assert.assertFalse(sseData.contains("/storage/"));
+
+            for (int i = 0; i < 5; i++) {
+                HttpResponse unauthResp = request(portal.getPort(), getRequest("/image/latest?source=phone"));
+                Assert.assertEquals(401, unauthResp.statusCode);
+            }
+
+            HttpResponse authResp = request(portal.getPort(), getRequest("/image/latest?source=phone&code=1234"));
+            Assert.assertEquals(200, authResp.statusCode);
+            Assert.assertArrayEquals(testImageBytes, authResp.rawBody);
+
+            HttpResponse authHeaderResp = request(portal.getPort(),
+                    "GET /image/latest?source=phone HTTP/1.1\r\n"
+                    + "Host: 127.0.0.1\r\n"
+                    + "X-Pairing-Code: 1234\r\n"
+                    + "Connection: close\r\n\r\n");
+            Assert.assertEquals(200, authHeaderResp.statusCode);
+            Assert.assertArrayEquals(testImageBytes, authHeaderResp.rawBody);
+        } finally {
+            portal.stop();
+        }
+    }
+
     private static String postRequest(String path, String body, String contentType) {
         byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
         return "POST " + path + " HTTP/1.1\r\n"
