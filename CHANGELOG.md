@@ -1,3 +1,20 @@
+## [4.0.0-dev.10](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.9...v4.0.0-dev.10) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.10`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.10），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### 🐛 Bug Fixes & Improvements
+
+* **Web Clipboard Image Handling:** prevent inadvertent fallback to text representation when an image clip is active in the clipboard.
+* **Real-time Image Notifications:** broadcast `hasImage` flag in Server-Sent Events (SSE) stream so connected web clients can immediately reflect image availability.
+
+### 🐛 錯誤修復與改善
+
+* **網頁剪貼簿圖片處理:** 修復剪貼簿包含圖片時可能非預期回退為文字內容的問題，確保圖片剪貼正確處理。
+* **即時圖片狀態通知:** 於 SSE (Server-Sent Events) 事件流中廣播 `hasImage` 狀態，使連線之網頁端可即時獲知圖片剪貼狀態。
+
 ## [4.0.0-dev.9](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.8...v4.0.0-dev.9) (2026-11-08)
 
 > [!WARNING]
