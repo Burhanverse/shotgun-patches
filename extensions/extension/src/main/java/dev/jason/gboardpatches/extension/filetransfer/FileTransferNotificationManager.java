@@ -65,6 +65,10 @@ public final class FileTransferNotificationManager {
         }
     }
 
+    public Context getAppContext() {
+        return appContext;
+    }
+
     public void setFileStreamHandler(FileStreamHandler handler) {
         this.streamHandler = handler;
     }

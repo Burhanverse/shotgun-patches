@@ -81,7 +81,7 @@ public final class FileUploadHandler {
                 }),
                 () -> true,
                 defaultFreeSpaceProvider(),
-                (name, mime) -> new MediaStoreUploadSink(context, name, mime),
+                null,
                 () -> Build.VERSION.SDK_INT);
     }
 
@@ -637,12 +637,18 @@ public final class FileUploadHandler {
         if (sinkFactory != null) {
             return sinkFactory.create(sanitizedName, mimeType);
         }
+        Context currentContext = this.context != null
+                ? this.context
+                : FileTransferNotificationManager.getInstance().getAppContext();
+        if (currentContext == null) {
+            throw new IOException("Context is null");
+        }
         try {
-            return new MediaStoreUploadSink(context, sanitizedName, mimeType);
+            return new MediaStoreUploadSink(currentContext, sanitizedName, mimeType);
         } catch (Throwable throwable) {
             logError("MediaStoreUploadSink failed, falling back to DirectFileUploadSink", throwable);
             try {
-                return new DirectFileUploadSink(context, sanitizedName);
+                return new DirectFileUploadSink(currentContext, sanitizedName);
             } catch (Throwable directThrowable) {
                 throw new IOException("Sink creation failed: " + throwable.getMessage(), throwable);
             }
