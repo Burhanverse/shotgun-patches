@@ -1,3 +1,20 @@
+## [4.0.0-dev.11](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.10...v4.0.0-dev.11) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.11`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.11），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### 🐛 Bug Fixes & Stability
+
+* **Upload Handler Context Resolution:** safely resolve application context from `FileTransferNotificationManager` when context is null in `FileUploadHandler`.
+* **Sink Fallback Safety:** ensure reliable initialization and safe fallback between `MediaStoreUploadSink` and `DirectFileUploadSink`.
+
+### 🐛 錯誤修復與穩定性
+
+* **檔案上傳處理器 Context 解析:** 當 `FileUploadHandler` 的 Context 為空時，安全自 `FileTransferNotificationManager` 取得 Application Context。
+* **儲存接收器備用機制安全防護:** 確保 `MediaStoreUploadSink` 與 `DirectFileUploadSink` 之間的切換與初始化更加穩定可靠。
+
 ## [4.0.0-dev.10](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.9...v4.0.0-dev.10) (2026-11-08)
 
 > [!WARNING]
