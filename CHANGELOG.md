@@ -1,3 +1,22 @@
+## [4.0.0-dev.12](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.11...v4.0.0-dev.12) (2026-11-08)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.0.0-dev.12`) for testing Web Clipboard File Transfer and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.0.0-dev.12），用於測試網頁剪貼簿檔案傳輸等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### ⚡ Performance & Transfer Optimizations
+
+* **Throughput & Buffer Scaling:** increased stream and upload buffers to 512 KB, enabled `TCP_NODELAY`, and tuned socket send/receive buffer sizes for significantly faster transfer speeds.
+* **Notification & State Throttling:** throttled progress tracking and notification updates to 500 ms intervals during active file streaming to minimize CPU and IPC overhead.
+* **Storage Sink Efficiency:** avoided redundant file channel repositioning and seek operations in `DirectFileUploadSink` and `MediaStoreUploadSink`.
+
+### ⚡ 效能與傳輸最佳化
+
+* **傳輸吞吐量與緩衝區擴展:** 將串流與上傳緩衝區提升至 512 KB，啟用 `TCP_NODELAY` 並最佳化通訊端緩衝區大小以大幅提升傳輸速度。
+* **通知與狀態節流:** 將檔案串流期間的進度記錄與通知更新節流至 500 ms 間隔，減少 CPU 與 IPC 開銷。
+* **儲存接收器效率改善:** 於 `DirectFileUploadSink` 與 `MediaStoreUploadSink` 中避免多餘的檔案指標重設與 seek 呼叫。
+
 ## [4.0.0-dev.11](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.10...v4.0.0-dev.11) (2026-11-08)
 
 > [!WARNING]
