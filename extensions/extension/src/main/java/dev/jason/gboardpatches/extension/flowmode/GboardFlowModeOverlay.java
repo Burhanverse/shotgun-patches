@@ -52,7 +52,7 @@ public final class GboardFlowModeOverlay extends View implements AutoCloseable {
     }
 
     public boolean isForBody(View candidate) {
-        return !closed && body == candidate;
+        return !closed && (isAttachedToWindow() || getParent() != null) && body == candidate;
     }
 
     public void pulse() {
@@ -145,7 +145,7 @@ public final class GboardFlowModeOverlay extends View implements AutoCloseable {
         removeCallbacks(frame);
         if (body != null) body.removeOnLayoutChangeListener(layout);
         animate().cancel();
-        animate().alpha(0).setDuration(400).withEndAction(() -> {
+        animate().alpha(0).setDuration(250).withEndAction(() -> {
             if (getParent() instanceof ViewGroup parent) parent.removeView(this);
         }).start();
     }

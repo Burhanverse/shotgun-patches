@@ -32,6 +32,8 @@ public final class GboardFlowModeRuntime {
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     private static volatile Context applicationContext;
+    private static volatile WeakReference<InputMethodService> lastKnownService =
+            new WeakReference<>(null);
 
     private GboardFlowModeRuntime() {
     }
@@ -230,17 +232,23 @@ public final class GboardFlowModeRuntime {
                 return false;
             }
 
-            InputMethodService service = inputMethodService(context);
-            if (service == null) {
+            InputMethodService resolved = inputMethodService(context);
+            if (resolved != null) {
+                lastKnownService = new WeakReference<>(resolved);
+            } else {
+                resolved = lastKnownService.get();
+            }
+            if (resolved == null) {
                 return false;
             }
+            final InputMethodService service = resolved;
 
             int rawKeycode = handles != null ? handles.extractKeycode(actionData) : 0;
             String text = handles != null ? handles.extractPayload(actionData) : null;
 
             int effectiveCode = mapKey(rawKeycode, text);
 
-            Object keyToken = gestureDispatcher != null ? gestureDispatcher : service;
+            Object keyToken = service;
             State state;
             synchronized (STATES) {
                 state = STATES.get(keyToken);
@@ -257,8 +265,8 @@ public final class GboardFlowModeRuntime {
             boolean wasFlowing = state.detector.isFlowing();
             boolean flowing = state.detector.onKey(effectiveCode, SystemClock.elapsedRealtimeNanos());
 
+            MAIN_HANDLER.removeCallbacks(state.inactivityReset);
             if (flowing) {
-                MAIN_HANDLER.removeCallbacks(state.inactivityReset);
                 MAIN_HANDLER.post(() -> {
                     try {
                         show(service, currentState);
@@ -267,10 +275,10 @@ public final class GboardFlowModeRuntime {
                         hide(currentState);
                     }
                 });
-                MAIN_HANDLER.postDelayed(state.inactivityReset, INACTIVITY_TIMEOUT_MS);
             } else if (wasFlowing) {
                 hide(currentState);
             }
+            MAIN_HANDLER.postDelayed(state.inactivityReset, INACTIVITY_TIMEOUT_MS);
         } catch (Throwable throwable) {
             Log.w(TAG, "Error in onGestureDispatch", throwable);
         }
@@ -335,12 +343,17 @@ public final class GboardFlowModeRuntime {
         GboardFlowModeOverlay overlay = state.overlay.get();
         state.overlay = new WeakReference<>(null);
         if (overlay != null) {
-            overlay.post(() -> {
+            Runnable closeTask = () -> {
                 try {
                     overlay.close();
                 } catch (Throwable ignored) {
                 }
-            });
+            };
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                closeTask.run();
+            } else {
+                MAIN_HANDLER.post(closeTask);
+            }
         }
     }
 
@@ -362,7 +375,7 @@ public final class GboardFlowModeRuntime {
             overlay = new GboardFlowModeOverlay(service, body, state.color, state.transparency, state.exclusion);
             service.getWindow().addContentView(overlay, new ViewGroup.LayoutParams(-1, -1));
             overlay.setAlpha(0f);
-            overlay.animate().alpha(1f).setDuration(350).start();
+            overlay.animate().alpha(1f).setDuration(250).start();
             state.overlay = new WeakReference<>(overlay);
         }
         overlay.pulse();
@@ -370,14 +383,36 @@ public final class GboardFlowModeRuntime {
 
     private static View findBody(View view) {
         if (view == null) return null;
+        View tagged = findBodyByTag(view);
+        if (tagged != null) return tagged;
+        View softKeyboardView = findSoftKeyboardView(view);
+        if (softKeyboardView != null) return softKeyboardView;
+        return view.findViewById(android.R.id.inputArea);
+    }
+
+    private static View findBodyByTag(View view) {
+        if (view == null) return null;
         Object tag = view.getTag();
-        if (tag instanceof String str && (str.equals(".keyboard-body-area")
-                || str.startsWith(".keyboard-body-area.keyboard-outline-bottom"))) {
+        if (tag instanceof String str && str.contains("keyboard-body-area")) {
             return view;
         }
         if (view instanceof ViewGroup group) {
             for (int i = 0; i < group.getChildCount(); i++) {
-                View found = findBody(group.getChildAt(i));
+                View found = findBodyByTag(group.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private static View findSoftKeyboardView(View view) {
+        if (view == null) return null;
+        if (view.getClass().getName().endsWith("SoftKeyboardView")) {
+            return view;
+        }
+        if (view instanceof ViewGroup group) {
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View found = findSoftKeyboardView(group.getChildAt(i));
                 if (found != null) return found;
             }
         }

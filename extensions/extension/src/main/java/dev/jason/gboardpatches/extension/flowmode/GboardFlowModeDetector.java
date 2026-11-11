@@ -11,8 +11,13 @@ public final class GboardFlowModeDetector {
     public static final long FALLBACK_NANOS = 150_000_000L, SPACE_NANOS = 700_000_000L;
     public static final double RELAXED_FACTOR = 1.5;
 
-    private long last, total, lastSpace;
-    private int pairs, spaces;
+    private final long[] intervals = new long[MIN_PAIRS];
+    private int intervalHead;
+    private int intervalCount;
+    private long intervalSum;
+
+    private long last, lastSpace;
+    private int spaces;
     private boolean regularSpaces = true, flowing;
     private long threshold = FALLBACK_NANOS;
 
@@ -23,9 +28,10 @@ public final class GboardFlowModeDetector {
 
     public synchronized void reset() {
         last = 0;
-        total = 0;
         lastSpace = 0;
-        pairs = 0;
+        intervalHead = 0;
+        intervalCount = 0;
+        intervalSum = 0;
         spaces = 0;
         regularSpaces = true;
         flowing = false;
@@ -36,7 +42,7 @@ public final class GboardFlowModeDetector {
     }
 
     public synchronized int pairCount() {
-        return pairs;
+        return intervalCount;
     }
 
     public synchronized boolean onKey(int keyCode, long now) {
@@ -44,48 +50,64 @@ public final class GboardFlowModeDetector {
             reset();
             return false;
         }
-        if (flowing) {
-            last = now;
-            return true;
-        }
+
         if (isBoundary(keyCode)) {
             if (keyCode == 62) {
                 if (last != 0 && now - last > SPACE_NANOS) {
-                    regularSpaces = false;
+                    reset();
+                    return false;
                 }
                 spaces++;
                 lastSpace = now;
             } else {
+                if (last != 0 && now - last > SPACE_NANOS) {
+                    reset();
+                    return false;
+                }
                 lastSpace = 0;
             }
             last = 0;
-            return false;
+            return flowing;
         }
+
         if (keyCode != -10043) {
-            return false;
+            return flowing;
         }
+
         if (last != 0) {
             long interval = now - last;
-            if (interval < 0) {
+            if (interval < 0 || interval > SPACE_NANOS) {
                 reset();
+                last = now;
                 return false;
             }
-            total += interval;
-            pairs++;
+
+            if (intervalCount < MIN_PAIRS) {
+                intervals[intervalHead] = interval;
+                intervalSum += interval;
+                intervalHead = (intervalHead + 1) % MIN_PAIRS;
+                intervalCount++;
+            } else {
+                intervalSum -= intervals[intervalHead];
+                intervals[intervalHead] = interval;
+                intervalSum += interval;
+                intervalHead = (intervalHead + 1) % MIN_PAIRS;
+            }
+
             long effective = threshold;
             if (regularSpaces && spaces >= MIN_SPACES) {
                 effective = BigDecimal.valueOf(threshold).multiply(new BigDecimal(RELAXED_FACTOR))
                         .setScale(0, RoundingMode.HALF_EVEN).longValue();
             }
-            if (pairs >= MIN_PAIRS && total / pairs < effective) {
-                flowing = true;
-            }
+
+            flowing = intervalCount >= MIN_PAIRS && intervalSum / intervalCount < effective;
         } else if (lastSpace != 0) {
             if (now - lastSpace > SPACE_NANOS) {
-                regularSpaces = false;
+                reset();
             }
             lastSpace = 0;
         }
+
         last = now;
         return flowing;
     }
