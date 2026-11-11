@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-dev.12",
+  "version": "4.1.0-dev.1",
   "patches": [
     {
       "name": "AI Writing Tools",

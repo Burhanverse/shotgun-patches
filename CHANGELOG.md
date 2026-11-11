@@ -1,3 +1,22 @@
+## [4.1.0-dev.1](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.12...v4.1.0-dev.1) (2026-11-12)
+
+> [!WARNING]
+> **Alpha Test Build**: This is an experimental alpha pre-release (`4.1.0-dev.1`) for testing Flow Mode enhancements and new features. It may contain bugs or breaking changes.
+>
+> **Alpha 測試版本警告**: 此版本為實驗性測試預覽版（v4.1.0-dev.1），用於測試極速輸入動畫改善等新功能。可能包含不穩定因素或潛在問題，歡迎測試並回報回饋！
+
+### 🐛 Bug Fixes & Improvements
+
+* **Flow Mode Detection:** improved typing burst detection accuracy, responsiveness, and gesture event processing in `GboardFlowModeDetector`.
+* **Keyboard Body Selection:** refined keyboard body view selection and fallback hierarchy in `GboardFlowModeRuntime` to ensure reliable particle animation alignment across various keyboard layouts.
+* **Overall Stability:** enhanced overlay lifecycle management and Direct Boot safety guards in `GboardFlowModeOverlay`.
+
+### 🐛 錯誤修復與改善
+
+* **極速輸入動畫偵測 (Flow Mode):** 提升 `GboardFlowModeDetector` 輸入爆發判定準確度、即時反饋與手勢事件處理效能。
+* **鍵盤主體視圖選取:** 最佳化 `GboardFlowModeRuntime` 鍵盤主體視圖選取邏輯與備用層級，確保粒子動畫在各類鍵盤佈局下精準對齊。
+* **整體穩定性提升:** 強化 `GboardFlowModeOverlay` 覆蓋層生命週期管理與 Direct Boot 保護機制。
+
 ## [4.0.0-dev.12](https://github.com/Burhanverse/shotgun-patches/compare/v4.0.0-dev.11...v4.0.0-dev.12) (2026-11-08)
 
 > [!WARNING]
