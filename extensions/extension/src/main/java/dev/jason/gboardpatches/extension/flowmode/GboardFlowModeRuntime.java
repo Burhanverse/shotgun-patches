@@ -15,7 +15,10 @@ import android.view.ViewGroup;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -381,42 +384,90 @@ public final class GboardFlowModeRuntime {
         overlay.pulse();
     }
 
-    private static View findBody(View view) {
-        if (view == null) return null;
-        View tagged = findBodyByTag(view);
-        if (tagged != null) return tagged;
-        View softKeyboardView = findSoftKeyboardView(view);
-        if (softKeyboardView != null) return softKeyboardView;
-        return view.findViewById(android.R.id.inputArea);
+    static View findBody(View root) {
+        if (root == null) return null;
+        List<View> candidates = new ArrayList<>();
+        collectCandidates(root, candidates);
+        View best = null;
+        int bestScore = Integer.MIN_VALUE;
+        int bestHeight = -1;
+        for (View candidate : candidates) {
+            int score = scoreCandidate(candidate);
+            int height = Math.max(candidate.getHeight(), candidate.getMeasuredHeight());
+            if (score > bestScore || (score == bestScore && height > bestHeight)) {
+                best = candidate;
+                bestScore = score;
+                bestHeight = height;
+            }
+        }
+        if (best != null) {
+            return best;
+        }
+        return root.findViewById(android.R.id.inputArea);
     }
 
-    private static View findBodyByTag(View view) {
-        if (view == null) return null;
+    private static void collectCandidates(View view, List<View> candidates) {
+        if (view == null) return;
+        if (isCandidate(view)) {
+            candidates.add(view);
+        }
+        if (view instanceof ViewGroup group) {
+            for (int i = 0; i < group.getChildCount(); i++) {
+                collectCandidates(group.getChildAt(i), candidates);
+            }
+        }
+    }
+
+    private static boolean isCandidate(View view) {
         Object tag = view.getTag();
         if (tag instanceof String str && str.contains("keyboard-body-area")) {
-            return view;
+            return true;
         }
-        if (view instanceof ViewGroup group) {
-            for (int i = 0; i < group.getChildCount(); i++) {
-                View found = findBodyByTag(group.getChildAt(i));
-                if (found != null) return found;
-            }
-        }
-        return null;
+        return view.getClass().getName().endsWith("SoftKeyboardView");
     }
 
-    private static View findSoftKeyboardView(View view) {
-        if (view == null) return null;
+    private static int scoreCandidate(View view) {
+        int score = 0;
+        if (view.getVisibility() == View.VISIBLE) {
+            score += 1000;
+        }
+        Object tag = view.getTag();
+        if (tag instanceof String str) {
+            if (str.contains("keyboard-outline-bottom")) {
+                score += 500;
+            }
+            if (str.contains("keyboard-body-area")) {
+                score += 300;
+            }
+        }
         if (view.getClass().getName().endsWith("SoftKeyboardView")) {
-            return view;
+            score += 100;
+        }
+        if (isHeaderOrFastAccess(view)) {
+            score -= 5000;
+        }
+        return score;
+    }
+
+    private static boolean isHeaderOrFastAccess(View view) {
+        if (view == null) return false;
+        Object tag = view.getTag();
+        if (tag instanceof String str) {
+            String lower = str.toLowerCase(Locale.ROOT);
+            if (lower.contains("fast-access") || lower.contains("fast_access")
+                    || lower.contains("access-point") || lower.contains("access_point")
+                    || lower.contains("header")) {
+                return true;
+            }
         }
         if (view instanceof ViewGroup group) {
             for (int i = 0; i < group.getChildCount(); i++) {
-                View found = findSoftKeyboardView(group.getChildAt(i));
-                if (found != null) return found;
+                if (isHeaderOrFastAccess(group.getChildAt(i))) {
+                    return true;
+                }
             }
         }
-        return null;
+        return false;
     }
 
     private static final class State {

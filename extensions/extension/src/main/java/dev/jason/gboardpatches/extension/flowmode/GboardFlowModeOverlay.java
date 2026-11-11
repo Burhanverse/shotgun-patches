@@ -94,10 +94,12 @@ public final class GboardFlowModeOverlay extends View implements AutoCloseable {
             body.getLocationOnScreen(bodyLocation);
             getLocationOnScreen(ownLocation);
             float left = bodyLocation[0] - ownLocation[0], top = bodyLocation[1] - ownLocation[1];
-            clip.set(left, top, left + body.getWidth(), top + body.getHeight());
-            centerX = left + body.getWidth() * .5f;
-            centerY = top + body.getHeight() * .35f;
-            bodyHeight = body.getHeight();
+            if (body.getWidth() > 0 && body.getHeight() > 0) {
+                clip.set(left, top, left + body.getWidth(), top + body.getHeight());
+                centerX = left + body.getWidth() * .5f;
+                centerY = top + body.getHeight() * .35f;
+                bodyHeight = body.getHeight();
+            }
         }
     }
 
